@@ -1,0 +1,920 @@
+#      - name: atacseq:2223941232
+#        files: []
+#        extra_args: ['-w atacseq:2223941232']
+#      - name: chipseq-workflow_200:3793245764
+#        files: []
+#        extra_args: ['-w chipseq-workflow_200:3793245764']
+instances:
+  - repo: local
+    items:
+      - name: atacseq:2223941232
+        files: []
+        extra_args: [ '-w atacseq:2223941232' ]
+      - name: atacseq-workflow_1000:2223941232
+        files: []
+        extra_args: [ '-w atacseq-workflow_1000:2223941232' ]
+      - name: atacseq-workflow_15000:2223941232
+        files: []
+        extra_args: [ '-w atacseq-workflow_15000:2223941232' ]
+      - name: atacseq-workflow_2000:2223941232
+        files: []
+        extra_args: [ '-w atacseq-workflow_2000:2223941232' ]
+      - name: atacseq-workflow_200:2223941232
+        files: []
+        extra_args: [ '-w atacseq-workflow_200:2223941232' ]
+      - name: atacseq-workflow_4000:2223941232
+        files: []
+        extra_args: [ '-w atacseq-workflow_4000:2223941232' ]
+      - name: atacseq-workflow_8000:2223941232
+        files: []
+        extra_args: [ '-w atacseq-workflow_8000:2223941232' ]
+      - name: atacseq:3908761308
+        files: []
+        extra_args: [ '-w atacseq:3908761308' ]
+      - name: atacseq-workflow_10000:3908761308
+        files: []
+        extra_args: [ '-w atacseq-workflow_10000:3908761308' ]
+      - name: atacseq-workflow_1000:3908761308
+        files: []
+        extra_args: [ '-w atacseq-workflow_1000:3908761308' ]
+      - name: atacseq-workflow_18000:3908761308
+        files: []
+        extra_args: [ '-w atacseq-workflow_18000:3908761308' ]
+      - name: atacseq-workflow_20000:3908761308
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_20000:3908761308' ]
+      - name: atacseq-workflow_2000:3908761308
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_2000:3908761308' ]
+      - name: atacseq-workflow_200:3908761308
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_200:3908761308' ]
+      - name: atacseq-workflow_25000:3908761308
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_25000:3908761308' ]
+      - name: atacseq-workflow_30000:3908761308
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_30000:3908761308' ]
+      - name: atacseq-workflow_4000:3908761308
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_4000:3908761308' ]
+      - name: atacseq-workflow_8000:3908761308
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_8000:3908761308' ]
+      - name: atacseq:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq:11187378708' ]
+      - name: atacseq-workflow_10000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_10000:11187378708' ]
+      - name: atacseq-workflow_1000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_1000:11187378708' ]
+      - name: atacseq-workflow_15000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_15000:11187378708' ]
+      - name: atacseq-workflow_18000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_18000:11187378708' ]
+      - name: atacseq-workflow_20000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_20000:11187378708' ]
+      - name: atacseq-workflow_2000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_2000:11187378708' ]
+      - name: atacseq-workflow_200:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_200:11187378708' ]
+      - name: atacseq-workflow_25000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_25000:11187378708' ]
+      - name: atacseq-workflow_30000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_30000:11187378708' ]
+      - name: atacseq-workflow_4000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_4000:11187378708' ]
+      - name: atacseq-workflow_8000:11187378708
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_8000:11187378708' ]
+      - name: atacseq:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq:11809629756' ]
+      - name: atacseq-workflow_10000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_10000:11809629756' ]
+      - name: atacseq-workflow_1000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_1000:11809629756' ]
+      - name: atacseq-workflow_15000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_15000:11809629756' ]
+      - name: atacseq-workflow_18000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_18000:11809629756' ]
+      - name: atacseq-workflow_20000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_20000:11809629756' ]
+      - name: atacseq-workflow_2000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_2000:11809629756' ]
+      - name: atacseq-workflow_200:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_200:11809629756' ]
+      - name: atacseq-workflow_25000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_25000:11809629756' ]
+      - name: atacseq-workflow_30000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_30000:11809629756' ]
+      - name: atacseq-workflow_4000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_4000:11809629756' ]
+      - name: atacseq-workflow_8000:11809629756
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_8000:11809629756' ]
+      - name: atacseq:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq:14091675276' ]
+      - name: atacseq-workflow_10000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_10000:14091675276' ]
+      - name: atacseq-workflow_1000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_1000:14091675276' ]
+      - name: atacseq-workflow_15000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_15000:14091675276' ]
+      - name: atacseq-workflow_18000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_18000:14091675276' ]
+      - name: atacseq-workflow_20000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_20000:14091675276' ]
+      - name: atacseq-workflow_2000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_2000:14091675276' ]
+      - name: atacseq-workflow_200:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_200:14091675276' ]
+      - name: atacseq-workflow_25000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_25000:14091675276' ]
+      - name: atacseq-workflow_30000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_30000:14091675276' ]
+      - name: atacseq-workflow_4000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_4000:14091675276' ]
+      - name: atacseq-workflow_8000:14091675276
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_8000:14091675276' ]
+      - name: bacass:3637252230
+        files: [ ]
+        extra_args: [ '-w bacass:3637252230' ]
+      - name: bacass:4352562006
+        files: [ ]
+        extra_args: [ '-w bacass:4352562006' ]
+      - name: chipseq:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq:3793245764' ]
+      - name: chipseq-workflow_10000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_10000:3793245764' ]
+      - name: chipseq-workflow_1000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_1000:3793245764' ]
+      - name: chipseq-workflow_15000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_15000:3793245764' ]
+      - name: chipseq-workflow_18000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_18000:3793245764' ]
+      - name: chipseq-workflow_20000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_20000:3793245764' ]
+      - name: chipseq-workflow_2000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_2000:3793245764' ]
+      - name: chipseq-workflow_200:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_200:3793245764' ]
+      - name: chipseq-workflow_25000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_25000:3793245764' ]
+      - name: chipseq-workflow_30000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_30000:3793245764' ]
+      - name: chipseq-workflow_4000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_4000:3793245764' ]
+      - name: chipseq-workflow_8000:3793245764
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_8000:3793245764' ]
+      - name: chipseq:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq:4605965334' ]
+      - name: chipseq-workflow_10000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_10000:4605965334' ]
+      - name: chipseq-workflow_1000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_1000:4605965334' ]
+      - name: chipseq-workflow_15000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_15000:4605965334' ]
+      - name: chipseq-workflow_18000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_18000:4605965334' ]
+      - name: chipseq-workflow_20000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_20000:4605965334' ]
+      - name: chipseq-workflow_2000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_2000:4605965334' ]
+      - name: chipseq-workflow_200:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_200:4605965334' ]
+      - name: chipseq-workflow_25000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_25000:4605965334' ]
+      - name: chipseq-workflow_30000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_30000:4605965334' ]
+      - name: chipseq-workflow_4000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_4000:4605965334' ]
+      - name: chipseq-workflow_8000:4605965334
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_8000:4605965334' ]
+      - name: chipseq:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq:4807293396' ]
+      - name: chipseq-workflow_10000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_10000:4807293396' ]
+      - name: chipseq-workflow_1000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_1000:4807293396' ]
+      - name: chipseq-workflow_15000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_15000:4807293396' ]
+      - name: chipseq-workflow_18000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_18000:4807293396' ]
+      - name: chipseq-workflow_20000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_20000:4807293396' ]
+      - name: chipseq-workflow_2000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_2000:4807293396' ]
+      - name: chipseq-workflow_200:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_200:4807293396' ]
+      - name: chipseq-workflow_25000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_25000:4807293396' ]
+      - name: chipseq-workflow_30000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_30000:4807293396' ]
+      - name: chipseq-workflow_4000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_4000:4807293396' ]
+      - name: chipseq-workflow_8000:4807293396
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_8000:4807293396' ]
+      - name: chipseq:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq:5058052541' ]
+      - name: chipseq-workflow_10000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_10000:5058052541' ]
+      - name: chipseq-workflow_1000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_1000:5058052541' ]
+      - name: chipseq-workflow_15000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_15000:5058052541' ]
+      - name: chipseq-workflow_18000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_18000:5058052541' ]
+      - name: chipseq-workflow_20000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_20000:5058052541' ]
+      - name: chipseq-workflow_2000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_2000:5058052541' ]
+      - name: chipseq-workflow_200:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_200:5058052541' ]
+      - name: chipseq-workflow_25000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_25000:5058052541' ]
+      - name: chipseq-workflow_30000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_30000:5058052541' ]
+      - name: chipseq-workflow_4000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_4000:5058052541' ]
+      - name: chipseq-workflow_8000:5058052541
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_8000:5058052541' ]
+      - name: chipseq:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq:32978181418' ]
+      - name: chipseq-workflow_10000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_10000:32978181418' ]
+      - name: chipseq-workflow_1000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_1000:32978181418' ]
+      - name: chipseq-workflow_15000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_15000:32978181418' ]
+      - name: chipseq-workflow_18000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_18000:32978181418' ]
+      - name: chipseq-workflow_20000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_20000:32978181418' ]
+      - name: chipseq-workflow_2000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_2000:32978181418' ]
+      - name: chipseq-workflow_200:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_200:32978181418' ]
+      - name: chipseq-workflow_25000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_25000:32978181418' ]
+      - name: chipseq-workflow_30000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_30000:32978181418' ]
+      - name: chipseq-workflow_4000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_4000:32978181418' ]
+      - name: chipseq-workflow_8000:32978181418
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_8000:32978181418' ]
+      - name: chipseq:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq:41366257414' ]
+      - name: chipseq-workflow_10000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_10000:41366257414' ]
+      - name: chipseq-workflow_1000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_1000:41366257414' ]
+      - name: chipseq-workflow_15000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_15000:41366257414' ]
+      - name: chipseq-workflow_18000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_18000:41366257414' ]
+      - name: chipseq-workflow_20000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_20000:41366257414' ]
+      - name: chipseq-workflow_2000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_2000:41366257414' ]
+      - name: chipseq-workflow_200:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_200:41366257414' ]
+      - name: chipseq-workflow_25000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_25000:41366257414' ]
+      - name: chipseq-workflow_30000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_30000:41366257414' ]
+      - name: chipseq-workflow_4000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_4000:41366257414' ]
+      - name: chipseq-workflow_8000:41366257414
+        files: [ ]
+        extra_args: [ '-w chipseq-workflow_8000:41366257414' ]
+      - name: eager:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager:8330435694' ]
+      - name: eager-workflow_10000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_10000:8330435694' ]
+      - name: eager-workflow_1000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_1000:8330435694' ]
+      - name: eager-workflow_15000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_15000:8330435694' ]
+      - name: eager-workflow_18000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_18000:8330435694' ]
+      - name: eager-workflow_20000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_20000:8330435694' ]
+      - name: eager-workflow_2000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_2000:8330435694' ]
+      - name: eager-workflow_200:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_200:8330435694' ]
+      - name: eager-workflow_25000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_25000:8330435694' ]
+      - name: eager-workflow_30000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_30000:8330435694' ]
+      - name: eager-workflow_4000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_4000:8330435694' ]
+      - name: eager-workflow_8000:8330435694
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_8000:8330435694' ]
+      - name: eager:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager:14754556884' ]
+      - name: eager-workflow_10000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_10000:14754556884' ]
+      - name: eager-workflow_1000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_1000:14754556884' ]
+      - name: eager-workflow_15000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_15000:14754556884' ]
+      - name: eager-workflow_18000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_18000:14754556884' ]
+      - name: eager-workflow_20000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_20000:14754556884' ]
+      - name: eager-workflow_2000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_2000:14754556884' ]
+      - name: eager-workflow_200:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_200:14754556884' ]
+      - name: eager-workflow_25000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_25000:14754556884' ]
+      - name: eager-workflow_30000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_30000:14754556884' ]
+      - name: eager-workflow_4000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_4000:14754556884' ]
+      - name: eager-workflow_8000:14754556884
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_8000:14754556884' ]
+      - name: eager:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager:19075314980' ]
+      - name: eager-workflow_10000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_10000:19075314980' ]
+      - name: eager-workflow_1000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_1000:19075314980' ]
+      - name: eager-workflow_15000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_15000:19075314980' ]
+      - name: eager-workflow_18000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_18000:19075314980' ]
+      - name: eager-workflow_20000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_20000:19075314980' ]
+      - name: eager-workflow_2000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_2000:19075314980' ]
+      - name: eager-workflow_200:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_200:19075314980' ]
+      - name: eager-workflow_25000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_25000:19075314980' ]
+      - name: eager-workflow_30000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_30000:19075314980' ]
+      - name: eager-workflow_4000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_4000:19075314980' ]
+      - name: eager-workflow_8000:19075314980
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_8000:19075314980' ]
+      - name: eager:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager:19100037384' ]
+      - name: eager-workflow_10000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_10000:19100037384' ]
+      - name: eager-workflow_1000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_1000:19100037384' ]
+      - name: eager-workflow_15000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_15000:19100037384' ]
+      - name: eager-workflow_18000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_18000:19100037384' ]
+      - name: eager-workflow_20000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_20000:19100037384' ]
+      - name: eager-workflow_2000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_2000:19100037384' ]
+      - name: eager-workflow_200:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_200:19100037384' ]
+      - name: eager-workflow_25000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_25000:19100037384' ]
+      - name: eager-workflow_30000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_30000:19100037384' ]
+      - name: eager-workflow_4000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_4000:19100037384' ]
+      - name: eager-workflow_8000:19100037384
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_8000:19100037384' ]
+      - name: eager:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager:19132169434' ]
+      - name: eager-workflow_10000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_10000:19132169434' ]
+      - name: eager-workflow_1000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_1000:19132169434' ]
+      - name: eager-workflow_15000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_15000:19132169434' ]
+      - name: eager-workflow_18000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_18000:19132169434' ]
+      - name: eager-workflow_20000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_20000:19132169434' ]
+      - name: eager-workflow_2000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_2000:19132169434' ]
+      - name: eager-workflow_200:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_200:19132169434' ]
+      - name: eager-workflow_25000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_25000:19132169434' ]
+      - name: eager-workflow_30000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_30000:19132169434' ]
+      - name: eager-workflow_4000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_4000:19132169434' ]
+      - name: eager-workflow_8000:19132169434
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_8000:19132169434' ]
+      - name: eager:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager:25705994498' ]
+      - name: eager-workflow_10000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_10000:25705994498' ]
+      - name: eager-workflow_1000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_1000:25705994498' ]
+      - name: eager-workflow_15000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_15000:25705994498' ]
+      - name: eager-workflow_18000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_18000:25705994498' ]
+      - name: eager-workflow_20000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_20000:25705994498' ]
+      - name: eager-workflow_2000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_2000:25705994498' ]
+      - name: eager-workflow_200:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_200:25705994498' ]
+      - name: eager-workflow_25000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_25000:25705994498' ]
+      - name: eager-workflow_30000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_30000:25705994498' ]
+      - name: eager-workflow_4000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_4000:25705994498' ]
+      - name: eager-workflow_8000:25705994498
+        files: [ ]
+        extra_args: [ '-w  eager-workflow_8000:25705994498' ]
+      - name: methylseq:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq:6273818718' ]
+      - name: methylseq-workflow_10000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_10000:6273818718' ]
+      - name: methylseq-workflow_1000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_1000:6273818718' ]
+      - name: methylseq-workflow_15000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_15000:6273818718' ]
+      - name: methylseq-workflow_18000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_18000:6273818718' ]
+      - name: methylseq-workflow_20000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_20000:6273818718' ]
+      - name: methylseq-workflow_2000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_2000:6273818718' ]
+      - name: methylseq-workflow_200:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_200:6273818718' ]
+      - name: methylseq-workflow_25000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_25000:6273818718' ]
+      - name: methylseq-workflow_30000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_30000:6273818718' ]
+      - name: methylseq-workflow_4000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_4000:6273818718' ]
+      - name: methylseq-workflow_8000:6273818718
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_8000:6273818718' ]
+      - name: methylseq:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq:6761426956' ]
+      - name: methylseq-workflow_10000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_10000:6761426956' ]
+      - name: methylseq-workflow_1000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_1000:6761426956' ]
+      - name: methylseq-workflow_15000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_15000:6761426956' ]
+      - name: methylseq-workflow_18000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_18000:6761426956' ]
+      - name: methylseq-workflow_20000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_20000:6761426956' ]
+      - name: methylseq-workflow_2000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_2000:6761426956' ]
+      - name: methylseq-workflow_200:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_200:6761426956' ]
+      - name: methylseq-workflow_25000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_25000:6761426956' ]
+      - name: methylseq-workflow_30000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_30000:6761426956' ]
+      - name: methylseq-workflow_4000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_4000:6761426956' ]
+      - name: methylseq-workflow_8000:6761426956
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_8000:6761426956' ]
+      - name: methylseq:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq:8885797810' ]
+      - name: methylseq-workflow_10000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_10000:8885797810' ]
+      - name: methylseq-workflow_1000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_1000:8885797810' ]
+      - name: methylseq-workflow_15000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_15000:8885797810' ]
+      - name: methylseq-workflow_18000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_18000:8885797810' ]
+      - name: methylseq-workflow_20000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_20000:8885797810' ]
+      - name: methylseq-workflow_2000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_2000:8885797810' ]
+      - name: methylseq-workflow_200:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_200:8885797810' ]
+      - name: methylseq-workflow_25000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_25000:8885797810' ]
+      - name: methylseq-workflow_30000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_30000:8885797810' ]
+      - name: methylseq-workflow_4000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_4000:8885797810' ]
+      - name: methylseq-workflow_8000:8885797810
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_8000:8885797810' ]
+      - name: methylseq:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq:11897958606' ]
+      - name: methylseq-workflow_10000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_10000:11897958606' ]
+      - name: methylseq-workflow_1000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_1000:11897958606' ]
+      - name: methylseq-workflow_15000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_15000:11897958606' ]
+      - name: methylseq-workflow_18000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_18000:11897958606' ]
+      - name: methylseq-workflow_20000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_20000:11897958606' ]
+      - name: methylseq-workflow_2000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_2000:11897958606' ]
+      - name: methylseq-workflow_200:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_200:11897958606' ]
+      - name: methylseq-workflow_25000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_25000:11897958606' ]
+      - name: methylseq-workflow_30000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_30000:11897958606' ]
+      - name: methylseq-workflow_4000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_4000:11897958606' ]
+      - name: methylseq-workflow_8000:11897958606
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_8000:11897958606' ]
+      - name: methylseq:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq:17027257018' ]
+      - name: methylseq-workflow_10000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_10000:17027257018' ]
+      - name: methylseq-workflow_1000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_1000:17027257018' ]
+      - name: methylseq-workflow_15000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_15000:17027257018' ]
+      - name: methylseq-workflow_18000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_18000:17027257018' ]
+      - name: methylseq-workflow_20000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_20000:17027257018' ]
+      - name: methylseq-workflow_2000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_2000:17027257018' ]
+      - name: methylseq-workflow_200:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_200:17027257018' ]
+      - name: methylseq-workflow_25000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_25000:17027257018' ]
+      - name: methylseq-workflow_30000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_30000:17027257018' ]
+      - name: methylseq-workflow_4000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_4000:17027257018' ]
+      - name: methylseq-workflow_8000:17027257018
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_8000:17027257018' ]
+      - name: methylseq:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq:22500260922' ]
+      - name: methylseq-workflow_10000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_10000:22500260922' ]
+      - name: methylseq-workflow_1000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_1000:22500260922' ]
+      - name: methylseq-workflow_15000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_15000:22500260922' ]
+      - name: methylseq-workflow_18000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_18000:22500260922' ]
+      - name: methylseq-workflow_20000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_20000:22500260922' ]
+      - name: methylseq-workflow_2000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_2000:22500260922' ]
+      - name: methylseq-workflow_200:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_200:22500260922' ]
+      - name: methylseq-workflow_25000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_25000:22500260922' ]
+      - name: methylseq-workflow_30000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_30000:22500260922' ]
+      - name: methylseq-workflow_4000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_4000:22500260922' ]
+      - name: methylseq-workflow_8000:22500260922
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_8000:22500260922' ]
+      - name: methylseq:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq:110641579976' ]
+      - name: methylseq-workflow_10000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_10000:110641579976' ]
+      - name: methylseq-workflow_1000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_1000:110641579976' ]
+      - name: methylseq-workflow_15000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_15000:110641579976' ]
+      - name: methylseq-workflow_18000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_18000:110641579976' ]
+      - name: methylseq-workflow_20000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_20000:110641579976' ]
+      - name: methylseq-workflow_2000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_2000:110641579976' ]
+      - name: methylseq-workflow_200:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_200:110641579976' ]
+      - name: methylseq-workflow_25000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_25000:110641579976' ]
+      - name: methylseq-workflow_30000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_30000:110641579976' ]
+      - name: methylseq-workflow_4000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_4000:110641579976' ]
+      - name: methylseq-workflow_8000:110641579976
+        files: [ ]
+        extra_args: [ '-w methylseq-workflow_8000:110641579976' ]
+      - name: atacseq-workflow_10000:2223941232
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_10000:2223941232' ]
+      - name: atacseq-workflow_18000:2223941232
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_18000:2223941232' ]
+      - name: atacseq-workflow_20000:2223941232
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_20000:2223941232' ]
+      - name: atacseq-workflow_25000:2223941232
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_25000:2223941232' ]
+      - name: atacseq-workflow_30000:2223941232
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_30000:2223941232' ]
+      - name: atacseq-workflow_15000:3908761308
+        files: [ ]
+        extra_args: [ '-w atacseq-workflow_15000:3908761308' ]
+
+variants:
+  - axis: 'cluster-size'
+    items:
+      #- name: 'large'
+      #  extra_args: [ '-m 4:1600:36', '-m 32:3200:36', '-m 6:6400:36', '-m 12:1600:36', '-m 8:800:36', '-m 32:19200:36' ]
+      #- name: 'normal'
+      #  extra_args: [ '-m 4:1600:24', '-m 32:3200:24', '-m 6:6400:24', '-m 12:1600:24', '-m 8:800:24', '-m 32:19200:24' ]
+      - name: 'tenmem'
+        extra_args: ['-m 4:16000:12', '-m 32:32000:12', '-m 6:64000:12', '-m 12:16000:12', '-m 8:8000:12', '-m 32:192000:12']
+     # - name: 'tiny'
+     #   extra_args: [ '-m 4:1600:12', '-m 32:3200:12', '-m 6:6400:12', '-m 12:1600:12', '-m 8:800:12', '-m 32:19200:12' ]
+     # - name: 'short'
+     #   extra_args: ['-m 4:1600:12 -m 32:3200:12 -m 6:6400:12']
+
+experiments:
+  - name: Algo1WithError
+    args: [ './experiment.sh', '@EXTRA_ARGS@', '-a 1',  '-e' ] #'@INSTANCE@',
+    stdout: out
+    num_threads: 24
+    slurm_args: [ '--exclude', 'stark[01-10]']
+  - name: Algo3WithError
+    args: [ './experiment.sh', '@EXTRA_ARGS@', '-a 3' , '-e' ] #'@INSTANCE@',
+    stdout: out
+    num_threads: 24
+    slurm_args: [ '--exclude', 'stark[01-10]']
+  - name: Algo5WithError
+    args: [ './experiment.sh', '@EXTRA_ARGS@', '-a 5', '-e'] #'@INSTANCE@',
+    stdout: out
+    num_threads: 24
+    slurm_args: [ '--exclude', 'stark[01-10]']
+  - name: Algo7WithError
+    args: [ './experiment.sh', '@EXTRA_ARGS@', '-a 7', '-e' ] #'@INSTANCE@',
+    stdout: out
+    num_threads: 24
+    slurm_args: ['--exclude', 'stark[01-10]']
+
+matrix:
+  include:
+    - experiments: [Algo1WithError, Algo3WithError, Algo5WithError, Algo7WithError]
+      axes: [cluster-size]

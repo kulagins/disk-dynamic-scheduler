@@ -1,0 +1,123 @@
+==77311== Memcheck, a memory error detector
+==77311== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==77311== Using Valgrind-3.14.0.RC2 and LibVEX; rerun with -h for copyright info
+==77311== Command: ./test-fifo
+==77311== 
+--77311-- run: /usr/bin/dsymutil "./test-fifo"
+profiling: /Users/lmarchal/travail/recherche/memdag/src/sp-ization.gcda: cannot merge previous GCDA file: mismatched number of counters (158)
+profiling: /Users/lmarchal/travail/recherche/memdag/src/sp-ization.gcda: cannot merge previous GCDA file: corrupt arc tag (0x00000000)
+profiling: /Users/lmarchal/travail/recherche/memdag/src/sp-ization.gcda: cannot merge previous run count: corrupt object tag (0x0000006e)
+==77311== 
+==77311== HEAP SUMMARY:
+==77311==     in use at exit: 18,309 bytes in 162 blocks
+==77311==   total heap usage: 279 allocs, 117 frees, 565,400 bytes allocated
+==77311== 
+==77311== 64 bytes in 1 blocks are definitely lost in loss record 20 of 44
+==77311==    at 0x1000C60C2: calloc (vg_replace_malloc.c:755)
+==77311==    by 0x100B2EBA4: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2EC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2EC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2EC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2D363: _read_images (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2BAC4: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B3E7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100021C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77311==    by 0x100021E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77311==    by 0x1005F671D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77311==    by 0x100B2B075: _objc_init (in /usr/lib/libobjc.A.dylib)
+==77311== 
+==77311== 64 bytes in 1 blocks are definitely lost in loss record 21 of 44
+==77311==    at 0x1000C60C2: calloc (vg_replace_malloc.c:755)
+==77311==    by 0x100B2EBA4: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2EC72: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2EC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2EC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2EC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2D363: _read_images (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2BAC4: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B3E7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100021C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77311==    by 0x100021E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77311==    by 0x1005F671D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77311== 
+==77311== 72 bytes in 3 blocks are possibly lost in loss record 22 of 44
+==77311==    at 0x1000C60C2: calloc (vg_replace_malloc.c:755)
+==77311==    by 0x100B2B7E2: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B3E7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100021C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77311==    by 0x100021E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77311==    by 0x1005F671D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77311==    by 0x100B2B075: _objc_init (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100580B34: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==77311==    by 0x100580B1B: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==77311==    by 0x1000F19C2: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==77311==    by 0x100033AC5: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==77311==    by 0x100033CF5: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==77311== 
+==77311== 80 (32 direct, 48 indirect) bytes in 1 blocks are definitely lost in loss record 23 of 44
+==77311==    at 0x1000C5A2C: malloc_zone_malloc (vg_replace_malloc.c:304)
+==77311==    by 0x100B2DAA1: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2DA50: NXCreateHashTable (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2D950: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2D8FA: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2C3CB: __sel_registerName(char const*, int, int) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2C0DA: sel_init (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2B9AD: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B3E7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100021C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77311==    by 0x100021E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77311==    by 0x1005F671D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77311== 
+==77311== 168 (32 direct, 136 indirect) bytes in 1 blocks are definitely lost in loss record 27 of 44
+==77311==    at 0x1000C5A2C: malloc_zone_malloc (vg_replace_malloc.c:304)
+==77311==    by 0x100B2DA80: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2DA50: NXCreateHashTable (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2D950: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2D8FA: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2C3CB: __sel_registerName(char const*, int, int) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2C0DA: sel_init (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2B9AD: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B3E7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100021C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77311==    by 0x100021E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77311==    by 0x1005F671D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77311== 
+==77311== 192 bytes in 3 blocks are definitely lost in loss record 32 of 44
+==77311==    at 0x1000C60C2: calloc (vg_replace_malloc.c:755)
+==77311==    by 0x100B2EBA4: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2EC72: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2D363: _read_images (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2BAC4: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B3E7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100021C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77311==    by 0x100021E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77311==    by 0x1005F671D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77311==    by 0x100B2B075: _objc_init (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100580B34: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==77311==    by 0x100580B1B: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==77311== 
+==77311== 4,136 (24 direct, 4,112 indirect) bytes in 1 blocks are definitely lost in loss record 44 of 44
+==77311==    at 0x1000C5A2C: malloc_zone_malloc (vg_replace_malloc.c:304)
+==77311==    by 0x100B2D928: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2D8FA: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2C3CB: __sel_registerName(char const*, int, int) (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2C0DA: sel_init (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B2B9AD: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100B3E7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100021C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77311==    by 0x100021E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77311==    by 0x1005F671D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77311==    by 0x100B2B075: _objc_init (in /usr/lib/libobjc.A.dylib)
+==77311==    by 0x100580B34: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==77311== 
+==77311== LEAK SUMMARY:
+==77311==    definitely lost: 408 bytes in 8 blocks
+==77311==    indirectly lost: 6,888 bytes in 8 blocks
+==77311==      possibly lost: 72 bytes in 3 blocks
+==77311==    still reachable: 32 bytes in 1 blocks
+==77311==         suppressed: 10,909 bytes in 142 blocks
+==77311== Reachable blocks (those to which a pointer was found) are not shown.
+==77311== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==77311== 
+==77311== For counts of detected and suppressed errors, rerun with: -v
+==77311== ERROR SUMMARY: 7 errors from 7 contexts (suppressed: 8 from 8)

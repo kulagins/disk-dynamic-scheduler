@@ -1,0 +1,106 @@
+cmake_minimum_required(VERSION 3.12)
+project(fonda_sched CXX)
+enable_language(C)
+
+option(FONDA_BUILD_MEMDAG "Build external tool dagp" ON)
+
+
+set(FONDA_INSTALL_BIN_DIR "bin"
+        CACHE PATH "Installation directory for executables")
+set(FONDA_INSTALL_LIB_DIR "lib"
+        CACHE PATH "Installation directory for libraries")
+set(FONDA_INSTALL_INCLUDE_DIR "include"
+        CACHE PATH "Installation directory for header files")
+set(FONDA_INSTALL_PKGCONFIG_DIR "lib/pkgconfig"
+        CACHE PATH "Installation directory for pkg-config file")
+set(FONDA_CXX_STANDARD "17"
+        CACHE STRING "CXX Version to compile with. Currently fixed to 17")
+
+set(FONDA_CXX_FLAGS "-pg -O0 -fpermissive")
+set(FONDA_LINK_FLAGS "")
+
+if (DEFINED ENV{CONDA_PREFIX})
+    set(FONDA_SEARCH_PREFIX "$ENV{CONDA_PREFIX}")
+    set(FONDA_SEARCH_PREFIX_LIB "${FONDA_SEARCH_PREFIX}/lib")
+    set(FONDA_SEARCH_PREFIX_INCLUDE "${FONDA_SEARCH_PREFIX}/include")
+endif ()
+
+if (FONDA_BUILD_MEMDAG)
+
+    find_path(IGRAPH_INCLUDE_DIRS NAMES igraph.h
+            HINTS "/usr/local/include"
+            "/usr/local/include/igraph")
+    find_library(IGRAPH_LIBRARIES igraph
+            "$ENV{LD_LIBRARY_PATH}"
+            "$ENV{DYLD_LIBRARY_PATH}")
+
+    set(MEMDAG_SOURCE_DIR ${PROJECT_SOURCE_DIR}/extlibs/memdag/src/)
+    add_library(memdag ${PROJECT_SOURCE_DIR}/extlibs/memdag/src/memdag.cpp)
+    target_sources(memdag PUBLIC ${MEMDAG_SOURCE_DIR}/seq-schedules-for-restrict.cpp
+            ${MEMDAG_SOURCE_DIR}/sp-ization.cpp
+            ${MEMDAG_SOURCE_DIR}/edge-selection-heuristics-for-restrict.cpp
+            ${MEMDAG_SOURCE_DIR}/graph-algorithms.cpp
+            ${MEMDAG_SOURCE_DIR}/tree.cpp
+            ${MEMDAG_SOURCE_DIR}/fifo.cpp
+            ${MEMDAG_SOURCE_DIR}/heap.cpp
+            ${MEMDAG_SOURCE_DIR}/sp-recognition.cpp
+            ${MEMDAG_SOURCE_DIR}/graph.cpp
+            ${MEMDAG_SOURCE_DIR}/maxmemory.cpp
+            ${MEMDAG_SOURCE_DIR}/sp-traversals.cpp
+            ${MEMDAG_SOURCE_DIR}/tree-opt-sched.cpp
+            ${MEMDAG_SOURCE_DIR}/tree-postorder-sched.cpp
+            ${MEMDAG_SOURCE_DIR}/cluster.cpp
+    )
+
+    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS})
+    target_link_libraries(memdag PRIVATE ${IGRAPH_LIBRARIES} -lcgraph -lcdt -lm -lgvc)
+
+    set_target_properties(memdag PROPERTIES
+            CXX_STANDARD ${FONDA_CXX_STANDARD}
+            COMPILE_FLAGS "${FONDA_CXX_FLAGS}"
+            LINK_FLAGS "${FONDA_LINK_FLAGS}")
+
+endif ()
+
+find_package(PkgConfig)
+pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
+
+add_executable(fonda_scheduler "${PROJECT_SOURCE_DIR}/fonda_scheduler/main.cpp")
+
+target_include_directories(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/include")
+target_sources(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/fonda_scheduler/io/graphWeightsBuilder.cpp"
+        "${PROJECT_SOURCE_DIR}/fonda_scheduler/common.cpp"
+        "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSched.cpp"
+)
+
+target_link_libraries(fonda_scheduler PRIVATE memdag PkgConfig::Pistache)
+set_target_properties(fonda_scheduler PROPERTIES
+        CXX_STANDARD ${FONDA_CXX_STANDARD}
+        COMPILE_FLAGS "${FONDA_CXX_FLAGS}"
+        LINK_FLAGS "${FONDA_LINK_FLAGS}")
+
+
+IF (FONDA_UNIT_TESTS)
+    enable_testing()
+    IF (EXISTS "${PROJECT_SOURCE_DIR}/extlibs/googletest/CMakeLists.txt")
+        option(BUILD_GTEST "Builds the googletest subproject" ON)
+        add_subdirectory(extlibs/googletest)
+    ENDIF ()
+    include_directories(SYSTEM ./lib)
+   # add_executable(dagp-tests ${PROJECT_SOURCE_DIR}/extlibs/dagP/tests/dagP-unittests.cpp "${PROJECT_SOURCE_DIR}/fonda_scheduler/test/test_grapht.cpp")
+    set_target_properties(dagp-tests PROPERTIES
+            CXX_STANDARD ${FONDA_CXX_STANDARD}
+            COMPILE_FLAGS "${FONDA_CXX_FLAGS}"
+            LINK_FLAGS "${FONDA_LINK_FLAGS}")
+    target_include_directories(dagp-tests PRIVATE "${PROJECT_SOURCE_DIR}/include")
+    target_sources(dagp-tests PRIVATE
+            "${PROJECT_SOURCE_DIR}/fonda_scheduler/common.cpp"
+            "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSched.cpp"
+            "${PROJECT_SOURCE_DIR}/fonda_scheduler/cluster.cpp")
+    target_link_libraries(dagp-tests
+            PRIVATE
+            gtest
+            memdag
+    )
+ENDIF ()
+

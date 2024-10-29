@@ -1,0 +1,289 @@
+==77243== Memcheck, a memory error detector
+==77243== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==77243== Using Valgrind-3.14.0.RC2 and LibVEX; rerun with -h for copyright info
+==77243== Command: ./test-graph
+==77243== 
+profiling: /Users/lmarchal/travail/recherche/memdag/src/sp-ization.gcda: cannot merge previous GCDA file: mismatched number of counters (158)
+profiling: /Users/lmarchal/travail/recherche/memdag/src/sp-ization.gcda: cannot merge previous GCDA file: corrupt arc tag (0x00000000)
+profiling: /Users/lmarchal/travail/recherche/memdag/src/sp-ization.gcda: cannot merge previous run count: corrupt object tag (0x0000006e)
+Source:V_one  Target:V_five
+Original graph:
+DiGraph G {
+ 4 [label="V_five (4) - 5.000000"];
+ 3 [label="V_four (3) - 4.000000"];
+ 2 [label="V_three (2) - 3.000000"];
+ 1 [label="V_two (1) - 2.000000"];
+ 0 [label="V_one (0) - 1.000000"];
+ 3 -> 4 [label="1.000000" path="V_four -> V_five"];
+ 2 -> 4 [label="1.000000" path="V_three -> V_five"];
+ 1 -> 3 [label="3.000000" path="V_two -> V_four"];
+ 1 -> 2 [label="6.000000" path="V_two -> V_three"];
+ 1 -> 2 [label="4.000000" path="V_two -> V_three"];
+ 0 -> 2 [label="8.000000" path="V_one -> V_three"];
+ 0 -> 1 [label="12.000000" path="V_one -> V_two"];
+}
+Graph after removing transitivity edges:
+DiGraph G {
+ 4 [label="V_five (4) - 5.000000"];
+ 3 [label="V_four (3) - 4.000000"];
+ 2 [label="V_three (2) - 3.000000"];
+ 1 [label="V_two (1) - 2.000000"];
+ 0 [label="V_one (0) - 1.000000"];
+ 3 -> 4 [label="1.000000" path="V_four -> V_five"];
+ 2 -> 4 [label="1.000000" path="V_three -> V_five"];
+ 1 -> 3 [label="3.000000" path="V_two -> V_four"];
+ 1 -> 2 [label="6.000000" path="V_two -> V_three"];
+ 1 -> 2 [label="12.000000" path="V_two -> V_three"];
+ 0 -> 1 [label="20.000000" path="V_one -> V_two"];
+}
+Graph after merging multiple edges:
+DiGraph G {
+ 4 [label="V_five (4) - 5.000000"];
+ 3 [label="V_four (3) - 4.000000"];
+ 2 [label="V_three (2) - 3.000000"];
+ 1 [label="V_two (1) - 2.000000"];
+ 0 [label="V_one (0) - 1.000000"];
+ 3 -> 4 [label="1.000000" path="V_four -> V_five"];
+ 2 -> 4 [label="1.000000" path="V_three -> V_five"];
+ 1 -> 3 [label="3.000000" path="V_two -> V_four"];
+ 1 -> 2 [label="18.000000" path="V_two -> V_three"];
+ 0 -> 1 [label="20.000000" path="V_one -> V_two"];
+}
+Nodes in topological order:V_one V_two V_three V_four V_five 
+Nodes in anti-topological order:V_five V_three V_four V_two V_one 
+Node V_five  	has top-level:7   	and bottom-level:5
+Node V_four  	has top-level:3   	and bottom-level:9
+Node V_three  	has top-level:3   	and bottom-level:8
+Node V_two  	has top-level:1   	and bottom-level:11
+Node V_one  	has top-level:0   	and bottom-level:12
+Nodes in topological order, sorted by increasing top_level:                V_one  V_two  V_three  V_four  V_five  
+Nodes in topological order, sorted by decreasing bottom_level:             V_one  V_two  V_four  V_three  V_five  
+Nodes in topological order, sorted by increasing top_level - bottom_level: V_one  V_two  V_four  V_three  V_five  
+
+Graph before sp-zation:
+DiGraph G {
+ 0 [label="V_one (0) - 1.000000"];
+ 1 [label="V_two (1) - 2.000000"];
+ 2 [label="V_three (2) - 3.000000"];
+ 3 [label="V_four (3) - 4.000000"];
+ 4 [label="V_five (4) - 5.000000"];
+ 5 [label="V_six (5) - 6.000000"];
+ 6 [label="V_seven (6) - 6.000000"];
+ 0 -> 1 [label="20.000000" path="V_one -> V_two"];
+ 1 -> 2 [label="18.000000" path="V_two -> V_three"];
+ 3 -> 4 [label="1.000000" path="V_four -> V_five"];
+ 2 -> 3 [label="1.000000" path="V_three -> V_four"];
+ 2 -> 5 [label="1.000000" path="V_three -> V_six"];
+ 5 -> 4 [label="1.000000" path="V_six -> V_five"];
+ 1 -> 6 [label="1.000000" path="V_two -> V_seven"];
+ 6 -> 3 [label="1.000000" path="V_seven -> V_four"];
+}
+
+Graph after sp-zation:
+DiGraph G {
+ 7 [label="SYNC_0_V_two (7) - 0.000000"];
+ 6 [label="V_seven (6) - 6.000000"];
+ 5 [label="V_six (5) - 6.000000"];
+ 4 [label="V_five (4) - 5.000000"];
+ 3 [label="V_four (3) - 4.000000"];
+ 2 [label="V_three (2) - 3.000000"];
+ 1 [label="V_two (1) - 2.000000"];
+ 0 [label="V_one (0) - 1.000000"];
+ 6 -> 7 [label="1.000000" path="V_seven -> SYNC_0_V_two"];
+ 7 -> 4 [label="1.000000" path="SYNC_0_V_two -> V_five"];
+ 5 -> 7 [label="1.000000" path="V_six -> SYNC_0_V_two"];
+ 7 -> 3 [label="2.000000" path="SYNC_0_V_two -> V_four"];
+ 2 -> 7 [label="1.000000" path="V_three -> SYNC_0_V_two"];
+ 1 -> 6 [label="1.000000" path="V_two -> V_seven"];
+ 2 -> 5 [label="1.000000" path="V_three -> V_six"];
+ 3 -> 4 [label="1.000000" path="V_four -> V_five"];
+ 1 -> 2 [label="18.000000" path="V_two -> V_three"];
+ 0 -> 1 [label="20.000000" path="V_one -> V_two"];
+}
+
+Same graph converted to igraph:
+/* Created by igraph 0.7.1 */
+digraph {
+  0;
+  1;
+  2;
+  3;
+  4;
+  5;
+  6;
+  7;
+
+  6 -> 7;
+  7 -> 4;
+  5 -> 7;
+  7 -> 3;
+  2 -> 7;
+  1 -> 6;
+  2 -> 5;
+  3 -> 4;
+  1 -> 2;
+  0 -> 1;
+}
+
+SP-ized graph after removing (copies of) v1, v2, v4, v5 and SYNC..:
+DiGraph G {
+ 6 [label="V_seven (6) - 6.000000"];
+ 5 [label="V_six (5) - 6.000000"];
+ 2 [label="V_three (2) - 3.000000"];
+ 2 -> 5 [label="1.000000" path="V_three -> V_six"];
+}
+
+And after enforcing single source/target:
+DiGraph G {
+ 9 [label="GRAPH_TARGET (9) - 0.000000"];
+ 8 [label="GRAPH_SOURCE (8) - 0.000000"];
+ 6 [label="V_seven (6) - 6.000000"];
+ 5 [label="V_six (5) - 6.000000"];
+ 2 [label="V_three (2) - 3.000000"];
+ 5 -> 9 [label="0.000000" path="V_six -> GRAPH_TARGET"];
+ 6 -> 9 [label="0.000000" path="V_seven -> GRAPH_TARGET"];
+ 8 -> 2 [label="0.000000" path="GRAPH_SOURCE -> V_three"];
+ 8 -> 6 [label="0.000000" path="GRAPH_SOURCE -> V_seven"];
+ 2 -> 5 [label="1.000000" path="V_three -> V_six"];
+}
+==77243== 
+==77243== HEAP SUMMARY:
+==77243==     in use at exit: 153,225 bytes in 200 blocks
+==77243==   total heap usage: 567 allocs, 367 frees, 741,705 bytes allocated
+==77243== 
+==77243== 48 bytes in 1 blocks are definitely lost in loss record 20 of 68
+==77243==    at 0x1000C70C2: calloc (vg_replace_malloc.c:755)
+==77243==    by 0x100007E62: new_leaf (sp-ization.c:35)
+==77243==    by 0x100009583: graph_sp_ization (sp-ization.c:302)
+==77243==    by 0x1000102BE: simple_graph_test (test-graph.c:88)
+==77243==    by 0x1000104EC: main (test-graph.c:122)
+==77243== 
+==77243== 64 bytes in 1 blocks are definitely lost in loss record 29 of 68
+==77243==    at 0x1000C70C2: calloc (vg_replace_malloc.c:755)
+==77243==    by 0x100B2FBA4: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2FC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2FC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2FC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2E363: _read_images (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2CAC4: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B3F7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100022C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77243==    by 0x100022E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77243==    by 0x1005F771D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77243==    by 0x100B2C075: _objc_init (in /usr/lib/libobjc.A.dylib)
+==77243== 
+==77243== 64 bytes in 1 blocks are definitely lost in loss record 30 of 68
+==77243==    at 0x1000C70C2: calloc (vg_replace_malloc.c:755)
+==77243==    by 0x100B2FBA4: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2FC72: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2FC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2FC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2FC5A: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2E363: _read_images (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2CAC4: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B3F7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100022C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77243==    by 0x100022E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77243==    by 0x1005F771D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77243== 
+==77243== 72 bytes in 3 blocks are possibly lost in loss record 31 of 68
+==77243==    at 0x1000C70C2: calloc (vg_replace_malloc.c:755)
+==77243==    by 0x100B2C7E2: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B3F7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100022C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77243==    by 0x100022E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77243==    by 0x1005F771D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77243==    by 0x100B2C075: _objc_init (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100581B34: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==77243==    by 0x100581B1B: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==77243==    by 0x1000F29C2: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==77243==    by 0x100034AC5: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==77243==    by 0x100034CF5: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==77243== 
+==77243== 80 (32 direct, 48 indirect) bytes in 1 blocks are definitely lost in loss record 33 of 68
+==77243==    at 0x1000C6A2C: malloc_zone_malloc (vg_replace_malloc.c:304)
+==77243==    by 0x100B2EAA1: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2EA50: NXCreateHashTable (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2E950: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2E8FA: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2D3CB: __sel_registerName(char const*, int, int) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2D0DA: sel_init (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2C9AD: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B3F7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100022C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77243==    by 0x100022E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77243==    by 0x1005F771D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77243== 
+==77243== 112 (16 direct, 96 indirect) bytes in 1 blocks are definitely lost in loss record 41 of 68
+==77243==    at 0x1000C70C2: calloc (vg_replace_malloc.c:755)
+==77243==    by 0x1000091B3: graph_sp_ization (sp-ization.c:253)
+==77243==    by 0x1000102BE: simple_graph_test (test-graph.c:88)
+==77243==    by 0x1000104EC: main (test-graph.c:122)
+==77243== 
+==77243== 128 bytes in 1 blocks are definitely lost in loss record 45 of 68
+==77243==    at 0x1000C75CA: realloc (vg_replace_malloc.c:829)
+==77243==    by 0x10000A80D: new_vertex_with_id (graph.c:37)
+==77243==    by 0x10000A8D9: new_vertex (graph.c:47)
+==77243==    by 0x100009153: graph_sp_ization (sp-ization.c:237)
+==77243==    by 0x1000102BE: simple_graph_test (test-graph.c:88)
+==77243==    by 0x1000104EC: main (test-graph.c:122)
+==77243== 
+==77243== 144 (32 direct, 112 indirect) bytes in 1 blocks are definitely lost in loss record 46 of 68
+==77243==    at 0x1000C6A2C: malloc_zone_malloc (vg_replace_malloc.c:304)
+==77243==    by 0x100B2EA80: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2EA50: NXCreateHashTable (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2E950: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2E8FA: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2D3CB: __sel_registerName(char const*, int, int) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2D0DA: sel_init (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2C9AD: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B3F7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100022C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77243==    by 0x100022E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77243==    by 0x1005F771D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77243== 
+==77243== 192 bytes in 3 blocks are definitely lost in loss record 52 of 68
+==77243==    at 0x1000C70C2: calloc (vg_replace_malloc.c:755)
+==77243==    by 0x100B2FBA4: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2FC72: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2E363: _read_images (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2CAC4: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B3F7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100022C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77243==    by 0x100022E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77243==    by 0x1005F771D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77243==    by 0x100B2C075: _objc_init (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100581B34: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==77243==    by 0x100581B1B: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==77243== 
+==77243== 1,368 (16 direct, 1,352 indirect) bytes in 1 blocks are definitely lost in loss record 59 of 68
+==77243==    at 0x1000C70C2: calloc (vg_replace_malloc.c:755)
+==77243==    by 0x100009813: graph_sp_ization (sp-ization.c:346)
+==77243==    by 0x1000102BE: simple_graph_test (test-graph.c:88)
+==77243==    by 0x1000104EC: main (test-graph.c:122)
+==77243== 
+==77243== 4,136 (24 direct, 4,112 indirect) bytes in 1 blocks are definitely lost in loss record 66 of 68
+==77243==    at 0x1000C6A2C: malloc_zone_malloc (vg_replace_malloc.c:304)
+==77243==    by 0x100B2E928: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2E8FA: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2D3CB: __sel_registerName(char const*, int, int) (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2D0DA: sel_init (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B2C9AD: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100B3F7DA: objc_object::sidetable_retainCount() (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100022C64: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*), bool, bool) (in /usr/lib/dyld)
+==77243==    by 0x100022E39: dyld::registerObjCNotifiers(void (*)(unsigned int, char const* const*, mach_header const* const*), void (*)(char const*, mach_header const*), void (*)(char const*, mach_header const*)) (in /usr/lib/dyld)
+==77243==    by 0x1005F771D: _dyld_objc_notify_register (in /usr/lib/system/libdyld.dylib)
+==77243==    by 0x100B2C075: _objc_init (in /usr/lib/libobjc.A.dylib)
+==77243==    by 0x100581B34: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==77243== 
+==77243== LEAK SUMMARY:
+==77243==    definitely lost: 616 bytes in 12 blocks
+==77243==    indirectly lost: 8,312 bytes in 37 blocks
+==77243==      possibly lost: 72 bytes in 3 blocks
+==77243==    still reachable: 133,316 bytes in 6 blocks
+==77243==         suppressed: 10,909 bytes in 142 blocks
+==77243== Reachable blocks (those to which a pointer was found) are not shown.
+==77243== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==77243== 
+==77243== For counts of detected and suppressed errors, rerun with: -v
+==77243== ERROR SUMMARY: 11 errors from 11 contexts (suppressed: 8 from 8)

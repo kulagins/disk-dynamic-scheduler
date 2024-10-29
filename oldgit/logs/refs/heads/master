@@ -1,0 +1,84 @@
+0000000000000000000000000000000000000000 dbb36b61381b64e2ce318be2431297ec39c68220 kulagins <kulagins@hu-berllin.de> 1722337984 +0200	commit (initial): first commit
+dbb36b61381b64e2ce318be2431297ec39c68220 b22b99c5d7f21c9a2e25855d0c94355dc6d5774e kulagins <kulagins@hu-berllin.de> 1722406412 +0200	commit: Added assignments to heft and heuristic, corrected the error with multiple edges with same weight being ignored
+b22b99c5d7f21c9a2e25855d0c94355dc6d5774e 2e9814305f12dcbde8518d351c1bd8eb2c7ff184 kulagins <kulagins@hu-berllin.de> 1722441495 +0200	commit: Answer with json with built assignments
+2e9814305f12dcbde8518d351c1bd8eb2c7ff184 c88b40cb53d7f77b31b1bfc65a86970fab83a6d3 kulagins <kulagins@hu-berllin.de> 1722501006 +0200	commit: return nothing is failure
+c88b40cb53d7f77b31b1bfc65a86970fab83a6d3 15014620b50a857b43ed424db141ee0aa59f956c kulagins <kulagins@hu-berllin.de> 1722613647 +0200	commit: compare vertices with lowercase names correctly
+15014620b50a857b43ed424db141ee0aa59f956c cbe633acc525c7eb28b0b54add4c4bcd6a929244 kulagins <kulagins@hu-berllin.de> 1722613710 +0200	merge origin/master: Merge made by the 'ort' strategy.
+cbe633acc525c7eb28b0b54add4c4bcd6a929244 5449fc2033639b09f79613289238e03844210ad0 kulagins <kulagins@hu-berllin.de> 1722933757 +0200	commit: return correct answer
+5449fc2033639b09f79613289238e03844210ad0 10110835007e4423ac2209c9c565a31fa8d46689 kulagins <kulagins@hu-berllin.de> 1722934783 +0200	commit: made heft-scheduler algorithm number 1 and added check for missing processor speeds
+10110835007e4423ac2209c9c565a31fa8d46689 1446538d8a28a67b5d1a7cc73d57f5fa5f4af515 kulagins <kulagins@hu-berllin.de> 1723026221 +0200	commit: added return cluster
+1446538d8a28a67b5d1a7cc73d57f5fa5f4af515 052175c4937b7d19c0fcf7fbf8aecd297cd2d361 kulagins <kulagins@hu-berllin.de> 1723110117 +0200	commit: removed too many outputs
+052175c4937b7d19c0fcf7fbf8aecd297cd2d361 249b3b0c0a2d5f7decb8ebe77d4a5da9bf72a08e kulagins <kulagins@hu-berllin.de> 1725288804 +0200	commit: The scheduler answers to a request of an updated schedule - the answer is incorrect wrt dealing with running tasks, but in an acceptable format.
+249b3b0c0a2d5f7decb8ebe77d4a5da9bf72a08e faea18df63188da2894299fc21a15acc1c768b08 kulagins <kulagins@hu-berllin.de> 1725366622 +0200	commit: take average from all values for nodes, not just the first one
+faea18df63188da2894299fc21a15acc1c768b08 7f282f27f5f20f9eaaeca1c522e7c2dc0ef789cb kulagins <kulagins@hu-berllin.de> 1725369564 +0200	commit: implemented edge value retrieval from wchars and taskinputsizes from the input json
+7f282f27f5f20f9eaaeca1c522e7c2dc0ef789cb ab80a4f98c282cb263244cefad446e39327d14ad kulagins <kulagins@hu-berllin.de> 1725441890 +0200	commit: fixing error when no wchars available in the request (set edge weights to 1)
+ab80a4f98c282cb263244cefad446e39327d14ad f3696ada82ea3d716ac26484698346015dc17d09 kulagins <kulagins@hu-berllin.de> 1725443168 +0200	commit: cleaned and corrected code for static scheduling part
+f3696ada82ea3d716ac26484698346015dc17d09 8e52b54df016035dcb7221b5d7588a64fd43528a kulagins <kulagins@hu-berllin.de> 1725631234 +0200	commit: redid the update, but tno finished. included the new format of the runtime system.
+8e52b54df016035dcb7221b5d7588a64fd43528a 67de667920dfa540bdf076846c618b644fb6c809 kulagins <kulagins@hu-berllin.de> 1725631754 +0200	commit: retun lowercase only task names
+67de667920dfa540bdf076846c618b644fb6c809 eb4d645bbc084e208a0f845a04dac432d093df38 kulagins <kulagins@hu-berllin.de> 1725878305 +0200	commit: disgnostic outputs when receiving requests
+eb4d645bbc084e208a0f845a04dac432d093df38 baec643407f197f42daf0853927b4c2075f4fce2 kulagins <kulagins@hu-berllin.de> 1725884738 +0200	commit: corrected update request handling with the new format (running tasks are array)
+baec643407f197f42daf0853927b4c2075f4fce2 e52920bd46ef895526fe6616b184beceda5c0ff4 kulagins <kulagins@hu-berllin.de> 1725887122 +0200	commit: corrected running tasks, including them in assignemnts now
+e52920bd46ef895526fe6616b184beceda5c0ff4 9f3cc23ef062bcffdb9668f55b46079a088a2b3e kulagins <kulagins@hu-berllin.de> 1725887583 +0200	commit: no returnig running tasks to rts
+9f3cc23ef062bcffdb9668f55b46079a088a2b3e 4cc4556734b3afd5442001b75364c788b46ead3f kulagins <kulagins@hu-berllin.de> 1725904448 +0200	commit: corrected the timestamp handling
+4cc4556734b3afd5442001b75364c788b46ead3f b78b401a79004fc330e2732f4efa5797f2eddac9 kulagins <kulagins@hu-berllin.de> 1726665256 +0200	commit: making runtime work: trimming quotes, correcting request format, outputs, request size etc
+b78b401a79004fc330e2732f4efa5797f2eddac9 bd57cfcf7132cc5afcf6d15bb8677a22ea87141a kulagins <kulagins@hu-berllin.de> 1726921217 +0200	commit: memdag: convert toFind to lowercase
+bd57cfcf7132cc5afcf6d15bb8677a22ea87141a a0f2075a8aab26865fcec14a85bcbbe1bbb91d02 kulagins <kulagins@hu-berllin.de> 1726921416 +0200	commit: choose eviction strategy - biggest or smallest; functions to compute possible delay
+a0f2075a8aab26865fcec14a85bcbbe1bbb91d02 cde61477bfcec851ff415a398d51774d720ee25c kulagins <kulagins@hu-berllin.de> 1727539427 +0200	commit: corrected the copying of cluster with setting correct bandwidth + better printing for processors
+cde61477bfcec851ff415a398d51774d720ee25c 59d2092ea67601b01f9971d13426bd88cc238a2d kulagins <kulagins@hu-berllin.de> 1727539482 +0200	commit: added function for peak memory requirement of veretex (out of in, own, and out)
+59d2092ea67601b01f9971d13426bd88cc238a2d 5bfe9e76b647695c47cdeb87e5f0529393430a84 kulagins <kulagins@hu-berllin.de> 1727540268 +0200	commit: remove source and target for alg 5 (avoid errors in runtime system); moved calss Assignment to common
+5bfe9e76b647695c47cdeb87e5f0529393430a84 312ed75bdde60d281e0a06346275acede67a49c7 kulagins <kulagins@hu-berllin.de> 1727540288 +0200	commit: various error fixes with debugging
+312ed75bdde60d281e0a06346275acede67a49c7 b78725fc41a4156edf3c61632f0e1b99d030c332 kulagins <kulagins@hu-berllin.de> 1727543295 +0200	commit: minor cleaning
+b78725fc41a4156edf3c61632f0e1b99d030c332 b83377f24eb179033bb30d1c1d2b489e7dead028 kulagins <kulagins@hu-berllin.de> 1727544625 +0200	commit: minor cleaning
+b83377f24eb179033bb30d1c1d2b489e7dead028 33341b6e39c77a367b780d49c63fcc8ff78973b7 kulagins <kulagins@hu-berllin.de> 1727632020 +0200	commit: experiments
+33341b6e39c77a367b780d49c63fcc8ff78973b7 2d33e21d5b415e2f7989394377ae374bdeae90d4 kulagins <kulagins@hu-berllin.de> 1727632520 +0200	commit: experiments
+2d33e21d5b415e2f7989394377ae374bdeae90d4 72a0da026ec52f42c2d2c91e254ecb2c00a4a7fe kulagins <kulagins@hu-berllin.de> 1727632736 +0200	commit: experiments
+72a0da026ec52f42c2d2c91e254ecb2c00a4a7fe 38e4bc3106eb4ef4ee955267e646712b6887422d kulagins <kulagins@hu-berllin.de> 1727632804 +0200	commit: experiments
+38e4bc3106eb4ef4ee955267e646712b6887422d 4d615d7535ae1dcfbf6d9ac12163e8c67cb4ee3a kulagins <kulagins@hu-berllin.de> 1727687143 +0200	commit: experiments
+4d615d7535ae1dcfbf6d9ac12163e8c67cb4ee3a 27bcd42f56435564596fe5b37ad1ddfa123ece33 kulagins <kulagins@hu-berllin.de> 1727690134 +0200	commit: experiments
+27bcd42f56435564596fe5b37ad1ddfa123ece33 fb889c75ee8e7fe36cbbc19b7c714e4e164df97d kulagins <kulagins@hu-berllin.de> 1727690185 +0200	commit: experiments
+fb889c75ee8e7fe36cbbc19b7c714e4e164df97d 1d0c91d03a854a8f89ac5065f66f1c39ec43082c kulagins <kulagins@hu-berllin.de> 1727690778 +0200	commit: experiments
+1d0c91d03a854a8f89ac5065f66f1c39ec43082c 11956e6d565fa1aa23b11c771a9b3cdc90476468 kulagins <kulagins@hu-berllin.de> 1727691111 +0200	commit: experiments
+11956e6d565fa1aa23b11c771a9b3cdc90476468 d079c89531932ac9e7be697b20e1c3ec81d3752e kulagins <kulagins@hu-berllin.de> 1727691317 +0200	commit: experiments
+d079c89531932ac9e7be697b20e1c3ec81d3752e a318ac7f6d33078dc30ffd7793e82071aa32f212 kulagins <kulagins@hu-berllin.de> 1727691588 +0200	commit: experiments
+a318ac7f6d33078dc30ffd7793e82071aa32f212 bf4732fabab8c7c334e2f011034b2675f9ead686 kulagins <kulagins@hu-berllin.de> 1727691781 +0200	commit: experiments
+bf4732fabab8c7c334e2f011034b2675f9ead686 e984ce908a0bdbc4b78922e07b818fe809beac01 kulagins <kulagins@hu-berllin.de> 1727691951 +0200	commit: experiments
+e984ce908a0bdbc4b78922e07b818fe809beac01 042db9d6257b3987393b46576852c73ba9188544 kulagins <kulagins@hu-berllin.de> 1727692021 +0200	merge origin/master: Fast-forward
+042db9d6257b3987393b46576852c73ba9188544 7bb04ab311d2fc2aaf1f73d3bd8d01b30c73d50f kulagins <kulagins@hu-berllin.de> 1727692150 +0200	commit: experiments
+7bb04ab311d2fc2aaf1f73d3bd8d01b30c73d50f ddb31c1553e27b96f6df0e46e95f56f4187e6536 kulagins <kulagins@hu-berllin.de> 1727692342 +0200	commit: experiments
+ddb31c1553e27b96f6df0e46e95f56f4187e6536 ff208f13e386129141e345a7f539b85b25a0263a kulagins <kulagins@hu-berllin.de> 1727692898 +0200	commit: experiments
+ff208f13e386129141e345a7f539b85b25a0263a 72eec68a9f1bde13dc1a893dcda234156a0ecb6c kulagins <kulagins@hu-berllin.de> 1727692927 +0200	commit: experiments
+72eec68a9f1bde13dc1a893dcda234156a0ecb6c 87598c7a46b12bf71e4df423201d7c6cb0c74200 kulagins <kulagins@hu-berllin.de> 1727693072 +0200	commit: experiments
+87598c7a46b12bf71e4df423201d7c6cb0c74200 43e237b239c0030d12fb8bf5bcf58dbb2fd88aba kulagins <kulagins@hu-berllin.de> 1727693472 +0200	commit: experiments
+43e237b239c0030d12fb8bf5bcf58dbb2fd88aba 84342888f17d25a179ef0af34f10b8355ed50855 kulagins <kulagins@hu-berllin.de> 1727699967 +0200	commit: experiments
+84342888f17d25a179ef0af34f10b8355ed50855 2fe7b3f2f5e6fee9e61dcae9945b891bfc81dd78 kulagins <kulagins@hu-berllin.de> 1727877026 +0200	commit: reduced the memory leak by returning edges to kick, not the best processor, imporved outputs, various changes
+2fe7b3f2f5e6fee9e61dcae9945b891bfc81dd78 b2ba37929c430a884d9cd748daffe65f8173d235 kulagins <kulagins@hu-berllin.de> 1727958278 +0200	commit: reduced the memory leak by returning edges to kick, not the best processor, imporved outputs, various changes
+b2ba37929c430a884d9cd748daffe65f8173d235 ffc22e4082eb1b52ef29af05f7f8ba576772c374 kulagins <kulagins@hu-berllin.de> 1727958309 +0200	commit: added no recomputation to compare
+ffc22e4082eb1b52ef29af05f7f8ba576772c374 55e14903e8143b7e6b7ca00dcdc27c27e6e194b1 kulagins <kulagins@hu-berllin.de> 1727961190 +0200	commit: experiments
+55e14903e8143b7e6b7ca00dcdc27c27e6e194b1 b05fcc87e103e80a60a6f7bb9470428f52da839f kulagins <kulagins@hu-berllin.de> 1727962518 +0200	commit: setprecision out
+b05fcc87e103e80a60a6f7bb9470428f52da839f 26117d36744e53e6c2488c3f936272ba302ee72e kulagins <kulagins@hu-berllin.de> 1727962740 +0200	commit: experiments
+26117d36744e53e6c2488c3f936272ba302ee72e 5360ade2cb713c1765d877a82fb6f61694e481b9 kulagins <kulagins@hu-berllin.de> 1727963079 +0200	commit: experiments
+5360ade2cb713c1765d877a82fb6f61694e481b9 67bc031f68cd53ceeb72fa19693159d18b1b3bd9 kulagins <kulagins@hu-berllin.de> 1727963771 +0200	commit: experiments
+67bc031f68cd53ceeb72fa19693159d18b1b3bd9 1f38b021d0523a8b91c08d1af525ab0a4a8fd05b kulagins <kulagins@hu-berllin.de> 1727965191 +0200	commit: experiments
+1f38b021d0523a8b91c08d1af525ab0a4a8fd05b d5f214565a54ec6db3a26a4b88ab4872bc228028 kulagins <kulagins@hu-berllin.de> 1727969377 +0200	commit: experiments - no scheduler
+d5f214565a54ec6db3a26a4b88ab4872bc228028 9d4acfd111ca07352f406f208cfb07bfd92b299c kulagins <kulagins@hu-berllin.de> 1727971745 +0200	commit: reaction to failure
+9d4acfd111ca07352f406f208cfb07bfd92b299c ee62bf1ec52c16eb87be9eaf3e12629184d02cdd kulagins <kulagins@hu-berllin.de> 1728052394 +0200	commit: dealing with deleting pointers, cleaning
+ee62bf1ec52c16eb87be9eaf3e12629184d02cdd 0ea787175d4082db116355953e852d0158309faf kulagins <kulagins@hu-berllin.de> 1728053791 +0200	commit: random port
+0ea787175d4082db116355953e852d0158309faf 1db9662d29dfae39fefe7b41eafbecad3375db20 kulagins <kulagins@hu-berllin.de> 1728056135 +0200	commit: experimetns
+1db9662d29dfae39fefe7b41eafbecad3375db20 30aae16c5e7f7315adfb57cc34c2caa9b99a988d kulagins <kulagins@hu-berllin.de> 1728058286 +0200	commit: experimetns
+30aae16c5e7f7315adfb57cc34c2caa9b99a988d 53b0ef710900441f66523296f1e53365123d4fef kulagins <kulagins@hu-berllin.de> 1728059933 +0200	commit: experimetns
+53b0ef710900441f66523296f1e53365123d4fef 511d607fb2465821ebc5fb6439dc36bce881a2f7 kulagins <kulagins@hu-berllin.de> 1728060489 +0200	commit: experimetns
+511d607fb2465821ebc5fb6439dc36bce881a2f7 702852bc8138531a026a7eb68e4f88cc1a9408f7 kulagins <kulagins@hu-berllin.de> 1728060622 +0200	commit: experimetns
+702852bc8138531a026a7eb68e4f88cc1a9408f7 beb51a4bcaf224306f3aca69d9568ab8592f34f3 kulagins <kulagins@hu-berllin.de> 1728061953 +0200	commit: experimetns
+beb51a4bcaf224306f3aca69d9568ab8592f34f3 b7df19f1c3abc7d1ad0e11b397d49308c7f937ca kulagins <kulagins@hu-berllin.de> 1728309510 +0200	commit: other clusters
+b7df19f1c3abc7d1ad0e11b397d49308c7f937ca 6185704ba5ef7391ed7ac047da0b1fbbe9e024e6 kulagins <kulagins@hu-berllin.de> 1728478975 +0200	commit: tenmem and no details
+6185704ba5ef7391ed7ac047da0b1fbbe9e024e6 c43e071b85301e49639581400dbf01cedda77f56 kulagins <kulagins@hu-berllin.de> 1728497369 +0200	commit: experiments
+c43e071b85301e49639581400dbf01cedda77f56 2fd1a2c7e44338a6a10f03d7cf48550375e765f9 kulagins <kulagins@hu-berllin.de> 1728565935 +0200	pull --no-stat -v --progress origin master: Fast-forward
+2fd1a2c7e44338a6a10f03d7cf48550375e765f9 3c4095ddd4a49b3bbc993da139c77c5438022105 kulagins <kulagins@hu-berllin.de> 1728566710 +0200	commit: small experiments
+3c4095ddd4a49b3bbc993da139c77c5438022105 2e605a0aa8248ae5fc73e80bf56b4b22a2991946 kulagins <kulagins@hu-berllin.de> 1728566730 +0200	commit: stop after invalid
+2e605a0aa8248ae5fc73e80bf56b4b22a2991946 340506e9c51786b354c83dbf457e48801624f71d kulagins <kulagins@hu-berllin.de> 1728567043 +0200	commit: experimets
+340506e9c51786b354c83dbf457e48801624f71d 165ad25e17e54e0f6322cfe186c3c2f5cc106cf9 kulagins <kulagins@hu-berllin.de> 1729082301 +0200	commit: experimets
+165ad25e17e54e0f6322cfe186c3c2f5cc106cf9 10b3a2d745d567a48c7c804071d83c2a2242ebf4 kulagins <kulagins@hu-berllin.de> 1729156533 +0200	commit: experimets
+10b3a2d745d567a48c7c804071d83c2a2242ebf4 41df5e911047eb29f17bdd912d2fb845874aadc2 kulagins <kulagins@hu-berllin.de> 1729156646 +0200	commit: experimets
+41df5e911047eb29f17bdd912d2fb845874aadc2 6a0ecc15449298fbb684df6ce24428ae982ee02d kulagins <kulagins@hu-berllin.de> 1729156875 +0200	commit: experimets
+6a0ecc15449298fbb684df6ce24428ae982ee02d abd9ab7485ef307b0683a7900bb0908f5b2dfa4d kulagins <kulagins@hu-berllin.de> 1729159953 +0200	commit: experimets
+abd9ab7485ef307b0683a7900bb0908f5b2dfa4d 10c87c121916297b07f8ad46e9181ca9f6d44fea kulagins <kulagins@hu-berllin.de> 1729171172 +0200	commit: dyn sched removed cout

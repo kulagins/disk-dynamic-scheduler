@@ -1,0 +1,14 @@
+strict digraph "" {
+	0	[label=CHECK_DESIGN];
+	1	[label=TRIMGALORE];
+	0 -> 1;
+	2	[label=FASTQC];
+	0 -> 2;
+	3	[label=BWA_MEM];
+	1 -> 3;
+	4	[label=MULTIQC];
+	1 -> 4;
+	2 -> 4;
+	5	[label=BWA_INDEX];
+	5 -> 3;
+}
