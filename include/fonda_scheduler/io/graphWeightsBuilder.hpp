@@ -18,8 +18,10 @@ typedef enum { INT, LONG, DOUBLE } valueTypes;
 
 namespace Fonda {
     Cluster * buildClusterFromJson(nlohmann::json query);
-    void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology, nlohmann::json query);
-    void retrieveEdgeWeights(graph_t *graphMemTopology, nlohmann::json query);
+    void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology, std::unordered_map<std::string, std::vector<std::vector<std::string>>>
+            workflow_rows, const string& workflow_name, Cluster * cluster);
+    void retrieveEdgeWeights(graph_t *graphMemTopology);
+    Cluster * buildClusterFromCsv(double readWritePenalty, double offloadPenalty);
 }
 
 #endif

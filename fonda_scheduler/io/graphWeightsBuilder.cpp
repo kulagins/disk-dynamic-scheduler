@@ -5,108 +5,186 @@
 
 #include <fonda_scheduler/io/graphWeightsBuilder.hpp>
 #include "fonda_scheduler/common.hpp"
+#include "../extlibs/csv2/single_include/csv2/csv2.hpp"
 
 namespace Fonda {
+
+    Cluster * buildClusterFromCsv(double readWritePenalty, double offloadPenalty){
+        csv2::Reader<csv2::delimiter<','>,
+                csv2::quote_character<'"'>,
+                csv2::first_row_is_header<true>,
+                csv2::trim_policy::trim_whitespace> csv;
+
+        Cluster * cluster = new Cluster();
+        if (csv.mmap("../input/machines.csv")) {
+            int id=0;
+            for (const auto row: csv) {
+                std::vector<std::string> row_data;
+                shared_ptr<Processor> p = make_shared<Processor>();
+
+                int rl = row.length();
+                if(rl>0) {
+                    p->id = id;
+                    cluster->addProcessor(p);
+                    id++;
+                }
+
+
+
+                int cell_cntr=0;
+                for (const auto& cell : row) {
+                    std::string cell_value;
+                    cell.read_value(cell_value);
+                    row_data.push_back(cell_value);
+
+
+                    if(cell_cntr==0){
+                        p->name=cell_value;
+                    }
+                    if(cell_cntr==2){
+                        p->setProcessorSpeed(stod(cell_value)*100);
+                    }
+                    if(cell_cntr==3){
+                        p->setMemorySize(stod(cell_value)*10000);
+                    }
+                    if(cell_cntr==8){
+                        p->readSpeedDisk=stod(cell_value)*readWritePenalty;
+                    }
+                    if(cell_cntr==9){
+                        p->writeSpeedDisk=stod(cell_value)*readWritePenalty;
+                        p->memoryOffloadingPenalty = stod(cell_value)* offloadPenalty;
+                    }
+                    //TODO read/write iops
+                    ++cell_cntr;
+                }
+
+
+            }
+        }
+
+        return cluster;
+
+    }
 
     Cluster *buildClusterFromJson(nlohmann::json query) {
         Cluster *cluster = new Cluster();
         int id = 0;
         for (auto element: query["cluster"]["machines"]) {
-            Processor *p;
+            shared_ptr<Processor>p;
 
             if(   element.contains("speed")) {
-                p = new Processor(element["memory"], element["speed"], id);
+                p = make_shared<Processor>(element["memory"], element["speed"], id);
             }
-            else p = new Processor(element["memory"], 1, id);
+            else p =make_shared<Processor>(element["memory"], 1, id);
             id++;
             cluster->addProcessor(p);
 
         }
-        cluster->initHomogeneousBandwidth(cluster->getNumberProcessors(), 1);
+
         Cluster::setFixedCluster(cluster);
         return cluster;
     }
 
-    void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology, nlohmann::json query) {
-        for (auto task : query["workflow"]["tasks"]) {
-            string task_name = trimQuotes( to_string(task["name"]));
-            double  task_w = stod(to_string(task["work"]));
-            double task_m =stod(to_string( task["memory"]));
-           // std::cout << "Task name: " << task_name <<  " weight "<<to_string(task_w)<< std::endl;
-            vertex_t *vertexToSet = findVertexByName(graphMemTopology, task_name);
-            if(vertexToSet==NULL) {
-                cout << "NOT FOUND VERTEX BY NAME " << task_name << endl;
-                continue;
+    void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology, std::unordered_map<std::string, std::vector<std::vector<std::string>>>
+            workflow_rows, const string& workflow_name, Cluster * cluster) {
+
+        double minMem= std::numeric_limits<double>::max(), minTime =  std::numeric_limits<double>::max(), minWchar= std::numeric_limits<double>::max(),
+        mintt = std::numeric_limits<double>::max();
+        for(vertex_t *v=graphMemTopology->first_vertex; v; v=v->next) {
+            v->bottom_level=-1;
+            string lowercase_name = v->name;
+            transform(lowercase_name.begin(),
+                      lowercase_name.end(),
+                      lowercase_name.begin(),
+                      [](unsigned char c) {
+                          return tolower(
+                                  c);
+                      });
+
+           string nameToSearch =  workflow_name+" "+lowercase_name;
+            if (workflow_rows.find(nameToSearch) != workflow_rows.end()) {
+                double avgMem=0, avgTime = 0, avgwchar=0, avgtinps=0;
+
+
+                for (const auto& row : workflow_rows[nameToSearch]) {
+                    int col_idx = 0;
+                    string proc_name;
+                    for (const auto& cell : row) {
+
+                        if (col_idx == 3) {
+                           proc_name=cell;
+                        }
+                        if (col_idx == 4) {
+                            //time
+                            double procSpeed = cluster->getOneProcessorByName(proc_name)->getProcessorSpeed();
+                            avgTime += stod(cell)* procSpeed;
+                        }
+                        if (col_idx == 5) {
+                            //memory
+                           avgMem+=stod(cell);
+                        }
+                        if (col_idx == 6) {
+                            //memory
+                            avgwchar+=stod(cell);
+                        }
+                        if (col_idx == 7) {
+                            //memory
+                            avgtinps+=stod(cell);
+                        }
+                        col_idx++;
+                    }
+                }
+                if(workflow_rows[nameToSearch].size()==0){
+                    cout<<"<<<<<"<<endl;
+                }
+                avgMem/=workflow_rows[nameToSearch].size();
+                avgTime/=workflow_rows[nameToSearch].size();
+                avgwchar/=workflow_rows[nameToSearch].size();
+                avgtinps/=workflow_rows[nameToSearch].size();
+                double factorTime= 1;//3600;
+                double factorMem = 1;//000000000000;
+                v->time=  avgTime/factorTime;//avgTime==0? 1: avgTime;
+                v->memoryRequirement= avgMem/factorMem; //avgMem==0? 1: avgMem;
+                v->wchar= avgwchar/factorMem;//avgwchar==0? 1: avgwchar;
+                v->taskinputsize= avgtinps/factorMem; //avgtinps==0? 1: avgtinps;
+
+                minMem= min(minMem, avgMem);
+                minTime = min(minTime, avgTime);
+                minWchar = min(minWchar, avgwchar);
+                mintt = min(mintt,avgtinps);
             }
-            vertexToSet->visited=false;
-           // double sumW=0;
-            //int cntr=0;
-            //for (const auto &time_value: task_data["time_predicted"].items()){
-            //    sumW+=time_value.value().get<double>();
-           //     cntr++;
-
-           // }
-           // double timeToSet =sumW / cntr ;
-            vertexToSet->time = task_w;
-
-          //   sumW=0;
-           //  cntr=0;
-          //  for (const auto &time_value: task_data["memory_predicted"].items()){
-          //      sumW+=time_value.value().get<double>();
-           //     cntr++;
-
-          //  }
-            //auto memToSet = sumW/cntr ;
-            vertexToSet->memoryRequirement = task_m;
-
+            else{
+                //cout<<"Nothing found for "<<v->name<<endl;
+            }
         }
-        retrieveEdgeWeights(graphMemTopology, query);
+
+        for(vertex_t *v=graphMemTopology->first_vertex; v; v=v->next) {
+            if(v->memoryRequirement==0){
+                v->time=  minTime;
+                v->memoryRequirement= minMem;
+                v->wchar= minWchar;
+                v->taskinputsize= mintt;
+            }
+        }
+        retrieveEdgeWeights(graphMemTopology);
     }
 
    void
-    retrieveEdgeWeights(graph_t *graphMemTopology, nlohmann::json query) {
-
-        map<vertex_t*, double> wchars, inputsizes;
-       for (const auto& [task_name, task_data] : query["workflow"]["tasks"].items()) {
-           //std::cout << "Task name: " << task_name << std::endl;
-           string taskNameFromData = to_string(task_data["name"]);
-           vertex_t *vertexToSet = findVertexByName(graphMemTopology, trimQuotes(taskNameFromData));
-
-           double sumW=0;
-           int cntr=0;
-           for (const auto &time_value: task_data["wchar"].items()){
-               sumW+=time_value.value().get<double>();
-               cntr++;
-
-           }
-           wchars.emplace(vertexToSet, (cntr==0?1: sumW / cntr));
-
-           sumW=0;
-           cntr=0;
-           for (const auto &time_value: task_data["taskinputsize"].items()){
-               sumW+=time_value.value().get<double>();
-               cntr++;
-
-           }
-           inputsizes.emplace(vertexToSet, (cntr==0?1: sumW / cntr));
-       }
-
-        // Rebalance edge values ????
+    retrieveEdgeWeights(graph_t *graphMemTopology) {
 
        vertex_t *vertex = graphMemTopology->first_vertex;
        while (vertex != NULL) {
-           double totalOutput =0;
+           double totalOutput =1;
            for (int j = 0; j < vertex->in_degree; j++) {
                edge *incomingEdge = vertex->in_edges[j];
                vertex_t *predecessor = incomingEdge->tail;
-               totalOutput += wchars.at(predecessor);
+               totalOutput += predecessor->wchar;
            }
            for (int j = 0; j < vertex->in_degree; j++){
                edge *incomingEdge = vertex->in_edges[j];
                vertex_t *predecessor = incomingEdge->tail;
-               incomingEdge->weight =(wchars.at(predecessor)/ totalOutput) * inputsizes.at(vertex);
+               incomingEdge->weight =(predecessor->wchar/ totalOutput) * vertex->taskinputsize;
            }
-
            vertex = vertex->next;
        }
 

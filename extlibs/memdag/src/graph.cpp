@@ -689,7 +689,13 @@ double peakMemoryRequirementOfVertex(const vertex_t * v) {
     for (int i = 0; i < v->out_degree; i++) {
         sumOut += v->out_edges[i]->weight;
     }
-    if (sumIn > maxMemReq) { maxMemReq = sumIn; }
-    if (sumOut > maxMemReq) { maxMemReq = sumOut; }
+    if (sumIn > maxMemReq) {
+        maxMemReq = sumIn;
+     //   std::cout<<"Incoming over mi on "<<v->name<<std::endl;
+    }
+    if (sumOut > maxMemReq) {
+        maxMemReq = sumOut;
+       // std::cout<<"Outgoing over mi on "<<v->name<<std::endl;
+}
     return maxMemReq;
 }

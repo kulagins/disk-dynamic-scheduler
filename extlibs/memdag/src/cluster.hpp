@@ -22,12 +22,11 @@ enum ClusteringModes {
 using namespace std;
 
 
-class Processor {
+class Processor  : public std::enable_shared_from_this<Processor> {
 protected:
     double memorySize;
     double processorSpeed;
     vertex_t *assignedTask;
-    int assignedLeaderId;
     static auto comparePendingMemories(edge_t* a, edge_t*b) -> bool {
         if(a->weight==b->weight){
             if(a->head->id==b->head->id)
@@ -40,14 +39,23 @@ protected:
 
 public:
     int id;
+    string name;
     bool isBusy;
-    bool visited;
-    double communicationBuffer;
-    double readyTime;
+    double readyTimeCompute;
+    double readyTimeRead;
+    double readyTimeWrite;
+    double softReadyTimeWrite;
+
+    double memoryOffloadingPenalty;
+
     double availableMemory;
-    double availableBuffer;
     std::set<edge_t *, decltype(comparePendingMemories)*> pendingMemories{comparePendingMemories};
-    std::set<edge_t*> pendingInBuffer;
+
+    double afterAvailableMemory;
+    std::set<edge_t *, decltype(comparePendingMemories)*> afterPendingMemories{comparePendingMemories};
+
+    double readSpeedDisk;
+    double writeSpeedDisk;
     double peakMemConsumption=0;
 
 
@@ -57,9 +65,10 @@ public:
         isBusy = false;
         assignedTask = nullptr;
         id = -1;
-        this->communicationBuffer =0;
-        this->readyTime=0;
-        this->availableBuffer =0;
+        this->readyTimeCompute=0;
+        this->readyTimeRead=0;
+        this->readyTimeWrite=0;
+        this->softReadyTimeWrite=0;
 
     }
 
@@ -70,9 +79,10 @@ public:
         isBusy = false;
         assignedTask = nullptr;
         this->id = id;
-        this->communicationBuffer =memorySize*10;
-        this->readyTime=0;
-        this->availableBuffer =communicationBuffer;
+        this->readyTimeCompute=0;
+        this->readyTimeRead=0;
+        this->readyTimeWrite=0;
+        this->softReadyTimeWrite=0;
     }
 
     Processor(double memorySize, double processorSpeed, int id=-1) {
@@ -82,18 +92,18 @@ public:
         isBusy = false;
         assignedTask = nullptr;
         this->id = id;
-        this->communicationBuffer =memorySize*10;
-        this->readyTime=0;
-        this->availableBuffer =communicationBuffer;
+        this->readyTimeCompute=0;
+        this->readyTimeRead=0;
+        this->readyTimeWrite=0;
+        this->softReadyTimeWrite=0;
     }
 
-    Processor(const Processor * copy);
+    Processor(const Processor &copy);
 
     //TODO impelement
     ~Processor() {
         //  if (assignedTask != nullptr) delete assignedTask;
         pendingMemories.clear();
-        pendingInBuffer.clear();
     }
 
     double getMemorySize() const {
@@ -106,6 +116,10 @@ public:
 
     double getProcessorSpeed() const {
         return processorSpeed;
+    }
+
+    void setProcessorSpeed(double s) {
+        this->processorSpeed=s;
     }
 
     double getAvailableMemory(){
@@ -126,35 +140,26 @@ public:
 
 class Cluster {
 protected:
-    vector<Processor *> processors;
-    vector<vector<double>> bandwidths;
+
     static Cluster *fixedCluster;
+    vector<edge_t *> filesOnDisk;
     int maxSpeed = -1;
 public:
-    vector<vector<double>> readyTimesBuffers;
+    vector<shared_ptr<Processor>> processors;
+
 
     Cluster() {
         processors.resize(0);
-        bandwidths.resize(0);
-        for (unsigned long i = 0; i < bandwidths.size(); i++) {
-            bandwidths.at(i).resize(0, 0);
-        }
-
-        for (unsigned long i = 0; i < readyTimesBuffers.size(); i++) {
-            readyTimesBuffers.at(i).resize(0, 0);
-        }
 
     }
 
     Cluster(unsigned int clusterSize) {
         processors.resize(clusterSize);
         for (unsigned long i = 0; i < clusterSize; i++) {
-            processors.at(i) = new Processor();
+            processors.at(i) = make_shared<Processor>();
         }
-        initHomogeneousBandwidth(clusterSize);
-        for (unsigned long i = 0; i < readyTimesBuffers.size(); i++) {
-            readyTimesBuffers.at(i).resize(0, 0);
-        }
+
+
 
     }
 
@@ -162,57 +167,30 @@ public:
         for (int i = 0; i < groupSizes->size(); i++) {
             unsigned int groupSize = groupSizes->at(i);
             for (unsigned int j = 0; j < groupSize; j++) {
-                this->processors.push_back(new Processor(memories->at(i), speeds->at(i)));
+                this->processors.push_back(make_shared<Processor>(memories->at(i), speeds->at(i)));
             }
         }
-        initHomogeneousBandwidth(memories->size(), 1);
+
     }
 
-    Cluster(const Cluster * copy) ;
+  //  Cluster(const Cluster * copy) ;
 
-
-    ~Cluster() {
-        bandwidths.resize(0);
-        readyTimesBuffers.resize(0);
-        for (unsigned long i = 0; i < processors.size(); i++) {
-            delete processors.at(i);
-        }
-    }
 
 public:
 
-    void addProcessor(Processor * p){
-        if(std::find_if(processors.begin(), processors.end(),[p](Processor* p1){
+    void addProcessor(const shared_ptr<Processor>& p){
+        if(std::find_if(processors.begin(), processors.end(),[p](const shared_ptr<Processor>& p1){
             return p->id==p1->id;
         }) != processors.end()){
             throw new runtime_error("non-unique processor id "+ to_string(p->id));
         }
         this->processors.emplace_back(p);
-        resizeReadyTimesBuffers(this->processors.size());
     }
 
-    void resizeReadyTimesBuffers(int newsize){
-        auto buf = readyTimesBuffers;
-        for (unsigned long i = 0; i < readyTimesBuffers.size(); i++) {
-            readyTimesBuffers.at(i).resize(0, 0);
-        }
-
-        readyTimesBuffers.resize(newsize);
-        for (unsigned long i = 0; i < readyTimesBuffers.size(); i++) {
-            readyTimesBuffers.at(i).resize(newsize, 0);
-        }
-
-        for(int a=0; a<buf.size(); a++){
-            for(int b=0; b<buf[a].size();b++){
-                readyTimesBuffers[a][b] = buf[a][b];
-            }
-        }
-
-    }
 
     void removeProcessor(Processor * toErase){
-        const vector<Processor *>::iterator &iterator = std::find_if(this->processors.begin(), this->processors.end(),
-                                                                     [toErase](Processor *p) {
+        const vector<shared_ptr<Processor>>::iterator &iterator = std::find_if(this->processors.begin(), this->processors.end(),
+                                                                     [toErase](const shared_ptr<Processor>& p) {
                                                                          return toErase->getMemorySize() ==
                                                                                 p->getMemorySize() &&
                                                                                 toErase->getProcessorSpeed() ==
@@ -222,46 +200,27 @@ public:
         delete toErase;
     }
 
-    vector<Processor *> getProcessors() const{
+    vector<shared_ptr<Processor>> getProcessors() {
         return this->processors;
     }
 
-    unsigned int getNumberProcessors() const {
+    [[nodiscard]] unsigned int getNumberProcessors() const {
         return this->processors.size();
     }
 
     unsigned int getNumberFreeProcessors() {
         int res = count_if(this->processors.begin(), this->processors.end(),
-                           [](const Processor *i) { return !i->isBusy; });
+                           [](const shared_ptr<Processor>& i) { return !i->isBusy; });
         return res;
     }
 
-
-    void initHomogeneousBandwidth(int bandwidthsNumber, double bandwidth = 1) {
-        bandwidths.resize(bandwidthsNumber);
-        setHomogeneousBandwidth(bandwidth);
-    }
-
-    void setHomogeneousBandwidth(double bandwidth) {
-        for (unsigned long i = 0; i < bandwidths.size(); i++) {
-            //TODO init only upper half
-            bandwidths.at(i).resize(bandwidths.size(), bandwidth);
-            for (unsigned long j = 0; j < bandwidths.size(); j++) {
-                bandwidths.at(i).at(j) = bandwidth;
-            }
-        }
-    }
-
-    double getBandwidth() const{
-        return this->bandwidths.at(0).at(0);
-    }
 
     void setMemorySizes(vector<double> &memories) {
         //  memoryHomogeneous = false;
         if (processors.size() != memories.size()) {
             processors.resize(memories.size());
             for (unsigned long i = 0; i < memories.size(); i++) {
-                processors.at(i) = new Processor(memories.at(i));
+                processors.at(i) = make_shared<Processor>(memories.at(i));
             }
         } else {
             for (unsigned long i = 0; i < memories.size(); i++) {
@@ -272,33 +231,18 @@ public:
     }
 
     void printProcessors() {
-        for (vector<Processor *>::iterator iter = this->processors.begin(); iter < processors.end(); iter++) {
+        for (auto iter = this->processors.begin(); iter < processors.end(); iter++) {
             cout << "Processor with memory " << (*iter)->getMemorySize() << ", speed " << (*iter)->getProcessorSpeed()
                  << " and busy? " << (*iter)->isBusy << "assigned " << ((*iter)->isBusy?(*iter)->getAssignedTaskId(): -1)
-                 << " ready time "<<(*iter)->readyTime<<" avail memory "<<(*iter)->availableMemory<<
+                 << " ready time compute " << (*iter)->readyTimeCompute
+                 << " ready time read " << (*iter)->readyTimeRead
+                 << " ready time write " << (*iter)->readyTimeWrite
+                 << " ready time write soft " << (*iter)->softReadyTimeWrite
+                 << " avail memory " << (*iter)->availableMemory <<
                  endl;
         }
     }
 
-    string getPrettyClusterString() {
-        string out = "Cluster:\n";
-        int numProcessors = this->processors.size();
-        out += "#Nodes: " + to_string(numProcessors) + ", ";
-       //TODO
-        // out += "MinMemory: " + to_string(this->getLastProcessorMem()) + ", ";
-        out += "MaxMemory: " + to_string(this->getProcessors().at(0)->getMemorySize()) + ", ";
-        out += "CumulativeMemory: " + to_string(this->getCumulativeMemory());
-
-        return out;
-    }
-
-    long getCumulativeMemory() {
-        long sum = 0;
-        for (Processor *proc: (this->processors)) {
-            sum += proc->getMemorySize();
-        }
-        return sum;
-    }
 
     static void setFixedCluster(Cluster *cluster) {
         Cluster::fixedCluster = cluster;
@@ -316,24 +260,31 @@ public:
     }
 
 
-    Processor *getMemBiggestFreeProcessor();
-    Processor *getFastestFreeProcessor();
-    Processor *getFastestProcessorFitting(double memReq);
+    shared_ptr<Processor>getMemBiggestFreeProcessor();
+    shared_ptr<Processor>getFastestFreeProcessor();
+    shared_ptr<Processor>getFastestProcessorFitting(double memReq);
 
-    Processor *getFirstFreeProcessorOrSmallest();
+    shared_ptr<Processor>getFirstFreeProcessorOrSmallest();
 
-    Processor * getProcessorById(int id){
+    shared_ptr<Processor> getProcessorById(int id){
         for ( auto &item: getProcessors()){
             if (item->id==id) return item;
         }
         throw new runtime_error("Processor not found by id "+ to_string(id));
     }
 
+    shared_ptr<Processor> getOneProcessorByName(string name){
+        for ( auto &item: getProcessors()){
+            if (item->name==name) return item;
+        }
+        throw new runtime_error("Processor not found by name "+ name);
+    }
+
     bool hasFreeProcessor();
 
     void clean();
 
-    Processor *smallestFreeProcessorFitting(double requiredMem);
+    shared_ptr<Processor>smallestFreeProcessorFitting(double requiredMem);
 
 
     void freeAllBusyProcessors();
@@ -346,5 +297,24 @@ public:
 
 };
 
+enum eventType{
+    OnTaskStart,
+    OnTaskFinish,
+    OnReadStart,
+    OnReadFinish,
+    OnWriteStart,
+    OnWriteFinish
+};
+class Event{
+public:
+    vertex_t* task;
+    edge_t* edge;
+    eventType type;
+    Processor * processor;
+    double expectedTimeFire;
+    double actualTimeFire;
+    vector<Event> predecessors, successors;
+    bool isEviction;
 
+};
 #endif

@@ -8,32 +8,32 @@ Cluster *Cluster::fixedCluster = NULL;
 
 
 //TODO CHECK!
-Processor *Cluster::getMemBiggestFreeProcessor() {
+shared_ptr<Processor>Cluster::getMemBiggestFreeProcessor() {
     sort(this->processors.begin(), this->processors.end(),
-         [](Processor *lhs, Processor *rhs) { return lhs->getMemorySize() > rhs->getMemorySize(); });
-    for (vector<Processor *>::iterator iter = this->processors.begin(); iter < this->processors.end(); iter++) {
+         [](const shared_ptr<Processor> &lhs, const shared_ptr<Processor> &rhs) { return lhs->getMemorySize() > rhs->getMemorySize(); });
+    for (auto iter = this->processors.begin(); iter < this->processors.end(); iter++) {
         if (!(*iter)->isBusy)
             return (*iter);
     }
     return NULL;
 }
 
-Processor *Cluster::getFastestProcessorFitting(double memReq) {
+shared_ptr<Processor> Cluster::getFastestProcessorFitting(double memReq) {
     sort(this->processors.begin(), this->processors.end(),
-         [](Processor *lhs, Processor *rhs) { return lhs->getProcessorSpeed() < rhs->getProcessorSpeed(); });
-    Processor * fastest = *this->processors.begin();
+         [](const shared_ptr<Processor> &lhs, const shared_ptr<Processor> &rhs) { return lhs->getProcessorSpeed() < rhs->getProcessorSpeed(); });
+    shared_ptr<Processor> fastest = *this->processors.begin();
     sort(this->processors.begin(), this->processors.end(),
-         [](Processor *lhs, Processor *rhs) { return lhs->getMemorySize() > rhs->getMemorySize(); });
-    for (vector<Processor *>::iterator iter = this->processors.begin(); iter < this->processors.end(); iter++) {
+         [](const shared_ptr<Processor> &lhs, const shared_ptr<Processor> &rhs) { return lhs->getMemorySize() > rhs->getMemorySize(); });
+    for (auto iter = this->processors.begin(); iter < this->processors.end(); iter++) {
         if (!(*iter)->isBusy && (*iter)->getMemorySize()>= memReq && (*iter)->getProcessorSpeed()>= fastest->getProcessorSpeed())
             fastest=(*iter);
     }
     return fastest;
 }
 
-Processor *Cluster::getFastestFreeProcessor() {
+shared_ptr<Processor>Cluster::getFastestFreeProcessor() {
 //todo make sure they are not resorted
-    for (vector<Processor *>::iterator iter = this->processors.begin(); iter < this->processors.end(); iter++) {
+    for (auto iter = this->processors.begin(); iter < this->processors.end(); iter++) {
         if (!(*iter)->isBusy)
             return (*iter);
     }
@@ -42,19 +42,19 @@ Processor *Cluster::getFastestFreeProcessor() {
 
 //todo rewrite with flag
 bool Cluster::hasFreeProcessor() {
-    for (vector<Processor *>::iterator iter = this->processors.begin(); iter < this->processors.end(); iter++) {
+    for (auto iter = this->processors.begin(); iter < this->processors.end(); iter++) {
         if (!(*iter)->isBusy)
             return true;
     }
     return false;
 }
 
-Processor *Cluster::getFirstFreeProcessorOrSmallest() {
+shared_ptr<Processor> Cluster::getFirstFreeProcessorOrSmallest() {
   //  std::sort(this->processors.begin(), this->processors.end(), [](Processor *a, Processor *b) {
  //       if(a==NULL || b==NULL) return true;
 //        return (a->getMemorySize() <= b->getMemorySize());
  //   });
-    for (vector<Processor *>::iterator iter = this->processors.begin(); iter < this->processors.end(); iter++) {
+    for (auto iter = this->processors.begin(); iter < this->processors.end(); iter++) {
         if (!(*iter)->isBusy)
             return (*iter);
     }
@@ -66,8 +66,7 @@ void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
         this->assignedTask = taskToBeAssigned;
         //TODO
         //taskToBeAssigned->assignedProcessor= this;
-       this->assignedLeaderId = taskToBeAssigned->leader;
-       taskToBeAssigned->assignedProcessor = this;
+       taskToBeAssigned->assignedProcessor =  shared_from_this();
         this->isBusy = true;
     } else{
         this->assignedTask = NULL;
@@ -86,20 +85,16 @@ int Processor::getAssignedTaskId() const {
 }
 
 void Cluster::clean() {
-    for (Processor *p: getProcessors()) {
-        delete p;
-    }
-    processors.resize(0);
-    bandwidths.resize(0);
+    processors.clear();
     delete fixedCluster;
 
 }
 
-Processor *Cluster::smallestFreeProcessorFitting(double requiredMem) {
+shared_ptr<Processor>Cluster::smallestFreeProcessorFitting(double requiredMem) {
     //TODO method for only free processors
     int min = std::numeric_limits<int>::max();
-    Processor *minProc = nullptr;
-    for (Processor *proc: (this->getProcessors())) {
+    shared_ptr<Processor> minProc = nullptr;
+    for (auto proc: (this->getProcessors())) {
         if (proc->getMemorySize() >= requiredMem && !proc->isBusy && min > proc->getMemorySize()) {
             min = proc->getMemorySize();
             minProc = proc;
@@ -140,7 +135,7 @@ Processor *Cluster::findSmallestFittingProcessorForMerge(Task *currentQNode, con
  */
 
 void Cluster::freeAllBusyProcessors() {
-    for (Processor *item: this->getProcessors()) {
+    for (auto item: this->getProcessors()) {
         if (item->isBusy) {
             if (item->getAssignedTask() != NULL) {
                //TODO
@@ -168,18 +163,17 @@ void Cluster::sortProcessorsByMemSize() {
 
 void Cluster::sortProcessorsByProcSpeed() {
     sort(this->processors.begin(), this->processors.end(),
-         [](Processor *lhs, Processor *rhs) { return lhs->getProcessorSpeed() > rhs->getProcessorSpeed(); });
+         [](const shared_ptr<Processor>&lhs, const shared_ptr<Processor>&rhs) { return lhs->getProcessorSpeed() > rhs->getProcessorSpeed(); });
     assert(this->getProcessors().at(0)->getProcessorSpeed() >
            this->getProcessors().at(this->getNumberProcessors() - 1)->getProcessorSpeed());
 
 }
 
-Cluster::Cluster(const Cluster * copy){
-    this->initHomogeneousBandwidth(copy->getNumberProcessors());
+/*Cluster::Cluster(const Cluster * copy){
 
     for (const auto &item: copy->getProcessors()){
         //deep copy processor
-        this->addProcessor(new Processor(item));
+        this->addProcessor(make_shared<Processor>(item));
     }
 
     this->readyTimesBuffers.resize(copy->readyTimesBuffers.size());
@@ -193,31 +187,6 @@ Cluster::Cluster(const Cluster * copy){
     this->setHomogeneousBandwidth(copy->getBandwidth());
 
 
-}
+} */
 
-Processor::Processor(const Processor * copy){
-    this->memorySize = copy->memorySize;
-    this->processorSpeed = copy->getProcessorSpeed();
-    this->id = copy->id;
-   this-> isBusy = false;
-    this-> assignedTask = nullptr;
-
-   this->assignedTask = copy->assignedTask;
-   this->assignedLeaderId = copy->assignedLeaderId;
-
-   this->isBusy = copy->isBusy;
-   this->visited = copy->visited;
-
-   this->communicationBuffer = copy->communicationBuffer;
-   this -> readyTime = copy->readyTime;
-   this->availableMemory = copy->availableMemory;
-   this->availableBuffer = copy-> availableBuffer;
-
-    for (auto &item: copy->pendingMemories){
-        this->pendingMemories.insert(item);
-    }
-    for (auto &item: copy->pendingInBuffer){
-        this->pendingInBuffer.insert(item);
-    }
-   
-}
+Processor::Processor(const Processor & copy)= default;

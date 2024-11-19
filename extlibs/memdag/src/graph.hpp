@@ -4,6 +4,9 @@
 #include <igraph/igraph.h>
 #include <string>
 #include "vector"
+#include <variant>
+#include <optional>
+#include <memory>
 
 /**
  * \file graph.h
@@ -27,7 +30,16 @@
  * \p in_degree and \p out_degree edges.
  *
  * \p data is a pointer reserved for the user's usage.
+
  */
+
+
+enum Status {
+    Blocked,
+    Ready,
+    Finished
+};
+
 
 extern bool Debug;
 class Processor;
@@ -41,6 +53,8 @@ struct vertex_t {
   * as extra edge weights.
    * */
   double memoryRequirement=0;
+  double wchar=0;
+  double taskinputsize=0;
 
   /* graph structure around the vertex */
   struct vertex_t *next, *prev;
@@ -54,22 +68,19 @@ struct vertex_t {
   int nb_of_unprocessed_parents; // reserved for topological traversals
   int generic_int;
   void *generic_pointer;
-  double top_level, bottom_level;
+  double top_level, bottom_level=-1;
   ///\endcond
   
   /* user data */
   void *data;
- // Processor * assignedProcessor;
-  double dijkstra_dist;
-  vertex_t *dijkstra_prev;
-  bool dijkstra_visited;
-
   graph_t * subgraph;
   int leader=-1;
-  Processor * assignedProcessor;
+  std::shared_ptr<Processor> assignedProcessor;
   double makespan;
 
   bool visited;
+  Status status;
+
 } ;
 
 
@@ -94,6 +105,19 @@ typedef enum e_edge_status_t { ORIGINAL=0, IN_CUT, ADDED} edge_status_t;
  * \p data is a pointer reserved for the user's usage.
  */
 
+enum class LocationType {
+    OnProcessor,
+    OnDisk,
+    Nowhere
+};
+
+struct Location {
+    LocationType locationType;
+    std::optional<int> processorId; // Holds processor ID if location is OnProcessor
+
+    explicit Location(LocationType type, std::optional<int> procId = std::nullopt)
+            : locationType(type), processorId(procId) {}
+};
 typedef struct edge {
   /* basic edge information */
   double         weight;
@@ -108,6 +132,7 @@ typedef struct edge {
   ///\cond HIDDEN_SYMBOLS
   /* other data used for graph algorithms */
   void *generic_pointer;
+  std::vector<Location> locations;
   ///\endcond} edge_t;
 } edge_t;
 
@@ -174,6 +199,9 @@ int sort_by_increasing_top_level(const void *v1, const void *v2);
 int sort_by_increasing_avg_level(const void *v1, const void *v2);
 vertex_t *next_vertex_in_sorted_topological_order(graph_t *graph, vertex_t *vertex, int (*compar)(const void *, const void *));
 
+bool isLocatedNowhere(edge_t* edge);
+bool isLocatedOnDisk(edge_t* edge);
+bool isLocatedOnThisProcessor(edge_t* edge, int id);
   
 /** @name Macros to iterate over vertices*/
 ///@{
@@ -239,7 +267,10 @@ public:
 
 };
 
+struct workflowElement {
+    std::variant<edge_t , vertex_t> element;
 
+};
 #endif
 
 

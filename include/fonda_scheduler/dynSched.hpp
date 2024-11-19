@@ -19,24 +19,22 @@ double calculateSimpleBottomUpRank(vertex_t *task);
 double calculateBLCBottomUpRank(vertex_t *task);
 std::vector < std::pair< vertex_t *, double> >  calculateMMBottomUpRank(graph_t * graph);
 
-Processor * tentativeAssignment(vertex_t * v, Processor * pj ,  Cluster* cluster, double &finishTime);
-
 double heuristic(graph_t * graph, Cluster * cluster, int bottomLevelVariant, int evictionVariant, vector<Assignment*> &assignments, double & peakMem);
+double new_heuristic(graph_t *graph, Cluster *cluster);
 vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int bottomLevelVariant);
 
 double getFinishTimeWithPredecessorsAndBuffers(vertex_t *v, const Processor *pj, const Cluster *cluster, double &startTime);
-void correctRtJJsOnPredecessors(Cluster *cluster, const vertex_t *vertexToAssign, const Processor *procToChange);
 
 void kickEdgesThatNeededToKickedToFreeMemForTask( const vector<edge_t*>& edgesToKick, Processor *procToChange);
 double removeInputPendingEdgesFromEverywherePendingMemAndBuffer(const Cluster *cluster, const vertex_t *vertexToAssign,
                                                                 Processor *procToChange, double availableMem);
 
-double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v, const Processor *pj);
-double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere3Part(const vertex_t *v, const Processor *pj);
+double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v, const shared_ptr<Processor>pj);
 
-vector<edge_t*> evict( vector<edge_t*> pendingMemories, double &currentlyAvailableBuffer, double &stillTooMuch, bool evictBiggestFirst);
+vector<edge_t*> evict( vector<edge_t*> pendingMemories, double &stillTooMuch, bool evictBiggestFirst);
 
-vector<edge_t*> tentativeAssignmentDespiteMemory(vertex_t *v, Processor *pj, Cluster* cluster, double &finishTime, double & startTime, bool &isValid, double &peakMem, bool evictBiigestFirst=false);
+vector< shared_ptr<Processor>> tentativeAssignment(vertex_t *v, shared_ptr<Processor>pj, Cluster* cluster, double &finishTime,
+                                                   double & startTime, bool &isValid, double &peakMem, bool isThisBaseline=false);
 void doRealAssignmentWithMemoryAdjustments(Cluster *cluster, double futureReadyTime, const vector<edge_t*> & edgesToKick, vertex_t *vertexToAssign,
                                            Processor *procToChange);
 graph_t *convertToNonMemRepresentation(graph_t *withMemories, map<int, int> &noMemToWithMem);

@@ -10,6 +10,7 @@
 #include "../extlibs/memdag/src/graph.hpp"
 #include "../include/fonda_scheduler/dynSched.hpp"
 #include "../include/fonda_scheduler/io/graphWeightsBuilder.hpp"
+#include "../extlibs/csv2/single_include/csv2/csv2.hpp"
 
 #include <chrono>
 #include <cstring>
@@ -33,24 +34,140 @@ bool isNoRecalculationStillValid= true;
 
 std::shared_ptr<Http::Endpoint> endpoint;
 
+
+int main(int argc, char *argv[]) {
+
+    csv2::Reader<csv2::delimiter<','>,
+            csv2::quote_character<'"'>,
+            csv2::first_row_is_header<true>,
+            csv2::trim_policy::trim_whitespace> csv;
+
+    std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows;
+
+
+    if (csv.mmap("../input/traces.csv")) {
+        for (const auto row: csv) {
+            std::vector<std::string> row_data;
+            std::string task_name, workflow_name;
+
+            int col_idx = 0;
+            for (const auto& cell : row) {
+                std::string cell_value;
+                cell.read_value(cell_value);
+                row_data.push_back(cell_value);
+
+                if (col_idx == 0) {
+                    workflow_name = cell_value;
+                }
+                // Assuming the workflow name is in the first column (index 0)
+                if (col_idx == 2) {
+                    task_name = cell_value;
+                }
+                ++col_idx;
+            }
+
+            // Store row in the map under the workflow name
+            workflow_rows[workflow_name+" "+task_name].push_back(row_data);
+        }
+    }
+
+  /*  std::string target_task = "atacseq";  // Replace with your target workflow name
+    if (workflow_rows.find(target_task) != workflow_rows.end()) {
+        std::cout << "Rows for " << target_task << ":" << std::endl;
+        for (const auto& row : workflow_rows[target_task]) {
+            for (const auto& cell : row) {
+                std::cout << cell << " ";
+            }
+            std::cout << std::endl;
+        }
+    } */
+
+    Cluster * cluster = Fonda::buildClusterFromCsv(1, 0.001);
+
+
+
+        string workflowName = argv[1];
+    workflowName = trimQuotes(workflowName);
+    currentName = workflowName;
+    int algoNumber = std::stoi(argv[2]);
+    cout << "new, algo " << algoNumber << " " <<currentName<<" ";
+
+    string filename = "../input/";
+    string suffix = "00";
+    if (workflowName.substr(workflowName.size() - suffix.size()) == suffix) {
+        filename += "generated/";//+filename;
+    }
+    filename += workflowName;
+
+    filename += workflowName.substr(workflowName.size() - suffix.size()) == suffix ? ".dot" : "_sparse.dot";
+    graph_t * graphMemTopology = read_dot_graph(filename.c_str(), NULL, NULL, NULL);
+    checkForZeroMemories(graphMemTopology);
+
+    currentAlgoNum = algoNumber;
+    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, cluster);
+
+
+    vector<Assignment *> assignments;
+    cout<<std::setprecision(15);
+    double d = new_heuristic(graphMemTopology, cluster);
+    cout<<"makespan "<<d<<endl;
+}
+
+vector<Assignment *>
+runAlgorithm(int algorithmNumber, graph_t *graphMemTopology, Cluster *cluster, string workflowName, bool & wasCrrect, double &resultingMS) {
+    vector<Assignment *> assignments;
+    try {
+
+        auto start = std::chrono::system_clock::now();
+        double avgPeakMem = 0;
+        switch (algorithmNumber) {
+            case 1: {
+                // print_graph_to_cout(graphMemTopology);
+                double d = heuristic(graphMemTopology, cluster, 1, 0, assignments, avgPeakMem);
+                resultingMS = d;
+                wasCrrect =( d!=-1);
+                cout << //workflowName << " " <<
+                     d << (wasCrrect ? " yes " : " no ") << avgPeakMem;
+                break;
+            }
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7: {
+                double ms =
+                        0;
+                wasCrrect = heft(graphMemTopology, cluster, ms, assignments, avgPeakMem);
+                resultingMS = ms;
+                cout << //workflowName << " " <<
+                     ms << (wasCrrect ? " yes" : " no") << " " << avgPeakMem<<endl;
+                break;
+            }
+            default:
+                cout << "UNKNOWN ALGORITHM" << endl;
+        }
+        lastAvgMem= avgPeakMem;
+        auto end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
+
+    }
+    catch (std::runtime_error &e) {
+        cout << e.what() << endl;
+        //return 1;
+    }
+    catch (...) {
+        cout << "Unknown error happened" << endl;
+    }
+    return assignments;
+}
+
+
+
 void new_schedule(const Rest::Request &req, Http::ResponseWriter resp) {
 
- /*   for (auto &item: currentAssignment){
-        delete item;
-    }
-    for (auto &item: currentAssignmentWithNoRecalculation){
-        delete item;
-    }
 
-    if(currentWorkflow!=NULL)
-        free_graph(currentWorkflow);
-    if(currentCluster!=NULL){
-     //   for (auto &item: currentCluster->getProcessors()){
-      //      delete item;
-     //   }
-     //   delete currentCluster;
-
-    } */
     currentAssignment.resize(0);
     currentAssignmentWithNoRecalculation.resize(0);
     updateCounter=delayCnt=0;
@@ -83,10 +200,10 @@ void new_schedule(const Rest::Request &req, Http::ResponseWriter resp) {
 
     currentAlgoNum = algoNumber;
     Cluster *cluster = Fonda::buildClusterFromJson(bodyjson);
-    cluster->setHomogeneousBandwidth(10000);
+
     //cluster->printProcessors();
 
-    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, bodyjson);
+    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, bodyjson, workflowName, cluster);
 
     double maxMemReq = 0;
     vertex_t *vertex = graphMemTopology->first_vertex;
@@ -215,7 +332,7 @@ void update(const Rest::Request &req, Http::ResponseWriter resp) {
 
                 } else {
                     assignmOfProblemCauser->task->makespan = newStartTime;
-                    assignmOfProblem->processor->readyTime = newStartTime;
+                    assignmOfProblem->processor->readyTimeCompute = newStartTime;
                     completeRecomputationOfSchedule(resp, bodyjson, timestamp, taskWithProblem);
                 }
                 takeOverChangesFromRunningTasks(bodyjson, currentWorkflow, currentAssignmentWithNoRecalculation);
@@ -251,7 +368,7 @@ void update(const Rest::Request &req, Http::ResponseWriter resp) {
                     //remove_vertex(currentWorkflow,vertex);
                     vertex->visited = true;
                     vertex->makespan = newStartTime;
-                    vertex->assignedProcessor->readyTime = newStartTime;
+                    vertex->assignedProcessor->readyTimeCompute = newStartTime;
                 }
                 assert(newStartTime == timestamp);
                 completeRecomputationOfSchedule(resp, bodyjson, timestamp, vertex);
@@ -286,33 +403,7 @@ void handleSignal(int signal) {
     std::cout << "Shutting down the server..." << std::endl;
     endpoint->shutdown();
 }
-int main(int argc, char *argv[]) {
-    signal(SIGINT, handleSignal);
-    signal(SIGTERM, handleSignal);
-    
-    using namespace Rest;
-    Debug = true;//true;
-    std::cout << std::fixed ;//<< std::setprecision(3);
 
-    int portFromArgs = argc>0 ? stoi(argv[1]): 9900;
-
-    Router router;      // POST/GET/etc. route handler
-    Port port(portFromArgs);    // port to listen on
-    Address addr(Ipv4::any(), port);
-    endpoint = std::make_shared<Http::Endpoint>(addr);
-    auto opts = Http::Endpoint::options().maxRequestSize(9291456).threads(1).flags(Tcp::Options::ReuseAddr | Tcp::Options::ReusePort);
-     endpoint->init(opts);
-
-    /* routes! */
-    Routes::Post(router, "/wf/:id/update", Routes::bind(&update));
-    Routes::Post(router, "/wf/new/", Routes::bind(&new_schedule));
-
-
-    endpoint->setHandler(router.handler());
-    endpoint->serve();
-
-    return 0;
-}
 void completeRecomputationOfSchedule(Http::ResponseWriter &resp, const json &bodyjson, double timestamp,
                                       vertex_t * vertexThatHasAProblem) {
 
@@ -423,7 +514,7 @@ void delayOneTask(Http::ResponseWriter &resp, const json &bodyjson, string &name
 
 Cluster *
 prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vector<Assignment *> &tempAssignments) {
-    Cluster *updatedCluster = new Cluster(currentCluster);
+    /*Cluster *updatedCluster = new Cluster(currentCluster);
     for (auto &processor: updatedCluster->getProcessors()) {
         processor->assignSubgraph(NULL);
         processor->isBusy = false;
@@ -483,7 +574,7 @@ prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vec
                     }
                     updatedProc->availableMemory =
                            updatedProc->getMemorySize() -sumOut;
-                    assert(updatedProc->availableMemory>=0);
+                    assert(updatedProc->availableMemory >= 0);
                     updatedProc->assignSubgraph((*it_assignm)->task);
                     for (int j = 0; j <  ver->out_degree; j++) {
                        updatedProc->pendingMemories.insert(ver->out_edges[j]);
@@ -508,7 +599,7 @@ prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vec
                         //                                                    ver->time / procOfTas->getProcessorSpeed()) :(start +
                         //                                                ver->time / procOfTas->getProcessorSpeed());
                         procOfTas->availableMemory = procOfTas->getMemorySize() - ver->memoryRequirement;
-                        assert(procOfTas->availableMemory>=0);
+                        assert(procOfTas->availableMemory >= 0);
                         procOfTas=NULL;
                     } else {
                         cout << "task also not found in the workflow" << endl;
@@ -601,84 +692,6 @@ prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vec
 
 
     return updatedCluster;
+     */
 }
 
-vector<Assignment *>
-runAlgorithm(int algorithmNumber, graph_t *graphMemTopology, Cluster *cluster, string workflowName, bool & wasCrrect, double &resultingMS) {
-    vector<Assignment *> assignments;
-    try {
-
-        auto start = std::chrono::system_clock::now();
-        double avgPeakMem = 0;
-        switch (algorithmNumber) {
-            case 1: {
-                // print_graph_to_cout(graphMemTopology);
-                double d = heuristic(graphMemTopology, cluster, 1, 0, assignments, avgPeakMem);
-                resultingMS = d;
-                wasCrrect =( d!=-1);
-                cout << //workflowName << " " <<
-                d << (wasCrrect ? " yes " : " no ") << avgPeakMem;
-                break;
-            }
-            case 2: {
-                double d = heuristic(graphMemTopology, cluster, 1, 1, assignments, avgPeakMem);
-                wasCrrect =( d!=-1);resultingMS = d;
-                cout << //workflowName << " " <<
-                d << (wasCrrect ? " yes " : " no ") << avgPeakMem;
-                break;
-            }
-            case 3: {
-                double d = heuristic(graphMemTopology, cluster, 2, 0, assignments, avgPeakMem);
-                wasCrrect =( d!=-1);resultingMS = d;
-                cout << //workflowName << " " <<
-                d << (wasCrrect ? " yes " : " no ") << avgPeakMem;
-                break;
-            }
-            case 4: {
-                double d = heuristic(graphMemTopology, cluster, 2, 1, assignments, avgPeakMem);
-                wasCrrect =( d!=-1);resultingMS = d;
-                cout << //workflowName << " " <<
-                d << (wasCrrect ? " yes " : " no ") << avgPeakMem;
-                break;
-            }
-            case 5: {
-                double d = heuristic(graphMemTopology, cluster, 3, 0, assignments, avgPeakMem);
-                wasCrrect =( d!=-1);resultingMS = d;
-                cout << //workflowName << " " <<
-                d << (wasCrrect ? " yes " : " no") << avgPeakMem;
-                break;
-            }
-            case 6: {
-                double d = heuristic(graphMemTopology, cluster, 3, 1, assignments, avgPeakMem);
-                wasCrrect =( d!=-1);resultingMS = d;
-                cout << //workflowName << " " <<
-                d << (wasCrrect ? " yes " : " no ") << avgPeakMem;
-                break;
-            }
-            case 7: {
-                double ms =
-                        0;
-                wasCrrect = heft(graphMemTopology, cluster, ms, assignments, avgPeakMem);
-                resultingMS = ms;
-                cout << //workflowName << " " <<
-                ms << (wasCrrect ? " yes" : " no") << " " << avgPeakMem<<endl;
-                break;
-            }
-            default:
-                cout << "UNKNOWN ALGORITHM" << endl;
-        }
-        lastAvgMem= avgPeakMem;
-        auto end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end - start;
-        std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
-
-    }
-    catch (std::runtime_error &e) {
-        cout << e.what() << endl;
-        //return 1;
-    }
-    catch (...) {
-        cout << "Unknown error happened" << endl;
-    }
-    return assignments;
-}
