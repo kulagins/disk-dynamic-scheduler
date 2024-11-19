@@ -1,0 +1,13 @@
+**/.DS_Store
+.idea
+.idea/
+cmake-*
+build
+build/*
+input/*.bin
+input/*.nodemappings
+input/generated/*.nodemappings
+mongo_data
+mongo_data/*
+mongo_data4
+mongo_data4/*
