@@ -26,7 +26,6 @@ if (DEFINED ENV{CONDA_PREFIX})
 endif ()
 
 if (FONDA_BUILD_MEMDAG)
-
     find_path(IGRAPH_INCLUDE_DIRS NAMES igraph.h
             HINTS "/usr/local/include"
             "/usr/local/include/igraph")
@@ -52,7 +51,7 @@ if (FONDA_BUILD_MEMDAG)
             ${MEMDAG_SOURCE_DIR}/cluster.cpp
     )
 
-    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS})
+    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS} extlibs/csv2/single_include)
     target_link_libraries(memdag PRIVATE ${IGRAPH_LIBRARIES} -lcgraph -lcdt -lm -lgvc)
 
     set_target_properties(memdag PROPERTIES
@@ -71,6 +70,7 @@ target_include_directories(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/includ
 target_sources(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/fonda_scheduler/io/graphWeightsBuilder.cpp"
         "${PROJECT_SOURCE_DIR}/fonda_scheduler/common.cpp"
         "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSched.cpp"
+        "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSchedDisk.cpp"
 )
 
 target_link_libraries(fonda_scheduler PRIVATE memdag PkgConfig::Pistache)
