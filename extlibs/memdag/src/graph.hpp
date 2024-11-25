@@ -75,7 +75,7 @@ struct vertex_t {
   void *data;
   graph_t * subgraph;
   int leader=-1;
-  std::shared_ptr<Processor> assignedProcessor;
+ int assignedProcessorId=-1;
   double makespan;
 
   bool visited;
@@ -134,6 +134,13 @@ typedef struct edge {
   void *generic_pointer;
   std::vector<Location> locations;
   ///\endcond} edge_t;
+
+    bool operator==(const edge& other) const {
+        //std::cout <<"comparing "<<tail->name<<" -> "<<head->name<< " to "<< other.tail->name<<" -> "<<other.head->name<<std::endl;
+        return tail->name == other.tail->name &&
+               head->name == other.head->name &&
+               weight == other.weight;
+    }
 } edge_t;
 
 /**
@@ -202,7 +209,9 @@ vertex_t *next_vertex_in_sorted_topological_order(graph_t *graph, vertex_t *vert
 bool isLocatedNowhere(edge_t* edge);
 bool isLocatedOnDisk(edge_t* edge);
 bool isLocatedOnThisProcessor(edge_t* edge, int id);
-  
+void delocateFromThisProcessorToDisk(edge_t* edge, int id);
+void locateToThisProcessorFromDisk(edge_t* edge, int id);
+void locateToThisProcessorFromNowhere(edge_t* edge, int id);
 /** @name Macros to iterate over vertices*/
 ///@{
 #define first_vertex(graph) (graph->first_vertex)
@@ -223,6 +232,7 @@ int add_edges_to_cope_with_limited_memory(graph_t *graph, double memory_bound, e
 
 vertex_t * findVertexByName(graph_t* graph, std::string toFind);
 vertex_t * findVertexById(graph_t* graph, int idToFind);
+void print_edge(edge_t * v);
 double peakMemoryRequirementOfVertex(const vertex_t * v);
 
 

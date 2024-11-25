@@ -66,12 +66,44 @@ void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
         this->assignedTask = taskToBeAssigned;
         //TODO
         //taskToBeAssigned->assignedProcessor= this;
-       taskToBeAssigned->assignedProcessor =  shared_from_this();
+       taskToBeAssigned->assignedProcessorId =  this->id;
         this->isBusy = true;
     } else{
         this->assignedTask = NULL;
         this->isBusy = false;
     }
+}
+
+//std::set<edge_t *, decltype(comparePendingMemories)*>::iterator
+//unsigned long
+std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Processor::delocateToDisk(edge_t* edge) {
+    auto it = this->pendingMemories.find(edge); // Find the element by key
+    if (it != this->pendingMemories.end()) {
+        delocateFromThisProcessorToDisk(edge, this->id);
+        cout << "delocated" << endl;
+        cout << "edgew " << edge->weight << endl;
+        this->availableMemory += edge->weight;
+        assert(this->availableMemory <= this->memorySize);
+        return this->pendingMemories.erase(it);
+    }
+        // If not found, return end()
+        return this->pendingMemories.end();
+}
+
+void Processor::loadFromDisk(edge_t* edge) {
+    this->pendingMemories.insert(edge);
+    locateToThisProcessorFromDisk(edge, this->id);
+    this->availableMemory-=edge->weight;
+    assert(this->availableMemory<=this->memorySize);
+    assert(this->availableMemory>0);
+}
+
+void Processor::loadFromNowhere(edge_t *edge) {
+    this->pendingMemories.insert(edge);
+    locateToThisProcessorFromNowhere(edge, this->id);
+    this->availableMemory-=edge->weight;
+    assert(this->availableMemory<=this->memorySize);
+    assert(this->availableMemory>0);
 }
 
 

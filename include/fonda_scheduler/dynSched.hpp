@@ -20,7 +20,7 @@ double calculateBLCBottomUpRank(vertex_t *task);
 std::vector < std::pair< vertex_t *, double> >  calculateMMBottomUpRank(graph_t * graph);
 
 double heuristic(graph_t * graph, Cluster * cluster, int bottomLevelVariant, int evictionVariant, vector<Assignment*> &assignments, double & peakMem);
-double new_heuristic(graph_t *graph, Cluster *cluster);
+double new_heuristic(graph_t *graph, Cluster *cluster, bool isHeft);
 vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int bottomLevelVariant);
 
 double getFinishTimeWithPredecessorsAndBuffers(vertex_t *v, const Processor *pj, const Cluster *cluster, double &startTime);
@@ -33,8 +33,8 @@ double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v
 
 vector<edge_t*> evict( vector<edge_t*> pendingMemories, double &stillTooMuch, bool evictBiggestFirst);
 
-vector< shared_ptr<Processor>> tentativeAssignment(vertex_t *v, shared_ptr<Processor>pj, Cluster* cluster, double &finishTime,
-                                                   double & startTime, bool &isValid, double &peakMem, bool isThisBaseline=false);
+vector< shared_ptr<Processor>> tentativeAssignment(vertex_t *v, shared_ptr<Processor>pj, double &finishTime,
+                                                   double & startTime, double &peakMem, int& resultingVariant, edge* &singleToKick, Cluster * cluster, bool isThisBaseline=false );
 void doRealAssignmentWithMemoryAdjustments(Cluster *cluster, double futureReadyTime, const vector<edge_t*> & edgesToKick, vertex_t *vertexToAssign,
                                            Processor *procToChange);
 graph_t *convertToNonMemRepresentation(graph_t *withMemories, map<int, int> &noMemToWithMem);
@@ -45,6 +45,9 @@ vertex_t * getLongestPredecessorWithBuffers(vertex_t *child, const Cluster *clus
 bool isDelayPossibleUntil(Assignment* assignmentToDelay, double newStartTime, vector<Assignment*> assignments, Cluster* cluster);
 std::vector<Assignment*>::iterator findAssignmentByName(vector<Assignment *> &assignments, string name);
 
+void
+processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
+                     double &earliestStartingTimeToComputeVertex, Cluster *cluster);
 
 
 

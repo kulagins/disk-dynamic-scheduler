@@ -27,6 +27,9 @@ protected:
     double memorySize;
     double processorSpeed;
     vertex_t *assignedTask;
+
+
+public:
     static auto comparePendingMemories(edge_t* a, edge_t*b) -> bool {
         if(a->weight==b->weight){
             if(a->head->id==b->head->id)
@@ -34,10 +37,8 @@ protected:
             else return a->head->id>b->head->id;
         }
         else
-        return a->weight<b->weight;
+            return a->weight<b->weight;
     }
-
-public:
     int id;
     string name;
     bool isBusy;
@@ -135,6 +136,16 @@ public:
 
     void assignSubgraph(vertex_t *taskToBeAssigned);
 
+    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge);/*{
+        delocateFromThisProcessorToDisk(edge, this->id);
+        cout<<"delocated"<<endl;
+        cout<<"edgew "<<edge->weight<<endl;
+        this->availableMemory+=edge->weight;
+        assert(this->availableMemory<=this->memorySize);
+        return this->pendingMemories.erase(edge);
+    } */
+    void loadFromDisk(edge_t* edge);
+    void loadFromNowhere(edge_t* edge);
 
 };
 
@@ -232,14 +243,19 @@ public:
 
     void printProcessors() {
         for (auto iter = this->processors.begin(); iter < processors.end(); iter++) {
-            cout << "Processor with memory " << (*iter)->getMemorySize() << ", speed " << (*iter)->getProcessorSpeed()
+            cout << "Processor " << (*iter)->id<< "with memory " << (*iter)->getMemorySize() << ", speed " << (*iter)->getProcessorSpeed()
                  << " and busy? " << (*iter)->isBusy << "assigned " << ((*iter)->isBusy?(*iter)->getAssignedTaskId(): -1)
                  << " ready time compute " << (*iter)->readyTimeCompute
                  << " ready time read " << (*iter)->readyTimeRead
                  << " ready time write " << (*iter)->readyTimeWrite
-                 << " ready time write soft " << (*iter)->softReadyTimeWrite
-                 << " avail memory " << (*iter)->availableMemory <<
-                 endl;
+                 //<< " ready time write soft " << (*iter)->softReadyTimeWrite
+                 //<< " avail memory " << (*iter)->availableMemory
+                 << " pending in memory "<<(*iter)->pendingMemories.size()<<" pcs: ";
+
+            for (const auto &item: (*iter)->pendingMemories){
+                print_edge(item);
+            }
+            cout<< endl;
         }
     }
 
@@ -294,8 +310,9 @@ public:
     void printAssignment();
 
 
-
 };
+
+vector<edge_t *> getBiggestPendingEdge(shared_ptr<Processor>pj);
 
 enum eventType{
     OnTaskStart,

@@ -9,7 +9,7 @@
 
 namespace Fonda {
 
-    Cluster * buildClusterFromCsv(double readWritePenalty, double offloadPenalty){
+    Cluster * buildClusterFromCsv(int memoryMultiplicator, double readWritePenalty, double offloadPenalty){
         csv2::Reader<csv2::delimiter<','>,
                 csv2::quote_character<'"'>,
                 csv2::first_row_is_header<true>,
@@ -45,7 +45,8 @@ namespace Fonda {
                         p->setProcessorSpeed(stod(cell_value)*100);
                     }
                     if(cell_cntr==3){
-                        p->setMemorySize(stod(cell_value)*10000);
+                        p->setMemorySize(stod(cell_value)*memoryMultiplicator);
+                        p->availableMemory= p->getMemorySize();
                     }
                     if(cell_cntr==8){
                         p->readSpeedDisk=stod(cell_value)*readWritePenalty;
@@ -86,7 +87,7 @@ namespace Fonda {
     }
 
     void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology, std::unordered_map<std::string, std::vector<std::vector<std::string>>>
-            workflow_rows, const string& workflow_name, Cluster * cluster) {
+            workflow_rows, const string& workflow_name, Cluster * cluster, int memShorteningDivision) {
 
         double minMem= std::numeric_limits<double>::max(), minTime =  std::numeric_limits<double>::max(), minWchar= std::numeric_limits<double>::max(),
         mintt = std::numeric_limits<double>::max();
@@ -121,32 +122,32 @@ namespace Fonda {
                         }
                         if (col_idx == 5) {
                             //memory
-                           avgMem+=stod(cell);
+                           avgMem+=stod(cell)/memShorteningDivision;
                         }
                         if (col_idx == 6) {
                             //memory
-                            avgwchar+=stod(cell);
+                            avgwchar+=stod(cell)/(memShorteningDivision*100);
                         }
                         if (col_idx == 7) {
                             //memory
-                            avgtinps+=stod(cell);
+                            avgtinps+=stod(cell)/(memShorteningDivision*100);
                         }
                         col_idx++;
                     }
                 }
-                if(workflow_rows[nameToSearch].size()==0){
+                if(workflow_rows[nameToSearch].empty()){
                     cout<<"<<<<<"<<endl;
                 }
-                avgMem/=workflow_rows[nameToSearch].size();
-                avgTime/=workflow_rows[nameToSearch].size();
-                avgwchar/=workflow_rows[nameToSearch].size();
-                avgtinps/=workflow_rows[nameToSearch].size();
-                double factorTime= 1;//3600;
-                double factorMem = 1;//000000000000;
-                v->time=  avgTime/factorTime;//avgTime==0? 1: avgTime;
-                v->memoryRequirement= avgMem/factorMem; //avgMem==0? 1: avgMem;
-                v->wchar= avgwchar/factorMem;//avgwchar==0? 1: avgwchar;
-                v->taskinputsize= avgtinps/factorMem; //avgtinps==0? 1: avgtinps;
+                double numOfMsrs = workflow_rows[nameToSearch].size();
+                avgMem/= numOfMsrs;
+                avgTime/= numOfMsrs;
+                avgwchar/= numOfMsrs;
+                avgtinps/= numOfMsrs;
+
+                v->time=  avgTime;//avgTime==0? 1: avgTime;
+                v->memoryRequirement= avgMem; //avgMem==0? 1: avgMem;
+                v->wchar= avgwchar;//avgwchar==0? 1: avgwchar;
+                v->taskinputsize= avgtinps; //avgtinps==0? 1: avgtinps;
 
                 minMem= min(minMem, avgMem);
                 minTime = min(minTime, avgTime);

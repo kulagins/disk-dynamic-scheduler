@@ -304,7 +304,7 @@ graph_t *copy_graph(graph_t *graph, int reverse_edges) {
     new_g->vertices_by_id[v->id]->makespan = v->makespan;
     if(v->subgraph!=NULL)
         new_g->vertices_by_id[v->id]->subgraph = copy_graph(v->subgraph,0);
-    new_g->vertices_by_id[v->id]->assignedProcessor = v->assignedProcessor;
+    new_g->vertices_by_id[v->id]->assignedProcessorId = v->assignedProcessorId;
   }
   
   for(edge_t *e=graph->first_edge; e; e=e->next) {
@@ -678,6 +678,10 @@ vertex_t * findVertexById(graph_t* graph, int idToFind){
     return  NULL;
 }
 
+void print_edge(edge_t * v){
+    std::cout<<v->tail->name<<" -> "<<v->head->name<<std::endl;
+}
+
 double peakMemoryRequirementOfVertex(const vertex_t * v) {
     double maxMemReq = v->memoryRequirement;
 
@@ -691,11 +695,11 @@ double peakMemoryRequirementOfVertex(const vertex_t * v) {
     }
     if (sumIn > maxMemReq) {
         maxMemReq = sumIn;
-     //   std::cout<<"Incoming over mi on "<<v->name<<std::endl;
+        //std::cout<<"Incoming over mi on "<<v->name<<std::endl;
     }
     if (sumOut > maxMemReq) {
         maxMemReq = sumOut;
-       // std::cout<<"Outgoing over mi on "<<v->name<<std::endl;
+        //std::cout<<"Outgoing over mi on "<<v->name<<std::endl;
 }
     return maxMemReq;
 }
