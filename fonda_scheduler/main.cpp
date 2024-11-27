@@ -34,17 +34,30 @@ bool isNoRecalculationStillValid= true;
 
 std::shared_ptr<Http::Endpoint> endpoint;
 
+/*
+ *
+ *  Call:  memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty, isBaseline
+ *  1000000, 100, 1, 0.001, true
+ *
+ */
 
 int main(int argc, char *argv[]) {
-
+    auto start = std::chrono::system_clock::now();
+    string workflowName = argv[1];
+    workflowName = trimQuotes(workflowName);
+    currentName = workflowName;
+    int algoNumber = std::stoi(argv[2]);
+    cout << "new, algo " << algoNumber << " " <<currentName<<" ";
+    int memoryMultiplicator = stoi(argv[3]), speedMultiplicator = stoi(argv[4]);
+    double readWritePenalty= stod(argv[5]), offloadPenalty= stod(argv[6]);
+    bool isBaseline = (std::string(argv[7]) == "yes");
+    //1000000, 100, 1, 0.001
     csv2::Reader<csv2::delimiter<','>,
             csv2::quote_character<'"'>,
             csv2::first_row_is_header<true>,
             csv2::trim_policy::trim_whitespace> csv;
 
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows;
-
-
     if (csv.mmap("../input/traces.csv")) {
         for (const auto row: csv) {
             std::vector<std::string> row_data;
@@ -67,45 +80,26 @@ int main(int argc, char *argv[]) {
             }
 
             // Store row in the map under the workflow name
-            workflow_rows[workflow_name+" "+task_name].push_back(row_data);
+            workflow_rows[workflow_name.append(" ").append(task_name)].push_back(row_data);
         }
     }
 
-  /*  std::string target_task = "atacseq";  // Replace with your target workflow name
-    if (workflow_rows.find(target_task) != workflow_rows.end()) {
-        std::cout << "Rows for " << target_task << ":" << std::endl;
-        for (const auto& row : workflow_rows[target_task]) {
-            for (const auto& cell : row) {
-                std::cout << cell << " ";
-            }
-            std::cout << std::endl;
-        }
-    } */
-
-    Cluster * cluster = Fonda::buildClusterFromCsv(1000000, 1, 0.001);
-
-
-
-    string workflowName = argv[1];
-    workflowName = trimQuotes(workflowName);
-    currentName = workflowName;
-    int algoNumber = std::stoi(argv[2]);
-    cout << "new, algo " << algoNumber << " " <<currentName<<" ";
+    Cluster * cluster = Fonda::buildClusterFromCsv(memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
 
     string filename = "../input/";
     string suffix = "00";
-    if (workflowName.substr(workflowName.size() - suffix.size()) == suffix) {
+    bool isGenerated = workflowName.substr(workflowName.size() - suffix.size()) == suffix;
+    if (isGenerated) {
         filename += "generated/";//+filename;
     }
     filename += workflowName;
 
-    filename += workflowName.substr(workflowName.size() - suffix.size()) == suffix ? ".dot" : "_sparse.dot";
+    filename += ".dot"; //isGenerated ? "_sparse.dot": ".dot";
     graph_t * graphMemTopology = read_dot_graph(filename.c_str(), NULL, NULL, NULL);
     checkForZeroMemories(graphMemTopology);
 
     currentAlgoNum = algoNumber;
     Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, cluster, 10);
-
 
     vertex_t *pv = graphMemTopology->first_vertex;
     while(pv!=NULL){
@@ -117,10 +111,18 @@ int main(int argc, char *argv[]) {
     }
     // cluster->printProcessors();
 
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::cout << " duration_of_prep " << elapsed_seconds.count()<<" ";// << endl;
 
+    start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
-    double d = new_heuristic(graphMemTopology, cluster, true);
+    double d = new_heuristic(graphMemTopology, cluster, isBaseline);
+
+     end = std::chrono::system_clock::now();
+     elapsed_seconds = end - start;
+    std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
     cout<<"makespan "<<d<<endl;
 }
 

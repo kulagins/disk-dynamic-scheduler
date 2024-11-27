@@ -9,7 +9,7 @@
 
 namespace Fonda {
 
-    Cluster * buildClusterFromCsv(int memoryMultiplicator, double readWritePenalty, double offloadPenalty){
+    Cluster * buildClusterFromCsv(int memoryMultiplicator, double readWritePenalty, double offloadPenalty, int speedMultiplicator){
         csv2::Reader<csv2::delimiter<','>,
                 csv2::quote_character<'"'>,
                 csv2::first_row_is_header<true>,
@@ -42,7 +42,7 @@ namespace Fonda {
                         p->name=cell_value;
                     }
                     if(cell_cntr==2){
-                        p->setProcessorSpeed(stod(cell_value)*100);
+                        p->setProcessorSpeed(stod(cell_value)*speedMultiplicator);
                     }
                     if(cell_cntr==3){
                         p->setMemorySize(stod(cell_value)*memoryMultiplicator);
@@ -94,6 +94,9 @@ namespace Fonda {
         for(vertex_t *v=graphMemTopology->first_vertex; v; v=v->next) {
             v->bottom_level=-1;
             string lowercase_name = v->name;
+            std::regex pattern("_\\d+");
+            lowercase_name = std::regex_replace(lowercase_name, pattern, "");
+           string workflow_name1 = std::regex_replace(workflow_name, pattern, "");
             transform(lowercase_name.begin(),
                       lowercase_name.end(),
                       lowercase_name.begin(),
@@ -102,7 +105,7 @@ namespace Fonda {
                                   c);
                       });
 
-           string nameToSearch =  workflow_name+" "+lowercase_name;
+           string nameToSearch =  workflow_name1+" "+lowercase_name;
             if (workflow_rows.find(nameToSearch) != workflow_rows.end()) {
                 double avgMem=0, avgTime = 0, avgwchar=0, avgtinps=0;
 

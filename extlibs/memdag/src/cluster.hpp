@@ -136,14 +136,7 @@ public:
 
     void assignSubgraph(vertex_t *taskToBeAssigned);
 
-    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge);/*{
-        delocateFromThisProcessorToDisk(edge, this->id);
-        cout<<"delocated"<<endl;
-        cout<<"edgew "<<edge->weight<<endl;
-        this->availableMemory+=edge->weight;
-        assert(this->availableMemory<=this->memorySize);
-        return this->pendingMemories.erase(edge);
-    } */
+    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge);
     void loadFromDisk(edge_t* edge);
     void loadFromNowhere(edge_t* edge);
 

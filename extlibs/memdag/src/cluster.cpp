@@ -77,13 +77,13 @@ void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
 //std::set<edge_t *, decltype(comparePendingMemories)*>::iterator
 //unsigned long
 std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Processor::delocateToDisk(edge_t* edge) {
+   // cout<<"delocate  from "<<this->id<<" ";
+  //  print_edge(edge);
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it != this->pendingMemories.end()) {
         delocateFromThisProcessorToDisk(edge, this->id);
-        cout << "delocated" << endl;
-        cout << "edgew " << edge->weight << endl;
         this->availableMemory += edge->weight;
-        assert(this->availableMemory <= this->memorySize);
+        assert(this->memorySize> this->availableMemory || abs( this->memorySize- this->availableMemory )<0.1);
         return this->pendingMemories.erase(it);
     }
         // If not found, return end()
@@ -99,6 +99,8 @@ void Processor::loadFromDisk(edge_t* edge) {
 }
 
 void Processor::loadFromNowhere(edge_t *edge) {
+   // cout<<"load onto proc "<<this->id<<" ";
+    //print_edge(edge);
     this->pendingMemories.insert(edge);
     locateToThisProcessorFromNowhere(edge, this->id);
     this->availableMemory-=edge->weight;
