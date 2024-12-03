@@ -23,7 +23,10 @@ double new_heuristic(graph_t *graph, Cluster *cluster, bool isHeft){
     int numberWithEvictedCases=0;
     for (auto &pair: ranks){
         auto vertex = pair.first;
-        //cout<<"processing "<< vertex->name<<endl;
+        cout<<"processing "<< vertex->name<<endl;
+        if(vertex->name=="MERGED_BAM_00004521"){
+              cout<<"";
+        }
         vector<shared_ptr<Processor>> bestModifiedProcs;
         shared_ptr<Processor> bestProcessorToAssign;
         double bestFinishTime = std::numeric_limits<double>::max();
@@ -38,9 +41,15 @@ double new_heuristic(graph_t *graph, Cluster *cluster, bool isHeft){
             int resultingVariant;
             auto ourModifiedProc = make_shared<Processor>(*processor);
             edge* toKick;
+            if(processor->id==31){
+                cout<<"";
+            }
+            checkIfPendingMemoryCorrect(ourModifiedProc);
             vector<shared_ptr<Processor>> modifiedProcs = tentativeAssignment(vertex, ourModifiedProc,
                                                                                      finTime, startTime,
                                                                                      peakMem, resultingVariant, toKick, cluster, isHeft);
+            if(!isHeft)
+                checkIfPendingMemoryCorrect(ourModifiedProc);
             //cout<<"start "<<startTime<<" end "<<finTime<<endl;
             if(bestFinishTime> finTime){
                     bestModifiedProcs= modifiedProcs;
@@ -66,12 +75,14 @@ double new_heuristic(graph_t *graph, Cluster *cluster, bool isHeft){
 
 
         if(bestModifiedProcs.empty()){
-            cout<<"Invalid assignment"<<endl;
+            cout<<"Invalid assignment ";
             return -1;
         }
         else{
-         //   cout<<"best "<<bestStartTime<<" "<<bestFinishTime<<" on proc "<<bestProcessorToAssign->id<<endl;
+            cout<<"best "<<bestStartTime<<" "<<bestFinishTime<<" on proc "<<bestProcessorToAssign->id<<endl;
         }
+
+
 
 
 
@@ -84,9 +95,10 @@ double new_heuristic(graph_t *graph, Cluster *cluster, bool isHeft){
                 assert(besttoKick!=NULL);
                 bestProcessorToAssign->delocateToDisk(besttoKick);
                 numberWithEvictedCases++;
+                checkIfPendingMemoryCorrect(bestProcessorToAssign);
                 break;
             case 3:
-             //   cout<<"best with all kick"<<endl;
+            //    cout<<"best with all kick"<<endl;
                 for(auto it= bestProcessorToAssign->pendingMemories.begin();
                                             it!= bestProcessorToAssign->pendingMemories.end();){
                     it = bestProcessorToAssign->delocateToDisk(*it);
@@ -94,43 +106,59 @@ double new_heuristic(graph_t *graph, Cluster *cluster, bool isHeft){
                 }
                 bestProcessorToAssign->pendingMemories.clear();
                 numberWithEvictedCases++;
+                checkIfPendingMemoryCorrect(bestProcessorToAssign);
                 break;
         }
-
+        checkIfPendingMemoryCorrect(bestProcessorToAssign);
+        cout<<"delocating from other procs according to tentative "<<endl;
         for (auto &modifiedProc: bestModifiedProcs){
+            cout<<" from "<<modifiedProc->id<<endl;
             auto it = std::find_if(cluster->processors.begin(), cluster->processors.end(),
                                    [&modifiedProc](std::shared_ptr<Processor> proc) {
                                        return proc->id == modifiedProc->id;
                                    });
             // If found, replace it with the modified version
             if (it != cluster->processors.end()) {
-                if( (*it)->id!= bestProcessorToAssign->id &&it.operator*()->pendingMemories.size()!= modifiedProc->pendingMemories.size()){
+                if( ((*it)->id!= bestProcessorToAssign->id || isHeft ) &&
+                        (*it)->pendingMemories.size()!= modifiedProc->pendingMemories.size()){
+
                     auto processorFromCluster = *it;
                     for(auto pendingInCluster= processorFromCluster->pendingMemories.begin();
                         pendingInCluster!= processorFromCluster->pendingMemories.end();){
-                       // print_edge(*pendingInCluster);
+                        print_edge(*pendingInCluster);
                         auto i = std::find_if(modifiedProc->pendingMemories.begin(),
                                               modifiedProc->pendingMemories.end(),
                                               [&pendingInCluster](auto pendInModif) {
                                                   return pendInModif==*pendingInCluster;
                                               });
                         if(i==modifiedProc->pendingMemories.end()){
-                            pendingInCluster= processorFromCluster->delocateToDisk(*pendingInCluster);
+                            delocateFromThisProcessorToDisk(*pendingInCluster, modifiedProc->id);
+                            if((*pendingInCluster)->head->name== vertex->name || !(isHeft && (*it)->id== bestProcessorToAssign->id ) )
+                                modifiedProc->availableMemory += (*pendingInCluster)->weight;
                         }
-                        else pendingInCluster++;
+                         pendingInCluster++;
                     }
 
                 }
+                assert(modifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+                checkIfPendingMemoryCorrect(bestProcessorToAssign);
+                cout<<"erplacing "<<modifiedProc->id<<endl;
                 *it = modifiedProc;
+
             }
             else{
                 cout<<"Not found proc by id "<<modifiedProc->id<<endl;
             }
         }
+        assert(bestProcessorToAssign->readyTimeCompute<  std::numeric_limits<double>::max());
         vertex->assignedProcessorId= bestProcessorToAssign->id;
+
+        checkIfPendingMemoryCorrect(bestProcessorToAssign);
+
+        cout<<"kicking in edges"<<endl;
         for (int j = 0; j < vertex->in_degree; j++) {
             edge *ine = vertex->in_edges[j];
-           // cout<<"ine ";print_edge(ine);
+           cout<<"ine ";print_edge(ine);
             for (auto location: ine->locations){
                 if(location.locationType==LocationType::OnProcessor ){ //&& location.processorId.value()!=bestProcessorToAssign->id
                     assert(location.processorId.has_value());
@@ -140,6 +168,7 @@ double new_heuristic(graph_t *graph, Cluster *cluster, bool isHeft){
                                                return e->head->id == ine->head->id && e->tail->id == ine->tail->id;
                                            });
                     if(it != otherProc->pendingMemories.end()){
+                        cout<<"found and kicked from "<<otherProc->id<<endl;
                         otherProc->delocateToDisk(ine);
                     }
                     else{
@@ -157,21 +186,30 @@ double new_heuristic(graph_t *graph, Cluster *cluster, bool isHeft){
             }
             ine->locations.clear();//.emplace_back(LocationType::OnProcessor, bestProcessorToAssign->id);
         }
+        checkIfPendingMemoryCorrect(bestProcessorToAssign);
 
-      //  cout<<"emplacing out edges ";
+        cout<<"actually remain pending: "<<bestProcessorToAssign->pendingMemories.size()<<" pieces, avail mem "<<bestProcessorToAssign->availableMemory<<" ";
+        for (auto it = bestProcessorToAssign->pendingMemories.begin();
+             it != bestProcessorToAssign->pendingMemories.end();){
+            print_edge(*it);
+            it++;
+        }
+
+
+        cout<<"emplacing out edges , starting with "<<bestProcessorToAssign->availableMemory<<endl;
         for(int i=0; i<vertex->out_degree; i++) {
             auto v1 = vertex->out_edges[i];
-       //     print_edge(v1);
+          //  print_edge(v1);
+          cout<<"adding "<<v1->weight<<endl;
             bestProcessorToAssign->loadFromNowhere(v1);
+            checkIfPendingMemoryCorrect(bestProcessorToAssign);
 
         }
-        double sum=0;
-        for (const auto &item: bestProcessorToAssign->pendingMemories){
-            sum+= item->weight;
+        for (const auto &item: cluster->getProcessors()){
+            checkIfPendingMemoryCorrect(item);
         }
 
-        //cout<<bestProcessorToAssign->availableMemory <<" "<< (bestProcessorToAssign->getMemorySize()- sum)<<endl;
-        assert((bestProcessorToAssign->availableMemory - (bestProcessorToAssign->getMemorySize()- sum)) <1);
+
         vertex->makespan= bestFinishTime;
         assert(bestStartTime<bestFinishTime);
         //cluster->printProcessors();
@@ -188,32 +226,82 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
                     double &peakMem, int& resultingvariant, edge * &toKick, Cluster * cluster, bool isThisBaseline) {
 
     //TODO CHECK SETTING AVAIL MEM and such
-   // cout<<"tent on proc "<<ourModifiedProc->id<< " ";
+    cout<<"tent on proc "<<ourModifiedProc->id<< " ";
+    assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
     resultingvariant=1;
 
     double sumOut=0;
+    cout<<"sumOUt includes ";
     for (int i = 0; i < v->out_degree; i++) {
-        sumOut += v->out_edges[i]->weight;
+         sumOut += v->out_edges[i]->weight;
+         cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
     }
 
     if(ourModifiedProc->getMemorySize()<sumOut){
-       // cout<<"too large outs"<<endl;
+        cout<<"too large outs absolutely"<<endl;
         finishTime= std::numeric_limits<double>::max();
         return {};
     }
-    if(isThisBaseline && ourModifiedProc->availableMemory<sumOut){
-          //  cout<<"too large outs on baseline"<<endl;
-            finishTime= std::numeric_limits<double>::max();
-            return {};
+
+    for (int i = 0; i < v->in_degree; i++) {
+         if(isLocatedOnThisProcessor( v->in_edges[i], ourModifiedProc->id)){
+             cout<<"in is located here ";
+             print_edge(v->in_edges[i]);
+             sumOut -= v->in_edges[i]->weight;
+         }
+
     }
+
     vector<std::shared_ptr<Processor>  > modifiedProcs;
 
     modifiedProcs.emplace_back(ourModifiedProc);
 
-
+    checkIfPendingMemoryCorrect(ourModifiedProc);
     processIncomingEdges(v, ourModifiedProc, modifiedProcs, startTime, cluster);
+    checkIfPendingMemoryCorrect(ourModifiedProc);
 
+    assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
     startTime = ourModifiedProc->readyTimeCompute> startTime? ourModifiedProc->readyTimeCompute: startTime;
+
+    assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+    if(isThisBaseline ){
+        if( ourModifiedProc->availableMemory<sumOut) {
+            cout<<"sum out is "<<sumOut <<", kicking unexpectedly "<<endl;
+            double stillNeedsToBeEvictedToRun = sumOut - ourModifiedProc->availableMemory;
+            double writeTime = ourModifiedProc->readyTimeCompute;
+
+            for (auto it = ourModifiedProc->pendingMemories.begin();
+                 it != ourModifiedProc->pendingMemories.end() && stillNeedsToBeEvictedToRun > 0;) {
+              //  print_edge(*it);
+                //it = ourModifiedProc->delocateToDisk(*it);
+               // if((*it)->head->name!=)
+                stillNeedsToBeEvictedToRun -= (*it)->weight;
+                writeTime+= (*it)->weight/ourModifiedProc->writeSpeedDisk;
+              //  ourModifiedProc->availableMemory+=(*it)->weight;
+                it = ourModifiedProc->pendingMemories.erase(it);
+
+            }
+           assert(stillNeedsToBeEvictedToRun<=0);
+            startTime= writeTime;
+            ourModifiedProc->readyTimeWrite= writeTime; ourModifiedProc->readyTimeCompute= writeTime;
+            assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+            //checkIfPendingMemoryCorrect(ourModifiedProc);
+
+
+            cout<<"assuming that remain pending: "<<ourModifiedProc->pendingMemories.size()<<" pieces, with avail memory "<<ourModifiedProc->availableMemory<< " ";
+            for (auto it = ourModifiedProc->pendingMemories.begin();
+                 it != ourModifiedProc->pendingMemories.end();){
+                print_edge(*it);
+                it++;
+            }
+
+            cout<<endl;
+
+        }
+
+    }
+    if(!isThisBaseline)
+        checkIfPendingMemoryCorrect(ourModifiedProc);
 
     double Res = howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(v, ourModifiedProc);
     peakMem = (Res<0)? 1:(ourModifiedProc->getMemorySize()-Res)/ourModifiedProc->getMemorySize();
@@ -225,25 +313,35 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
 
         double timeToFinishNoEvicted = startTime+ v->time/ ourModifiedProc->getProcessorSpeed() + amountToOffload / ourModifiedProc->memoryOffloadingPenalty;
         assert(timeToFinishNoEvicted>startTime);
+        if(sumOut>ourModifiedProc->availableMemory){
+            cout<<"cant"<<endl;
+            timeToFinishNoEvicted= std::numeric_limits<double>::max();
+        }
+
+
         double timeToFinishBiggestEvicted = std::numeric_limits<double>::max(),
         timeToFinishAllEvicted = std::numeric_limits<double>::max() ;
         double timeToWriteAllPending = 0;
-
         vector<edge_t *> penMemsAsVector = getBiggestPendingEdge(ourModifiedProc);
+        double startTimeFor1Evicted, startTimeForAllEvicted;
+        startTimeFor1Evicted = startTimeForAllEvicted = ourModifiedProc->readyTimeWrite> startTime?
+                                                        ourModifiedProc->readyTimeWrite: startTime;
         if(!penMemsAsVector.empty()) {
             auto biggestFileWeight = (*penMemsAsVector.begin())->weight;
             double amountToOffloadWithoutBiggestFile = (amountToOffload - biggestFileWeight) > 0 ? (amountToOffload -
                                                                                                     biggestFileWeight) : 0 ;
-            startTime = ourModifiedProc->readyTimeWrite> startTime?
-                        ourModifiedProc->readyTimeWrite: startTime;
             double finishTimeToWrite = ourModifiedProc->readyTimeWrite +
                                        biggestFileWeight / ourModifiedProc->writeSpeedDisk;
-            startTime = max(startTime, finishTimeToWrite);
+            startTimeFor1Evicted = max(startTime, finishTimeToWrite);
             timeToFinishBiggestEvicted =
-                    startTime
+                    startTimeFor1Evicted
                     + v->time / ourModifiedProc->getProcessorSpeed() +
                     amountToOffloadWithoutBiggestFile / ourModifiedProc->memoryOffloadingPenalty;
-            assert(timeToFinishBiggestEvicted>startTime);
+            assert(timeToFinishBiggestEvicted>startTimeFor1Evicted);
+
+            double availableMemWithoutBiggest = ourModifiedProc->availableMemory+ biggestFileWeight;
+            if(sumOut>availableMemWithoutBiggest)
+                timeToFinishBiggestEvicted= std::numeric_limits<double>::max();
 
 
 
@@ -253,47 +351,64 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
                 sumWeightsOfAllPending+= item->weight;
             }
 
-            double amountToOffloadWithoutAllFiles = (ourModifiedProc->getMemorySize() - biggestFileWeight > 0) ? 0 :
-                                                    biggestFileWeight - ourModifiedProc->getMemorySize();
+            double amountToOffloadWithoutAllFiles = (amountToOffload - sumWeightsOfAllPending > 0) ?
+                    amountToOffload - sumWeightsOfAllPending : 0 ;
 
+            assert(amountToOffloadWithoutAllFiles>=0);
             finishTimeToWrite = ourModifiedProc->readyTimeWrite +
                                 timeToWriteAllPending;
-            startTime = max(startTime, finishTimeToWrite);
-            timeToFinishAllEvicted = startTime + v->time / ourModifiedProc->getProcessorSpeed() +
+            startTimeForAllEvicted = max(startTimeForAllEvicted, finishTimeToWrite);
+            timeToFinishAllEvicted = startTimeForAllEvicted + v->time / ourModifiedProc->getProcessorSpeed() +
                                      amountToOffloadWithoutAllFiles / ourModifiedProc->memoryOffloadingPenalty;
-            assert(timeToFinishAllEvicted>startTime);
+            assert(timeToFinishAllEvicted>startTimeForAllEvicted);
+
         }
 
         double minTTF = min(timeToFinishNoEvicted, min(timeToFinishBiggestEvicted, timeToFinishAllEvicted));
-        assert(minTTF>startTime);
+        if(minTTF==std::numeric_limits<double>::max() ){
+            cout<<"minTTF inf"<<endl;
+            finishTime= std::numeric_limits<double>::max();
+            return {};
+        }
+        assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
         ourModifiedProc->readyTimeCompute = minTTF;
+        finishTime= ourModifiedProc->readyTimeCompute;
+        assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+
+        if(isThisBaseline){
+            ourModifiedProc->readyTimeCompute = timeToFinishNoEvicted;
+            finishTime=timeToFinishNoEvicted;
+            resultingvariant=1;
+            assert(finishTime> startTime);
+            return modifiedProcs;
+        }
 
 
         if(timeToFinishBiggestEvicted == minTTF){
             toKick = (*penMemsAsVector.begin());
-          //  cout<<"best tentative with biggest Evicted "; print_edge(toKick);
+            cout<<"best tentative with biggest Evicted "; print_edge(toKick);
             resultingvariant=2;
             ourModifiedProc->readyTimeWrite +=
                     (*penMemsAsVector.begin())->weight / ourModifiedProc->writeSpeedDisk;
             // ourModifiedProc->pendingMemories.erase()
             //penMemsAsVector.erase(penMemsAsVector.begin());
-
+            assert(startTime<=startTimeFor1Evicted);
+            startTime= startTimeFor1Evicted;
             assert(toKick!=nullptr);
             assert(!toKick->locations.empty());
             assert(isLocatedOnThisProcessor(toKick, ourModifiedProc->id));
         }
         if(timeToFinishAllEvicted==minTTF){
             resultingvariant=3;
-          //  cout<<"best tentative with all Evicted ";
+            cout<<"best tentative with all Evicted ";
             ourModifiedProc->readyTimeWrite += timeToWriteAllPending;
+            assert(startTime<=startTimeForAllEvicted);
+            startTime= startTimeForAllEvicted;
             //penMemsAsVector.resize(0);
+
         }
 
-        if(isThisBaseline){
-            ourModifiedProc->readyTimeCompute = timeToFinishNoEvicted;
-            resultingvariant=1;
-        }
-        finishTime= ourModifiedProc->readyTimeCompute;
+
     }
     else{
         //startTime =  ourModifiedProc->readyTimeCompute;
@@ -302,6 +417,7 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
         finishTime= ourModifiedProc->readyTimeCompute;
 
     }
+   // cout<<endl;
     assert(finishTime> startTime);
     return modifiedProcs;
 }
@@ -341,12 +457,15 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, 
                                       });
                 if(it==modifiedProcs.end()){
                    addedProc = make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
+                    cout<<"adding modified proc "<<addedProc->id<<endl;
+                    modifiedProcs.emplace_back(addedProc);
+                    checkIfPendingMemoryCorrect(addedProc);
                 }
                 else{
                     addedProc = *it;
                 }
 
-                modifiedProcs.emplace_back(addedProc);
+                assert(!hasDuplicates(modifiedProcs));
 
                 double timeToStartWriting= max(predecessor->makespan, addedProc->readyTimeWrite);
                 addedProc->readyTimeWrite= timeToStartWriting+ incomingEdge->weight / addedProc->writeSpeedDisk;
@@ -358,6 +477,7 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, 
                 addedProc->pendingMemories.erase(incomingEdge);
                 //cout<<"other proc "<<addedProc->id<<" evicting edge "; print_edge(incomingEdge);
                 assert(addpl> addedProc->pendingMemories.size());
+                //checkIfPendingMemoryCorrect(addedProc);
             }
         }
     }
@@ -394,7 +514,10 @@ void delocateFromThisProcessorToDisk(edge_t* edge, int id){
                                                     return location.locationType == LocationType::OnProcessor &&
                                                            location.processorId == id;
                                                 });
-  // cout<<"delocating "; print_edge(edge);
+   cout<<"delocating "; print_edge(edge);
+   if(edge->head->name=="circularmapper_00009417" && edge->tail->name=="convertBam_00009427"){
+       cout<<"";
+   }
    assert(locationOnThisProcessor  != edge->locations.end());
    edge->locations.erase(locationOnThisProcessor);
    if(!isLocatedOnDisk(edge))
@@ -404,7 +527,7 @@ void delocateFromThisProcessorToDisk(edge_t* edge, int id){
 }
 
 void locateToThisProcessorFromDisk(edge_t* edge, int id){
-   // cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
+    cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
     assert(isLocatedOnDisk(edge));
     auto locationOnDisk = std::find_if(edge->locations.begin(), edge->locations.end(),
                                                 [](Location location) {
@@ -610,4 +733,27 @@ vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int botto
             break;
     }
     return ranks;
+}
+
+void checkIfPendingMemoryCorrect(shared_ptr<Processor> p){
+    double sumOut=0;
+    for(auto pendingMemorie : p->pendingMemories){
+        sumOut +=pendingMemorie->weight;
+    }
+    double busy = p->availableMemory + sumOut;
+    if(abs(p->getMemorySize() -busy) >0.1)
+        cout<<"check "<<p->getMemorySize()<<" vs "<< busy<<endl;
+    assert(abs(p->getMemorySize() -busy) <0.1);
+    assert(p->readyTimeCompute<  std::numeric_limits<double>::max());
+}
+
+bool hasDuplicates(const std::vector<shared_ptr<Processor>>& vec) {
+    std::unordered_set<int> seenIds;
+    for (const auto& obj : vec) {
+        if (!seenIds.insert(obj->id).second) {
+            // Insert returns {iterator, false} if the value already exists
+            return true;
+        }
+    }
+    return false;
 }

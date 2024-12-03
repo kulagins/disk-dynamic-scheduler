@@ -1,5 +1,16 @@
 #!/bin/bash
 pwd
+../build/fonda_scheduler atacseq 1 1000000 100 1 0.001 yes
+../build/fonda_scheduler bacass 1 1000000 100 1 0.001 yes
+../build/fonda_scheduler chipseq 1 1000000 100 1 0.001 yes
+../build/fonda_scheduler eager 1 1000000 100 1 0.001 yes
+../build/fonda_scheduler methylseq 1 1000000 100 1 0.001 yes
+
+../build/fonda_scheduler atacseq 1 1000000 100 1 0.001  no
+../build/fonda_scheduler bacass 1 1000000 100 1 0.001  no
+../build/fonda_scheduler chipseq 1 1000000 100 1 0.001  no
+../build/fonda_scheduler eager 1 1000000 100 1 0.001  no
+../build/fonda_scheduler methylseq 1 1000000 100 1 0.001  no
 
 ../build/fonda_scheduler methylseq_1000 1 1000000 100 1 0.001 yes
 ../build/fonda_scheduler methylseq_1000 1 1000000 100 1 0.001 no

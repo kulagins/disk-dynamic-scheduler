@@ -49,6 +49,7 @@ void
 processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
                      double &earliestStartingTimeToComputeVertex, Cluster *cluster);
 
-
+void checkIfPendingMemoryCorrect(shared_ptr<Processor> p);
+bool hasDuplicates(const std::vector<shared_ptr<Processor>>& vec);
 
 #endif //RESHI_TXT_DYNSCHED_HPP

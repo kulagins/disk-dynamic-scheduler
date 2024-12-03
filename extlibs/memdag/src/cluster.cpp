@@ -77,8 +77,8 @@ void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
 //std::set<edge_t *, decltype(comparePendingMemories)*>::iterator
 //unsigned long
 std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Processor::delocateToDisk(edge_t* edge) {
-   // cout<<"delocate  from "<<this->id<<" ";
-  //  print_edge(edge);
+   cout<<"delocate  from "<<this->id<<" ";
+   print_edge(edge);
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it != this->pendingMemories.end()) {
         delocateFromThisProcessorToDisk(edge, this->id);
@@ -87,6 +87,7 @@ std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Proce
         return this->pendingMemories.erase(it);
     }
         // If not found, return end()
+        cout<<"not fnd1"<<endl;
         return this->pendingMemories.end();
 }
 
@@ -99,11 +100,12 @@ void Processor::loadFromDisk(edge_t* edge) {
 }
 
 void Processor::loadFromNowhere(edge_t *edge) {
-   // cout<<"load onto proc "<<this->id<<" ";
-    //print_edge(edge);
+    cout<<"load onto proc "<<this->id<<" ";
+    print_edge(edge);
     this->pendingMemories.insert(edge);
     locateToThisProcessorFromNowhere(edge, this->id);
     this->availableMemory-=edge->weight;
+    cout<<"remains mem "<< this->availableMemory<<endl;
     assert(this->availableMemory<=this->memorySize);
     assert(this->availableMemory>0);
 }
@@ -136,37 +138,6 @@ shared_ptr<Processor>Cluster::smallestFreeProcessorFitting(double requiredMem) {
     }
     return minProc;
 }
-/*
-Processor *Cluster::findSmallestFittingProcessorForMerge(Task *currentQNode, const Tree *tree, double requiredMemory) {
-    Processor *optimalProcessor = nullptr;
-    double optimalMemorySize = std::numeric_limits<double>::max();
-    vector<Task *> *childrenvector = currentQNode->getParent()->getChildren();
-    bool mergeThreeNodes = (currentQNode->getChildren()->empty()) & (childrenvector->size() == 2);
-    vector<Processor *> eligibleProcessors;
-    if (mergeThreeNodes) {
-        eligibleProcessors.push_back(tree->getTask(childrenvector->front()->getOtherSideId())->getAssignedProcessor());
-        eligibleProcessors.push_back(tree->getTask(childrenvector->back()->getOtherSideId())->getAssignedProcessor());
-        eligibleProcessors.push_back(
-                tree->getTask(currentQNode->getParent()->getOtherSideId())->getAssignedProcessor());
-    } else {
-        eligibleProcessors.push_back(tree->getTask(currentQNode->getOtherSideId())->getAssignedProcessor());
-        eligibleProcessors.push_back(
-                tree->getTask(currentQNode->getParent()->getOtherSideId())->getAssignedProcessor());
-    }
-    eligibleProcessors.erase(std::remove_if(eligibleProcessors.begin(),
-                                            eligibleProcessors.end(),
-                                            [](Processor *proc) { return proc == NULL; }),
-                             eligibleProcessors.end());
-    for (auto eligibleProcessor: eligibleProcessors) {
-        if (eligibleProcessor != NULL && eligibleProcessor->getMemorySize() > requiredMemory &&
-            eligibleProcessor->getMemorySize() < optimalMemorySize) {
-            optimalProcessor = eligibleProcessor;
-            optimalMemorySize = eligibleProcessor->getMemorySize();
-        }
-    }
-    return optimalProcessor;
-}
- */
 
 void Cluster::freeAllBusyProcessors() {
     for (auto item: this->getProcessors()) {
@@ -184,16 +155,6 @@ void Cluster::freeAllBusyProcessors() {
 
 }
 
-bool cmp_processors_memsize(Processor *a, Processor *b) {
-    return (a->getMemorySize() >= b->getMemorySize());
-};
-
-void Cluster::sortProcessorsByMemSize() {
-  //  std::sort(this->processors.begin(), this->processors.end(), cmp_processors_memsize);
-    //assert(this->getProcessors().at(0)->getMemorySize() >
-     //      this->getProcessors().at(this->getNumberProcessors() - 1)->getMemorySize());
-
-}
 
 void Cluster::sortProcessorsByProcSpeed() {
     sort(this->processors.begin(), this->processors.end(),
@@ -203,24 +164,5 @@ void Cluster::sortProcessorsByProcSpeed() {
 
 }
 
-/*Cluster::Cluster(const Cluster * copy){
-
-    for (const auto &item: copy->getProcessors()){
-        //deep copy processor
-        this->addProcessor(make_shared<Processor>(item));
-    }
-
-    this->readyTimesBuffers.resize(copy->readyTimesBuffers.size());
-    for (int i=0; i< copy->readyTimesBuffers.size(); i++){
-        this->readyTimesBuffers.at(i).resize(copy->readyTimesBuffers.at(i).size());
-        for (int j=0; j< copy->readyTimesBuffers.at(i).size(); j++){
-            this->readyTimesBuffers.at(i).at(j) = copy->readyTimesBuffers.at(i).at(j);
-        }
-    }
-
-    this->setHomogeneousBandwidth(copy->getBandwidth());
-
-
-} */
 
 Processor::Processor(const Processor & copy)= default;

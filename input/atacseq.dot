@@ -1,878 +1,111 @@
-digraph "atacseq" {
-p0 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p127 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p0 -> p127 [label="ch_multiqc_custom_config"];
-
-p1 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p21 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p1 -> p21 [label="ch_blacklist"];
-
-p2 [shape=point,label="",fixedsize=true,width=0.1];
-p3 [label="CHECK_DESIGN"];
-p2 -> p3 [label="design"];
-
-p3 [label="CHECK_DESIGN"];
-p4 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitCsv"];
-p3 -> p4 [label="ch_design_reads_csv"];
-
-p4 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitCsv"];
-p5 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p4 -> p5;
-
-p5 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p6 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p5 -> p6;
-
-p6 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p7 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p6 -> p7 [label="design_replicates_exist"];
-
-p6 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p25 [label="TRIMGALORE"];
-p6 -> p25 [label="ch_raw_reads_trimgalore"];
-
-p6 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p24 [label="FASTQC"];
-p6 -> p24 [label="ch_raw_reads_fastqc"];
-
-p6 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p11 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p6 -> p11 [label="design_multiple_samples"];
-
-p7 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p8 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="flatten"];
-p7 -> p8;
-
-p8 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="flatten"];
-p9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="max"];
-p8 -> p9;
-
-p9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="max"];
-p10 [shape=point];
-p9 -> p10;
-
-p11 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p12 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="flatten"];
-p11 -> p12;
-
-p12 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="flatten"];
-p13 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="unique"];
-p12 -> p13;
-
-p13 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="unique"];
-p14 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="count"];
-p13 -> p14;
-
-p14 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="count"];
-p15 [shape=point];
-p14 -> p15;
-
-p16 [shape=point,label="",fixedsize=true,width=0.1];
-p17 [label="BWA_INDEX"];
-p16 -> p17 [label="fasta"];
-
-p17 [label="BWA_INDEX"];
-p26 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p17 -> p26 [label="ch_bwa_index"];
-
-p18 [shape=point,label="",fixedsize=true,width=0.1];
-p19 [label="MAKE_GENE_BED"];
-p18 -> p19 [label="gtf"];
-
-p19 [label="MAKE_GENE_BED"];
-p20 [label="MAKE_TSS_BED"];
-p19 -> p20 [label="ch_gene_bed"];
-
-p20 [label="MAKE_TSS_BED"];
-p71 [label="MERGED_LIB_ATAQV"];
-p20 -> p71 [label="ch_tss_bed"];
-
-p21 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p23 [label="MAKE_GENOME_FILTER"];
-p21 -> p23;
-
-p22 [shape=point,label="",fixedsize=true,width=0.1];
-p23 [label="MAKE_GENOME_FILTER"];
-p22 -> p23 [label="fasta"];
-
-p23 [label="MAKE_GENOME_FILTER"];
-p33 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p23 -> p33 [label="ch_genome_filter_regions"];
-
-p23 [label="MAKE_GENOME_FILTER"];
-p70 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p23 -> p70 [label="ch_genome_autosomes"];
-
-p23 [label="MAKE_GENOME_FILTER"];
-p43 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p23 -> p43 [label="ch_genome_sizes_mlib_bigwig"];
-
-p23 [label="MAKE_GENOME_FILTER"];
-p79 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p23 -> p79 [label="ch_genome_sizes_mrep_bigwig"];
-
-p24 [label="FASTQC"];
-p131 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p24 -> p131 [label="ch_fastqc_reports_mqc"];
-
-p25 [label="TRIMGALORE"];
-p27 [label="BWA_MEM"];
-p25 -> p27 [label="ch_trimmed_reads"];
-
-p25 [label="TRIMGALORE"];
-p133 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p25 -> p133 [label="ch_trimgalore_results_mqc"];
-
-p25 [label="TRIMGALORE"];
-p135 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p25 -> p135 [label="ch_trimgalore_fastqc_reports_mqc"];
-
-p26 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p27 [label="BWA_MEM"];
-p26 -> p27;
-
-p27 [label="BWA_MEM"];
-p28 [label="SORT_BAM"];
-p27 -> p28 [label="ch_bwa_bam"];
-
-p28 [label="SORT_BAM"];
-p29 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p28 -> p29;
-
-p28 [label="SORT_BAM"];
-p137 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p28 -> p137 [label="ch_sort_bam_flagstat_mqc"];
-
-p29 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p30 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p29 -> p30;
-
-p30 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p31 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p30 -> p31;
-
-p31 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p32 [label="MERGED_LIB_BAM"];
-p31 -> p32 [label="ch_sort_bam_merge"];
-
-p32 [label="MERGED_LIB_BAM"];
-p35 [label="MERGED_LIB_BAM_FILTER"];
-p32 -> p35 [label="ch_mlib_bam_filter"];
-
-p32 [label="MERGED_LIB_BAM"];
-p39 [label="MERGED_LIB_PRESEQ"];
-p32 -> p39 [label="ch_mlib_bam_preseq"];
-
-p32 [label="MERGED_LIB_BAM"];
-p69 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p32 -> p69 [label="ch_mlib_bam_ataqv"];
-
-p32 [label="MERGED_LIB_BAM"];
-p138 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p32 -> p138 [label="ch_mlib_bam_stats_mqc"];
-
-p32 [label="MERGED_LIB_BAM"];
-p141 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p32 -> p141 [label="ch_mlib_bam_metrics_mqc"];
-
-p33 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p35 [label="MERGED_LIB_BAM_FILTER"];
-p33 -> p35;
-
-p34 [shape=point,label="",fixedsize=true,width=0.1];
-p35 [label="MERGED_LIB_BAM_FILTER"];
-p34 -> p35 [label="bamtools_filter_config"];
-
-p35 [label="MERGED_LIB_BAM_FILTER"];
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p35 -> p38 [label="ch_mlib_filter_bam"];
-
-p35 [label="MERGED_LIB_BAM_FILTER"];
-p37 [shape=point];
-p35 -> p37 [label="ch_mlib_filter_bam_flagstat"];
-
-p35 [label="MERGED_LIB_BAM_FILTER"];
-p36 [shape=point];
-p35 -> p36 [label="ch_mlib_filter_bam_stats_mqc"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p41 [label="MERGED_LIB_PICARD_METRICS"];
-p38 -> p41 [label="ch_mlib_rm_orphan_bam_metrics"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p42 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p38 -> p42 [label="ch_mlib_rm_orphan_bam_bigwig"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p47 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p38 -> p47 [label="ch_mlib_rm_orphan_bam_macs"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p46 [label="MERGED_LIB_PLOTFINGERPRINT"];
-p38 -> p46 [label="ch_mlib_rm_orphan_bam_plotfingerprint"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p74 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p38 -> p74;
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p63 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p38 -> p63 [label="ch_mlib_name_bam_mlib_counts"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p98 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p38 -> p98 [label="ch_mlib_name_bam_mrep_counts"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p42 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p38 -> p42 [label="ch_mlib_rm_orphan_flagstat_bigwig"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p47 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p38 -> p47 [label="ch_mlib_rm_orphan_flagstat_macs"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p139 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p38 -> p139 [label="ch_mlib_rm_orphan_flagstat_mqc"];
-
-p38 [label="MERGED_LIB_BAM_REMOVE_ORPHAN"];
-p140 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p38 -> p140 [label="ch_mlib_rm_orphan_stats_mqc"];
-
-p39 [label="MERGED_LIB_PRESEQ"];
-p151 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p39 -> p151 [label="ch_mlib_preseq_mqc"];
-
-p40 [shape=point,label="",fixedsize=true,width=0.1];
-p41 [label="MERGED_LIB_PICARD_METRICS"];
-p40 -> p41 [label="fasta"];
-
-p41 [label="MERGED_LIB_PICARD_METRICS"];
-p142 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p41 -> p142 [label="ch_mlib_collectmetrics_mqc"];
-
-p42 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p44 [label="MERGED_LIB_BIGWIG"];
-p42 -> p44;
-
-p43 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p44 [label="MERGED_LIB_BIGWIG"];
-p43 -> p44;
-
-p44 [label="MERGED_LIB_BIGWIG"];
-p45 [label="MERGED_LIB_PLOTPROFILE"];
-p44 -> p45 [label="ch_mlib_bigwig_plotprofile"];
-
-p44 [label="MERGED_LIB_BIGWIG"];
-p104 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p44 -> p104 [label="ch_mlib_bigwig_igv"];
-
-p19 [label="MAKE_GENE_BED"];
-p45 [label="MERGED_LIB_PLOTPROFILE"];
-p19 -> p45 [label="ch_gene_bed"];
-
-p45 [label="MERGED_LIB_PLOTPROFILE"];
-p153 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p45 -> p153 [label="ch_mlib_plotprofile_mqc"];
-
-p46 [label="MERGED_LIB_PLOTFINGERPRINT"];
-p155 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p46 -> p155 [label="ch_mlib_plotfingerprint_mqc"];
-
-p47 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p50 [label="MERGED_LIB_MACS2"];
-p47 -> p50;
-
-p48 [shape=point,label="",fixedsize=true,width=0.1];
-p50 [label="MERGED_LIB_MACS2"];
-p48 -> p50 [label="mlib_peak_count_header"];
-
-p49 [shape=point,label="",fixedsize=true,width=0.1];
-p50 [label="MERGED_LIB_MACS2"];
-p49 -> p50 [label="mlib_frip_score_header"];
-
-p50 [label="MERGED_LIB_MACS2"];
-p53 [label="MERGED_LIB_MACS2_ANNOTATE"];
-p50 -> p53 [label="ch_mlib_macs_homer"];
-
-p50 [label="MERGED_LIB_MACS2"];
-p54 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p50 -> p54 [label="ch_mlib_macs_qc"];
-
-p50 [label="MERGED_LIB_MACS2"];
-p58 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p50 -> p58 [label="ch_mlib_macs_consensus"];
-
-p50 [label="MERGED_LIB_MACS2"];
-p69 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p50 -> p69 [label="ch_mlib_macs_ataqv"];
-
-p50 [label="MERGED_LIB_MACS2"];
-p106 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p50 -> p106 [label="ch_mlib_macs_igv"];
-
-p50 [label="MERGED_LIB_MACS2"];
-p143 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p50 -> p143 [label="ch_mlib_macs_mqc"];
-
-p51 [shape=point,label="",fixedsize=true,width=0.1];
-p53 [label="MERGED_LIB_MACS2_ANNOTATE"];
-p51 -> p53 [label="fasta"];
-
-p52 [shape=point,label="",fixedsize=true,width=0.1];
-p53 [label="MERGED_LIB_MACS2_ANNOTATE"];
-p52 -> p53 [label="gtf"];
-
-p53 [label="MERGED_LIB_MACS2_ANNOTATE"];
-p55 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p53 -> p55 [label="ch_mlib_macs_annotate"];
-
-p54 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p57 [label="MERGED_LIB_MACS2_QC"];
-p54 -> p57;
-
-p55 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p57 [label="MERGED_LIB_MACS2_QC"];
-p55 -> p57;
-
-p56 [shape=point,label="",fixedsize=true,width=0.1];
-p57 [label="MERGED_LIB_MACS2_QC"];
-p56 -> p57 [label="mlib_peak_annotation_header"];
-
-p57 [label="MERGED_LIB_MACS2_QC"];
-p145 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p57 -> p145 [label="ch_mlib_peak_qc_mqc"];
-
-p58 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p59 [label="MERGED_LIB_CONSENSUS"];
-p58 -> p59;
-
-p59 [label="MERGED_LIB_CONSENSUS"];
-p62 [label="MERGED_LIB_CONSENSUS_ANNOTATE"];
-p59 -> p62 [label="ch_mlib_macs_consensus_bed"];
-
-p59 [label="MERGED_LIB_CONSENSUS"];
-p64 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p59 -> p64 [label="ch_mlib_macs_consensus_saf"];
-
-p59 [label="MERGED_LIB_CONSENSUS"];
-p62 [label="MERGED_LIB_CONSENSUS_ANNOTATE"];
-p59 -> p62 [label="ch_mlib_macs_consensus_bool"];
-
-p59 [label="MERGED_LIB_CONSENSUS"];
-p108 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p59 -> p108 [label="ch_mlib_macs_consensus_igv"];
-
-p60 [shape=point,label="",fixedsize=true,width=0.1];
-p62 [label="MERGED_LIB_CONSENSUS_ANNOTATE"];
-p60 -> p62 [label="fasta"];
-
-p61 [shape=point,label="",fixedsize=true,width=0.1];
-p62 [label="MERGED_LIB_CONSENSUS_ANNOTATE"];
-p61 -> p62 [label="gtf"];
-
-p63 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p65 [label="MERGED_LIB_CONSENSUS_COUNTS"];
-p63 -> p65;
-
-p64 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p65 [label="MERGED_LIB_CONSENSUS_COUNTS"];
-p64 -> p65;
-
-p65 [label="MERGED_LIB_CONSENSUS_COUNTS"];
-p68 [label="MERGED_LIB_CONSENSUS_DESEQ2"];
-p65 -> p68 [label="ch_mlib_macs_consensus_counts"];
-
-p65 [label="MERGED_LIB_CONSENSUS_COUNTS"];
-p147 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p65 -> p147 [label="ch_mlib_macs_consensus_counts_mqc"];
-
-p66 [shape=point,label="",fixedsize=true,width=0.1];
-p68 [label="MERGED_LIB_CONSENSUS_DESEQ2"];
-p66 -> p68 [label="mlib_deseq2_pca_header"];
-
-p67 [shape=point,label="",fixedsize=true,width=0.1];
-p68 [label="MERGED_LIB_CONSENSUS_DESEQ2"];
-p67 -> p68 [label="mlib_deseq2_clustering_header"];
-
-p68 [label="MERGED_LIB_CONSENSUS_DESEQ2"];
-p149 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p68 -> p149 [label="ch_mlib_macs_consensus_deseq_mqc"];
-
-p68 [label="MERGED_LIB_CONSENSUS_DESEQ2"];
-p110 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p68 -> p110 [label="ch_mlib_macs_consensus_deseq_comp_igv"];
-
-p69 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p71 [label="MERGED_LIB_ATAQV"];
-p69 -> p71;
-
-p70 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p71 [label="MERGED_LIB_ATAQV"];
-p70 -> p71;
-
-p71 [label="MERGED_LIB_ATAQV"];
-p72 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p71 -> p72 [label="ch_mlib_ataqv"];
-
-p72 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p73 [label="MERGED_LIB_ATAQV_MKARV"];
-p72 -> p73;
-
-p74 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p75 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p74 -> p75;
-
-p75 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p76 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p75 -> p76;
-
-p76 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p77 [label="MERGED_REP_BAM"];
-p76 -> p77 [label="ch_mlib_rm_orphan_bam_mrep"];
-
-p77 [label="MERGED_REP_BAM"];
-p78 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p77 -> p78 [label="ch_mrep_bam_bigwig"];
-
-p77 [label="MERGED_REP_BAM"];
-p82 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p77 -> p82 [label="ch_mrep_bam_macs"];
-
-p77 [label="MERGED_REP_BAM"];
-p78 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p77 -> p78 [label="ch_mrep_bam_flagstat_bigwig"];
-
-p77 [label="MERGED_REP_BAM"];
-p82 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p77 -> p82 [label="ch_mrep_bam_flagstat_macs"];
-
-p77 [label="MERGED_REP_BAM"];
-p157 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p77 -> p157 [label="ch_mrep_bam_flagstat_mqc"];
-
-p77 [label="MERGED_REP_BAM"];
-p159 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p77 -> p159 [label="ch_mrep_bam_stats_mqc"];
-
-p77 [label="MERGED_REP_BAM"];
-p161 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p77 -> p161 [label="ch_mrep_bam_metrics_mqc"];
-
-p78 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p80 [label="MERGED_REP_BIGWIG"];
-p78 -> p80;
-
-p79 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p80 [label="MERGED_REP_BIGWIG"];
-p79 -> p80;
-
-p80 [label="MERGED_REP_BIGWIG"];
-p81 [shape=point];
-p80 -> p81 [label="ch_mrep_bigwig"];
-
-p80 [label="MERGED_REP_BIGWIG"];
-p112 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p80 -> p112 [label="ch_mrep_bigwig_igv"];
-
-p82 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p85 [label="MERGED_REP_MACS2"];
-p82 -> p85;
-
-p83 [shape=point,label="",fixedsize=true,width=0.1];
-p85 [label="MERGED_REP_MACS2"];
-p83 -> p85 [label="mrep_peak_count_header"];
-
-p84 [shape=point,label="",fixedsize=true,width=0.1];
-p85 [label="MERGED_REP_MACS2"];
-p84 -> p85 [label="mrep_frip_score_header"];
-
-p85 [label="MERGED_REP_MACS2"];
-p88 [label="MERGED_REP_MACS2_ANNOTATE"];
-p85 -> p88 [label="ch_mrep_macs_homer"];
-
-p85 [label="MERGED_REP_MACS2"];
-p89 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p85 -> p89 [label="ch_mrep_macs_qc"];
-
-p85 [label="MERGED_REP_MACS2"];
-p93 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p85 -> p93 [label="ch_mrep_macs_consensus"];
-
-p85 [label="MERGED_REP_MACS2"];
-p114 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p85 -> p114 [label="ch_mrep_macs_igv"];
-
-p85 [label="MERGED_REP_MACS2"];
-p163 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p85 -> p163 [label="ch_mrep_macs_mqc"];
-
-p86 [shape=point,label="",fixedsize=true,width=0.1];
-p88 [label="MERGED_REP_MACS2_ANNOTATE"];
-p86 -> p88 [label="fasta"];
-
-p87 [shape=point,label="",fixedsize=true,width=0.1];
-p88 [label="MERGED_REP_MACS2_ANNOTATE"];
-p87 -> p88 [label="gtf"];
-
-p88 [label="MERGED_REP_MACS2_ANNOTATE"];
-p90 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p88 -> p90 [label="ch_mrep_macs_annotate"];
-
-p89 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p92 [label="MERGED_REP_MACS2_QC"];
-p89 -> p92;
-
-p90 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p92 [label="MERGED_REP_MACS2_QC"];
-p90 -> p92;
-
-p91 [shape=point,label="",fixedsize=true,width=0.1];
-p92 [label="MERGED_REP_MACS2_QC"];
-p91 -> p92 [label="mrep_peak_annotation_header"];
-
-p92 [label="MERGED_REP_MACS2_QC"];
-p165 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p92 -> p165 [label="ch_mrep_peak_qc_mqc"];
-
-p93 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p94 [label="MERGED_REP_CONSENSUS"];
-p93 -> p94;
-
-p94 [label="MERGED_REP_CONSENSUS"];
-p97 [label="MERGED_REP_CONSENSUS_ANNOTATE"];
-p94 -> p97 [label="ch_mrep_macs_consensus_bed"];
-
-p94 [label="MERGED_REP_CONSENSUS"];
-p99 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p94 -> p99 [label="ch_mrep_macs_consensus_saf"];
-
-p94 [label="MERGED_REP_CONSENSUS"];
-p97 [label="MERGED_REP_CONSENSUS_ANNOTATE"];
-p94 -> p97 [label="ch_mrep_macs_consensus_bool"];
-
-p94 [label="MERGED_REP_CONSENSUS"];
-p116 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p94 -> p116 [label="ch_mrep_macs_consensus_igv"];
-
-p95 [shape=point,label="",fixedsize=true,width=0.1];
-p97 [label="MERGED_REP_CONSENSUS_ANNOTATE"];
-p95 -> p97 [label="fasta"];
-
-p96 [shape=point,label="",fixedsize=true,width=0.1];
-p97 [label="MERGED_REP_CONSENSUS_ANNOTATE"];
-p96 -> p97 [label="gtf"];
-
-p98 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p100 [label="MERGED_REP_CONSENSUS_COUNTS"];
-p98 -> p100;
-
-p99 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p100 [label="MERGED_REP_CONSENSUS_COUNTS"];
-p99 -> p100;
-
-p100 [label="MERGED_REP_CONSENSUS_COUNTS"];
-p103 [label="MERGED_REP_CONSENSUS_DESEQ2"];
-p100 -> p103 [label="ch_mrep_macs_consensus_counts"];
-
-p100 [label="MERGED_REP_CONSENSUS_COUNTS"];
-p167 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p100 -> p167 [label="ch_mrep_macs_consensus_counts_mqc"];
-
-p101 [shape=point,label="",fixedsize=true,width=0.1];
-p103 [label="MERGED_REP_CONSENSUS_DESEQ2"];
-p101 -> p103 [label="mrep_deseq2_pca_header"];
-
-p102 [shape=point,label="",fixedsize=true,width=0.1];
-p103 [label="MERGED_REP_CONSENSUS_DESEQ2"];
-p102 -> p103 [label="mrep_deseq2_clustering_header"];
-
-p103 [label="MERGED_REP_CONSENSUS_DESEQ2"];
-p169 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p103 -> p169 [label="ch_mrep_macs_consensus_deseq_mqc"];
-
-p103 [label="MERGED_REP_CONSENSUS_DESEQ2"];
-p118 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p103 -> p118 [label="ch_mrep_macs_consensus_deseq_comp_igv"];
-
-p104 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p105 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p104 -> p105;
-
-p105 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p121 [label="IGV"];
-p105 -> p121;
-
-p106 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p107 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p106 -> p107;
-
-p107 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p121 [label="IGV"];
-p107 -> p121;
-
-p108 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p109 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p108 -> p109;
-
-p109 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p121 [label="IGV"];
-p109 -> p121;
-
-p110 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p111 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p110 -> p111;
-
-p111 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p121 [label="IGV"];
-p111 -> p121;
-
-p112 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p113 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p112 -> p113;
-
-p113 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p121 [label="IGV"];
-p113 -> p121;
-
-p114 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p115 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p114 -> p115;
-
-p115 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p121 [label="IGV"];
-p115 -> p121;
-
-p116 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p117 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p116 -> p117;
-
-p117 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p121 [label="IGV"];
-p117 -> p121;
-
-p118 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p119 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p118 -> p119;
-
-p119 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p121 [label="IGV"];
-p119 -> p121;
-
-p120 [shape=point,label="",fixedsize=true,width=0.1];
-p121 [label="IGV"];
-p120 -> p121 [label="fasta"];
-
-p122 [label="get_software_versions"];
-p129 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p122 -> p129 [label="ch_software_versions_mqc"];
-
-p123 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.from"];
-p124 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p123 -> p124;
-
-p124 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="reduce"];
-p124 -> p125;
-
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="reduce"];
-p126 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p125 -> p126;
-
-p126 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p130 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collectFile"];
-p126 -> p130 [label="ch_workflow_summary"];
-
-p127 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p128 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p127 -> p128;
-
-p128 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p128 -> p172;
-
-p129 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p172 [label="MULTIQC"];
-p129 -> p172;
-
-p130 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collectFile"];
-p172 [label="MULTIQC"];
-p130 -> p172;
-
-p131 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p132 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p131 -> p132;
-
-p132 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p132 -> p172;
-
-p133 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p134 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p133 -> p134;
-
-p134 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p134 -> p172;
-
-p135 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p136 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p135 -> p136;
-
-p136 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p136 -> p172;
-
-p137 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p172 [label="MULTIQC"];
-p137 -> p172;
-
-p138 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p172 [label="MULTIQC"];
-p138 -> p172;
-
-p139 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p172 [label="MULTIQC"];
-p139 -> p172;
-
-p140 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p172 [label="MULTIQC"];
-p140 -> p172;
-
-p141 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p172 [label="MULTIQC"];
-p141 -> p172;
-
-p142 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p172 [label="MULTIQC"];
-p142 -> p172;
-
-p143 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p144 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p143 -> p144;
-
-p144 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p144 -> p172;
-
-p145 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p146 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p145 -> p146;
-
-p146 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p146 -> p172;
-
-p147 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p148 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p147 -> p148;
-
-p148 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p148 -> p172;
-
-p149 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p150 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p149 -> p150;
-
-p150 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p150 -> p172;
-
-p151 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p152 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p151 -> p152;
-
-p152 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p152 -> p172;
-
-p153 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p154 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p153 -> p154;
-
-p154 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p154 -> p172;
-
-p155 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p156 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p155 -> p156;
-
-p156 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p156 -> p172;
-
-p157 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p158 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p157 -> p158;
-
-p158 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p158 -> p172;
-
-p159 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p160 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p159 -> p160;
-
-p160 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p160 -> p172;
-
-p161 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p162 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p161 -> p162;
-
-p162 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p162 -> p172;
-
-p163 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p164 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p163 -> p164;
-
-p164 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p164 -> p172;
-
-p165 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p166 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p165 -> p166;
-
-p166 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p166 -> p172;
-
-p167 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p168 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p167 -> p168;
-
-p168 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p168 -> p172;
-
-p169 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p170 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p169 -> p170;
-
-p170 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p172 [label="MULTIQC"];
-p170 -> p172;
-
-p171 [shape=point,label="",fixedsize=true,width=0.1];
-p172 [label="MULTIQC"];
-p171 -> p172 [label="multiqc_config"];
-
-p172 [label="MULTIQC"];
-p173 [shape=point];
-p172 -> p173 [label="ch_multiqc_report"];
-
-p174 [shape=point,label="",fixedsize=true,width=0.1];
-p176 [label="output_documentation"];
-p174 -> p176 [label="output_docs"];
-
-p175 [shape=point,label="",fixedsize=true,width=0.1];
-p176 [label="output_documentation"];
-p175 -> p176 [label="images"];
-
+strict digraph "" {
+	0	[label=CHECK_DESIGN];
+	6	[label=TRIMGALORE];
+	0 -> 6;
+	5	[label=FASTQC];
+	0 -> 5;
+	7	[label=BWA_MEM];
+	6 -> 7;
+	37	[label=MULTIQC];
+	6 -> 37;
+	5 -> 37;
+	1	[label=BWA_INDEX];
+	1 -> 7;
+	2	[label=MAKE_GENE_BED];
+	3	[label=MAKE_TSS_BED];
+	2 -> 3;
+	15	[label=MERGED_LIB_PLOTPROFILE];
+	2 -> 15;
+	24	[label=MERGED_LIB_ATAQV];
+	3 -> 24;
+	25	[label=MERGED_LIB_ATAQV_MKARV];
+	24 -> 25;
+	4	[label=MAKE_GENOME_FILTER];
+	4 -> 24;
+	10	[label=MERGED_LIB_BAM_FILTER];
+	4 -> 10;
+	14	[label=MERGED_LIB_BIGWIG];
+	4 -> 14;
+	27	[label=MERGED_REP_BIGWIG];
+	4 -> 27;
+	8	[label=SORT_BAM];
+	7 -> 8;
+	9	[label=MERGED_LIB_BAM];
+	8 -> 9;
+	8 -> 37;
+	9 -> 24;
+	9 -> 10;
+	12	[label=MERGED_LIB_PRESEQ];
+	9 -> 12;
+	9 -> 37;
+	11	[label=MERGED_LIB_BAM_REMOVE_ORPHAN];
+	10 -> 11;
+	12 -> 37;
+	13	[label=MERGED_LIB_PICARD_METRICS];
+	11 -> 13;
+	16	[label=MERGED_LIB_PLOTFINGERPRINT];
+	11 -> 16;
+	11 -> 14;
+	17	[label=MERGED_LIB_MACS2];
+	11 -> 17;
+	22	[label=MERGED_LIB_CONSENSUS_COUNTS];
+	11 -> 22;
+	26	[label=MERGED_REP_BAM];
+	11 -> 26;
+	33	[label=MERGED_REP_CONSENSUS_COUNTS];
+	11 -> 33;
+	11 -> 37;
+	13 -> 37;
+	16 -> 37;
+	14 -> 15;
+	35	[label=IGV];
+	14 -> 35;
+	15 -> 37;
+	17 -> 24;
+	18	[label=MERGED_LIB_MACS2_ANNOTATE];
+	17 -> 18;
+	19	[label=MERGED_LIB_MACS2_QC];
+	17 -> 19;
+	20	[label=MERGED_LIB_CONSENSUS];
+	17 -> 20;
+	17 -> 35;
+	17 -> 37;
+	18 -> 19;
+	19 -> 37;
+	21	[label=MERGED_LIB_CONSENSUS_ANNOTATE];
+	20 -> 21;
+	20 -> 22;
+	20 -> 35;
+	23	[label=MERGED_LIB_CONSENSUS_DESEQ2];
+	22 -> 23;
+	22 -> 37;
+	23 -> 35;
+	23 -> 37;
+	26 -> 27;
+	28	[label=MERGED_REP_MACS2];
+	26 -> 28;
+	26 -> 37;
+	27 -> 35;
+	29	[label=MERGED_REP_MACS2_ANNOTATE];
+	28 -> 29;
+	30	[label=MERGED_REP_MACS2_QC];
+	28 -> 30;
+	31	[label=MERGED_REP_CONSENSUS];
+	28 -> 31;
+	28 -> 35;
+	28 -> 37;
+	29 -> 30;
+	30 -> 37;
+	32	[label=MERGED_REP_CONSENSUS_ANNOTATE];
+	31 -> 32;
+	31 -> 33;
+	31 -> 35;
+	34	[label=MERGED_REP_CONSENSUS_DESEQ2];
+	33 -> 34;
+	33 -> 37;
+	34 -> 35;
+	34 -> 37;
+	36	[label=get_software_versions];
+	36 -> 37;
+	38	[label=output_documentation];
 }

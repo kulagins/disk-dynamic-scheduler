@@ -29,8 +29,8 @@ namespace Fonda {
                     id++;
                 }
 
-
-
+                
+                int proc_multiplier=0;    
                 int cell_cntr=0;
                 for (const auto& cell : row) {
                     std::string cell_value;
@@ -40,6 +40,9 @@ namespace Fonda {
 
                     if(cell_cntr==0){
                         p->name=cell_value;
+                    }
+                    if(cell_cntr==1){
+                        proc_multiplier = stoi(cell_value);
                     }
                     if(cell_cntr==2){
                         p->setProcessorSpeed(stod(cell_value)*speedMultiplicator);
@@ -57,6 +60,12 @@ namespace Fonda {
                     }
                     //TODO read/write iops
                     ++cell_cntr;
+                }
+                for(int i=1; i<proc_multiplier; i++){
+                    auto p1 = make_shared<Processor>(*p);
+                    p1->id = id;
+                    id++;
+                    cluster->addProcessor(p1);
                 }
 
 

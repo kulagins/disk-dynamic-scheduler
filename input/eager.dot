@@ -1,1418 +1,269 @@
-digraph "eager" {
-p0 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p149 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p0 -> p149 [label="ch_anno_for_bedtools"];
-
-p1 [shape=point,label="",fixedsize=true,width=0.1];
-p2 [label="unzip_reference"];
-p1 -> p2 [label="zipped_fasta"];
-
-p2 [label="unzip_reference"];
-p43 [label="makeBWAIndex"];
-p2 -> p43 [label="ch_fasta_for_bwaindex"];
-
-p2 [label="unzip_reference"];
-p3 [shape=point];
-p2 -> p3 [label="ch_fasta_for_bt2index"];
-
-p2 [label="unzip_reference"];
-p47 [label="makeFastaIndex"];
-p2 -> p47 [label="ch_fasta_for_faidx"];
-
-p2 [label="unzip_reference"];
-p52 [label="makeSeqDict"];
-p2 -> p52 [label="ch_fasta_for_seqdict"];
-
-p2 [label="unzip_reference"];
-p98 [label="circulargenerator"];
-p2 -> p98 [label="ch_fasta_for_circulargenerator"];
-
-p2 [label="unzip_reference"];
-p100 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p100 [label="ch_fasta_for_circularmapper"];
-
-p2 [label="unzip_reference"];
-p151 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p151 [label="ch_fasta_for_damageprofiler"];
-
-p2 [label="unzip_reference"];
-p170 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p170 [label="ch_fasta_for_qualimap"];
-
-p2 [label="unzip_reference"];
-p156 [label="mask_reference_for_pmdtools"];
-p2 -> p156 [label="ch_unmasked_fasta_for_masking"];
-
-p2 [label="unzip_reference"];
-p158 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p158 [label="ch_unmasked_fasta_for_pmdtools"];
-
-p2 [label="unzip_reference"];
-p174 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p174 [label="ch_fasta_for_genotyping_ug"];
-
-p2 [label="unzip_reference"];
-p178 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p178 [label="ch_fasta_for_genotyping_hc"];
-
-p2 [label="unzip_reference"];
-p182 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p182 [label="ch_fasta_for_genotyping_freebayes"];
-
-p2 [label="unzip_reference"];
-p190 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p190 [label="ch_fasta_for_genotyping_pileupcaller"];
-
-p2 [label="unzip_reference"];
-p204 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p204 [label="ch_fasta_for_vcf2genome"];
-
-p2 [label="unzip_reference"];
-p208 [label="multivcfanalyzer"];
-p2 -> p208 [label="ch_fasta_for_multivcfanalyzer"];
-
-p2 [label="unzip_reference"];
-p197 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p197 [label="ch_fasta_for_genotyping_angsd"];
-
-p2 [label="unzip_reference"];
-p153 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p153 [label="ch_fasta_for_damagerescaling"];
-
-p2 [label="unzip_reference"];
-p202 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p2 -> p202 [label="ch_fasta_for_bcftools_stats"];
-
-p4 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
-p5 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p4 -> p5;
-
-p5 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p6 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p5 -> p6;
-
-p6 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p66 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p6 -> p66 [label="ch_adapterlist"];
-
-p7 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
-p8 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p7 -> p8;
-
-p8 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p171 [label="qualimap"];
-p8 -> p171 [label="ch_snpcapture_bed"];
-
-p9 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
-p10 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p9 -> p10;
-
-p10 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p156 [label="mask_reference_for_pmdtools"];
-p10 -> p156 [label="ch_bedfile_for_reference_masking"];
-
-p11 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
-p12 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p11 -> p12;
-
-p12 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p212 [label="sexdeterrmine"];
-p12 -> p212 [label="ch_bed_for_sexdeterrmine"];
-
-p13 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
-p14 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p13 -> p14;
-
-p14 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p193 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p14 -> p193 [label="ch_bed_for_pileupcaller"];
-
-p15 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
-p16 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p15 -> p16;
-
-p16 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p194 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p16 -> p194 [label="ch_snp_for_pileupcaller"];
-
-p17 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p223 [label="malt"];
-p17 -> p223 [label="ch_db_for_malt"];
-
-p18 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p225 [label="maltextract"];
-p18 -> p225 [label="ch_taxonlist_for_maltextract"];
-
-p19 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p225 [label="maltextract"];
-p19 -> p225 [label="ch_ncbifiles_for_maltextract"];
-
-p20 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p237 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p20 -> p237 [label="ch_multiqc_custom_config"];
-
-p21 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p22 [shape=point];
-p21 -> p22;
-
-p23 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
-p24 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitCsv"];
-p23 -> p24;
-
-p24 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitCsv"];
-p25 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p24 -> p25;
-
-p25 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p26 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p25 -> p26 [label="ch_input_sample"];
-
-p26 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p31 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p26 -> p31 [label="ch_input_sample_downstream"];
-
-p26 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p27 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p26 -> p27 [label="ch_input_sample_check"];
-
-p27 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p28 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p27 -> p28;
-
-p28 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p29 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p28 -> p29;
-
-p29 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p30 [shape=point];
-p29 -> p30;
-
-p31 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p33 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p31 -> p33;
-
-p31 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p32 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p31 -> p32;
-
-p32 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p37 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p32 -> p37 [label="ch_fastq_channel"];
-
-p33 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p36 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p33 -> p36 [label="ch_bam_channel"];
-
-p34 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p35 [shape=point];
-p34 -> p35;
-
-p36 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p55 [label="convertBam"];
-p36 -> p55 [label="ch_input_for_convertbam"];
-
-p36 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p56 [label="indexinputbam"];
-p36 -> p56 [label="ch_input_for_indexbam"];
-
-p37 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p57 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p37 -> p57 [label="ch_input_for_skipconvertbam"];
-
-p37 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p91 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p37 -> p91 [label="ch_input_for_lanemerge_hostremovalfastq"];
-
-p38 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.from"];
-p39 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p38 -> p39;
-
-p39 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p40 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="reduce"];
-p39 -> p40;
-
-p40 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="reduce"];
-p41 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p40 -> p41;
-
-p41 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p287 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collectFile"];
-p41 -> p287 [label="ch_workflow_summary"];
-
-p42 [shape=point,label="",fixedsize=true,width=0.1];
-p43 [label="makeBWAIndex"];
-p42 -> p43 [label="where_are_my_files"];
-
-p43 [label="makeBWAIndex"];
-p94 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p43 -> p94 [label="bwa_index"];
-
-p43 [label="makeBWAIndex"];
-p96 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p43 -> p96 [label="bwa_index_bwamem"];
-
-p44 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p103 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p44 -> p103 [label="bt2_index"];
-
-p45 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p48 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p45 -> p48 [label="ch_fai_for_skipfastaindexing"];
-
-p46 [shape=point,label="",fixedsize=true,width=0.1];
-p47 [label="makeFastaIndex"];
-p46 -> p47 [label="where_are_my_files"];
-
-p47 [label="makeFastaIndex"];
-p48 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p47 -> p48 [label="ch_fasta_faidx_index"];
-
-p48 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p49 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p48 -> p49;
-
-p49 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p175 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p49 -> p175 [label="ch_fai_for_ug"];
-
-p49 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p179 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p49 -> p179 [label="ch_fai_for_hc"];
-
-p49 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p183 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p49 -> p183 [label="ch_fai_for_freebayes"];
-
-p49 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p191 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p49 -> p191 [label="ch_fai_for_pileupcaller"];
-
-p49 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p198 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p49 -> p198 [label="ch_fai_for_angsd"];
-
-p50 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p53 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p50 -> p53 [label="ch_dict_for_skipdict"];
-
-p51 [shape=point,label="",fixedsize=true,width=0.1];
-p52 [label="makeSeqDict"];
-p51 -> p52 [label="where_are_my_files"];
-
-p52 [label="makeSeqDict"];
-p53 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p52 -> p53 [label="ch_seq_dict"];
-
-p53 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p54 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p53 -> p54;
-
-p54 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p180 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p54 -> p180 [label="ch_dict_for_hc"];
-
-p54 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p199 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p54 -> p199 [label="ch_dict_for_angsd"];
-
-p54 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p176 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p54 -> p176 [label="ch_dict_for_ug"];
-
-p54 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p184 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p54 -> p184 [label="ch_dict_for_freebayes"];
-
-p54 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p192 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p54 -> p192 [label="ch_dict_for_pileupcaller"];
-
-p55 [label="convertBam"];
-p57 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p55 -> p57 [label="ch_output_from_convertbam"];
-
-p56 [label="indexinputbam"];
-p105 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p56 -> p105 [label="ch_indexbam_for_filtering"];
-
-p57 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p58 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p57 -> p58;
-
-p58 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p59 [label="fastqc"];
-p58 -> p59 [label="ch_convertbam_for_fastqc"];
-
-p58 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p60 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p58 -> p60 [label="ch_convertbam_for_fastp"];
-
-p59 [label="fastqc"];
-p241 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p59 -> p241 [label="ch_prefastqc_for_multiqc"];
-
-p60 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p62 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p60 -> p62;
-
-p60 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p61 [label="fastp"];
-p60 -> p61;
-
-p61 [label="fastp"];
-p63 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p61 -> p63 [label="ch_output_from_fastp"];
-
-p61 [label="fastp"];
-p263 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p61 -> p263 [label="ch_fastp_for_multiqc"];
-
-p62 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p64 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p62 -> p64 [label="ch_skipfastp_for_merge"];
-
-p63 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p64 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p63 -> p64 [label="ch_fastp_for_merge"];
-
-p64 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p65 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p64 -> p65;
-
-p65 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p67 [label="adapter_removal"];
-p65 -> p67 [label="ch_fastp_for_adapterremoval"];
-
-p65 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p72 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p65 -> p72 [label="ch_fastp_for_skipadapterremoval"];
-
-p66 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p67 [label="adapter_removal"];
-p66 -> p67;
-
-p67 [label="adapter_removal"];
-p69 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p67 -> p69 [label="ch_output_from_adapterremoval_r1"];
-
-p67 [label="adapter_removal"];
-p68 [shape=point];
-p67 -> p68 [label="ch_output_from_adapterremoval_r2"];
-
-p67 [label="adapter_removal"];
-p245 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p67 -> p245 [label="ch_adapterremoval_logs"];
-
-p69 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p70 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p69 -> p70;
-
-p70 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p72 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p70 -> p72 [label="ch_output_from_adapterremoval"];
-
-p70 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p71 [shape=point];
-p70 -> p71 [label="ch_adapterremoval_for_postfastqc"];
-
-p72 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p73 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="filter"];
-p72 -> p73;
-
-p73 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="filter"];
-p74 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p73 -> p74;
-
-p74 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p75 [label="post_ar_fastq_trimming"];
-p74 -> p75 [label="ch_adapterremoval_for_post_ar_trimming"];
-
-p74 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p79 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p74 -> p79 [label="ch_adapterremoval_for_skip_post_ar_trimming"];
-
-p75 [label="post_ar_fastq_trimming"];
-p77 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p75 -> p77 [label="ch_post_ar_trimming_for_lanemerge_r1"];
-
-p75 [label="post_ar_fastq_trimming"];
-p76 [shape=point];
-p75 -> p76 [label="ch_post_ar_trimming_for_lanemerge_r2"];
-
-p77 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p78 [shape=point];
-p77 -> p78 [label="ch_post_ar_trimming_for_lanemerge"];
-
-p79 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p80 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p79 -> p80 [label="ch_inlinebarcoderemoval_for_lanemerge"];
-
-p79 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p93 [label="fastqc_after_clipping"];
-p79 -> p93 [label="ch_inlinebarcoderemoval_for_fastqc_after_clipping"];
-
-p80 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p81 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p80 -> p81;
-
-p81 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p82 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p81 -> p82;
-
-p82 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p83 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p82 -> p83;
-
-p82 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p84 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p82 -> p84;
-
-p83 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p88 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p83 -> p88 [label="ch_branched_for_lanemerge_skipme"];
-
-p84 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p85 [label="lanemerge"];
-p84 -> p85 [label="ch_branched_for_lanemerge_ready"];
-
-p85 [label="lanemerge"];
-p87 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p85 -> p87 [label="ch_lanemerge_for_mapping_r1"];
-
-p85 [label="lanemerge"];
-p86 [shape=point];
-p85 -> p86 [label="ch_lanemerge_for_mapping_r2"];
-
-p87 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p88 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p87 -> p88;
-
-p88 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p89 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p88 -> p89;
-
-p89 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p102 [label="circularmapper"];
-p89 -> p102 [label="ch_lanemerge_for_cm"];
-
-p89 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p97 [label="bwamem"];
-p89 -> p97 [label="ch_lanemerge_for_bwamem"];
-
-p89 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p104 [label="bowtie2"];
-p89 -> p104 [label="ch_lanemerge_for_bt2"];
-
-p89 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p95 [label="bwa"];
-p89 -> p95 [label="ch_lanemerge_for_bwa"];
-
-p89 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p90 [shape=point];
-p89 -> p90 [label="ch_lanemerge_for_skipmap"];
-
-p91 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p92 [label="lanemerge_hostremoval_fastq"];
-p91 -> p92;
-
-p92 [label="lanemerge_hostremoval_fastq"];
-p107 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p92 -> p107 [label="ch_fastqlanemerge_for_hostremovalfastq"];
-
-p93 [label="fastqc_after_clipping"];
-p243 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p93 -> p243 [label="ch_fastqc_after_clipping"];
-
-p94 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p95 [label="bwa"];
-p94 -> p95;
-
-p95 [label="bwa"];
-p105 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p95 -> p105 [label="ch_output_from_bwa"];
-
-p96 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p97 [label="bwamem"];
-p96 -> p97;
-
-p97 [label="bwamem"];
-p105 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p97 -> p105 [label="ch_output_from_bwamem"];
-
-p98 [label="circulargenerator"];
-p99 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p98 -> p99 [label="ch_circularmapper_indices"];
-
-p98 [label="circulargenerator"];
-p101 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p98 -> p101 [label="ch_circularmapper_elongatedfasta"];
-
-p99 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p102 [label="circularmapper"];
-p99 -> p102;
-
-p100 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p102 [label="circularmapper"];
-p100 -> p102;
-
-p101 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p102 [label="circularmapper"];
-p101 -> p102;
-
-p102 [label="circularmapper"];
-p105 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p102 -> p105 [label="ch_output_from_cm"];
-
-p103 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p104 [label="bowtie2"];
-p103 -> p104;
-
-p104 [label="bowtie2"];
-p105 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p104 -> p105 [label="ch_output_from_bt2"];
-
-p104 [label="bowtie2"];
-p247 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p104 -> p247 [label="ch_bt2_for_multiqc"];
-
-p105 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p106 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p105 -> p106;
-
-p106 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p108 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p106 -> p108 [label="ch_mapping_for_hostremovalfastq"];
-
-p106 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p114 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p106 -> p114 [label="ch_mapping_for_seqtype_merging"];
-
-p107 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p108 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p107 -> p108;
-
-p108 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p109 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p108 -> p109;
-
-p109 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p110 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p109 -> p110;
-
-p110 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p111 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="filter"];
-p110 -> p111;
-
-p111 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="filter"];
-p112 [label="hostremoval_input_fastq"];
-p111 -> p112 [label="ch_synced_for_hostremovalfastq"];
-
-p112 [label="hostremoval_input_fastq"];
-p113 [shape=point];
-p112 -> p113 [label="ch_output_from_hostremovalfastq"];
-
-p114 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p115 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p114 -> p115;
-
-p115 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p116 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p115 -> p116;
-
-p116 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p118 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p116 -> p118;
-
-p116 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p117 [label="seqtype_merge"];
-p116 -> p117;
-
-p117 [label="seqtype_merge"];
-p118 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p117 -> p118 [label="ch_seqtypemerge_for_filtering"];
-
-p118 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p119 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p118 -> p119;
-
-p119 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p120 [label="samtools_flagstat"];
-p119 -> p120 [label="ch_seqtypemerged_for_samtools_flagstat"];
-
-p119 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p121 [label="samtools_filter"];
-p119 -> p121 [label="ch_seqtypemerged_for_samtools_filter"];
-
-p119 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p123 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p119 -> p123 [label="ch_seqtypemerged_for_skipfiltering"];
-
-p120 [label="samtools_flagstat"];
-p249 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p120 -> p249 [label="ch_flagstat_for_multiqc"];
-
-p120 [label="samtools_flagstat"];
-p129 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p120 -> p129 [label="ch_flagstat_for_endorspy"];
-
-p121 [label="samtools_filter"];
-p123 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p121 -> p123 [label="ch_output_from_filtering"];
-
-p121 [label="samtools_filter"];
-p217 [label="metagenomic_complexity_filter"];
-p121 -> p217 [label="ch_bam_filtering_for_metagenomic"];
-
-p121 [label="samtools_filter"];
-p122 [shape=point];
-p121 -> p122 [label="ch_metagenomic_for_skipentropyfilter"];
-
-p123 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p124 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="filter"];
-p123 -> p124;
-
-p124 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="filter"];
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p124 -> p125;
-
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p131 [label="dedup"];
-p125 -> p131 [label="ch_filtering_for_dedup"];
-
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p147 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p125 -> p147 [label="ch_mapped_for_preseq"];
-
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p133 [label="markduplicates"];
-p125 -> p133 [label="ch_filtering_for_markdup"];
-
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p128 [label="samtools_flagstat_after_filter"];
-p125 -> p128 [label="ch_filtering_for_flagstat"];
-
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p127 [shape=point];
-p125 -> p127 [label="ch_skiprmdup_for_libeval"];
-
-p125 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p126 [shape=point];
-p125 -> p126 [label="ch_filtering_for_skiprmdup"];
-
-p128 [label="samtools_flagstat_after_filter"];
-p251 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p128 -> p251 [label="ch_bam_filtered_flagstat_for_multiqc"];
-
-p128 [label="samtools_flagstat_after_filter"];
-p129 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p128 -> p129 [label="ch_bam_filtered_flagstat_for_endorspy"];
-
-p129 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
-p130 [label="endorSpy"];
-p129 -> p130 [label="ch_allflagstats_for_endorspy"];
-
-p130 [label="endorSpy"];
-p269 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p130 -> p269 [label="ch_endorspy_for_multiqc"];
-
-p131 [label="dedup"];
-p132 [shape=point];
-p131 -> p132 [label="ch_hist_for_preseq"];
-
-p131 [label="dedup"];
-p261 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p131 -> p261 [label="ch_dedup_results_for_multiqc"];
-
-p131 [label="dedup"];
-p137 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p131 -> p137 [label="ch_output_from_dedup"];
-
-p131 [label="dedup"];
-p134 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p131 -> p134 [label="ch_dedup_for_libeval"];
-
-p133 [label="markduplicates"];
-p259 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p133 -> p259 [label="ch_markdup_results_for_multiqc"];
-
-p133 [label="markduplicates"];
-p137 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p133 -> p137 [label="ch_output_from_markdup"];
-
-p133 [label="markduplicates"];
-p134 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p133 -> p134 [label="ch_markdup_for_libeval"];
-
-p134 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p135 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p134 -> p135;
-
-p135 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p213 [label="nuclear_contamination"];
-p135 -> p213 [label="ch_for_nuclear_contamination"];
-
-p135 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p152 [label="damageprofiler"];
-p135 -> p152 [label="ch_rmdup_for_damageprofiler"];
-
-p135 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p136 [shape=point];
-p135 -> p136 [label="ch_rmdup_for_preseq"];
-
-p135 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p209 [label="mtnucratio"];
-p135 -> p209 [label="ch_rmdup_formtnucratio"];
-
-p137 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p138 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p137 -> p138;
-
-p138 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p139 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p138 -> p139;
-
-p139 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p140 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p139 -> p140;
-
-p139 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p141 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p139 -> p141;
-
-p140 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p143 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p140 -> p143 [label="ch_input_for_skiplibrarymerging"];
-
-p141 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p142 [label="library_merge"];
-p141 -> p142 [label="ch_fixedinput_for_librarymerging"];
-
-p142 [label="library_merge"];
-p143 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p142 -> p143 [label="ch_output_from_librarymerging"];
-
-p143 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p144 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="filter"];
-p143 -> p144;
-
-p144 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="filter"];
-p145 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p144 -> p145;
-
-p145 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p159 [label="pmdtools"];
-p145 -> p159 [label="ch_rmdup_for_pmdtools"];
-
-p145 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p150 [label="bedtools"];
-p145 -> p150 [label="ch_rmdup_for_bedtools"];
-
-p145 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p161 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p145 -> p161 [label="ch_rmdup_for_bamutils"];
-
-p145 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p154 [label="mapdamage_rescaling"];
-p145 -> p154 [label="ch_rmdup_for_damagerescaling"];
-
-p145 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p146 [shape=point];
-p145 -> p146 [label="ch_rmdup_for_skipdamagemanipulation"];
-
-p147 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p148 [label="preseq"];
-p147 -> p148 [label="ch_input_for_preseq"];
-
-p148 [label="preseq"];
-p253 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p148 -> p253 [label="ch_preseq_for_multiqc"];
-
-p149 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p150 [label="bedtools"];
-p149 -> p150;
-
-p151 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p152 [label="damageprofiler"];
-p151 -> p152;
-
-p152 [label="damageprofiler"];
-p255 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p152 -> p255 [label="ch_damageprofiler_results"];
-
-p153 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p154 [label="mapdamage_rescaling"];
-p153 -> p154;
-
-p154 [label="mapdamage_rescaling"];
-p155 [shape=point];
-p154 -> p155 [label="ch_output_from_damagerescaling"];
-
-p156 [label="mask_reference_for_pmdtools"];
-p157 [shape=point];
-p156 -> p157 [label="ch_masked_fasta_for_pmdtools"];
-
-p158 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p159 [label="pmdtools"];
-p158 -> p159;
-
-p159 [label="pmdtools"];
-p160 [shape=point];
-p159 -> p160 [label="ch_output_from_pmdtools"];
-
-p161 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p163 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p161 -> p163;
-
-p161 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p162 [label="bam_trim"];
-p161 -> p162;
-
-p162 [label="bam_trim"];
-p163 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p162 -> p163 [label="ch_trimmed_from_bamutils"];
-
-p163 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p164 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p163 -> p164;
-
-p164 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p165 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p164 -> p165;
-
-p165 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p166 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p165 -> p166;
-
-p166 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p168 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p166 -> p168;
-
-p166 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p167 [label="additional_library_merge"];
-p166 -> p167;
-
-p167 [label="additional_library_merge"];
-p168 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p167 -> p168 [label="ch_output_from_trimmerge"];
-
-p168 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p169 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p168 -> p169;
-
-p169 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p171 [label="qualimap"];
-p169 -> p171 [label="ch_addlibmerge_for_qualimap"];
-
-p169 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p172 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p169 -> p172 [label="ch_output_from_bamutils"];
-
-p169 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p210 [label="sexdeterrmine_prep"];
-p169 -> p210 [label="ch_for_sexdeterrmine_prep"];
-
-p170 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p171 [label="qualimap"];
-p170 -> p171;
-
-p171 [label="qualimap"];
-p257 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p171 -> p257 [label="ch_qualimap_results"];
-
-p172 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p181 [label="genotyping_hc"];
-p172 -> p181 [label="ch_damagemanipulation_for_genotyping_hc"];
-
-p172 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p186 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p172 -> p186 [label="ch_damagemanipulation_for_genotyping_pileupcaller"];
-
-p172 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p173 [shape=point];
-p172 -> p173 [label="ch_damagemanipulation_for_skipgenotyping"];
-
-p172 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p200 [label="genotyping_angsd"];
-p172 -> p200 [label="ch_damagemanipulation_for_genotyping_angsd"];
-
-p172 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p185 [label="genotyping_freebayes"];
-p172 -> p185 [label="ch_damagemanipulation_for_genotyping_freebayes"];
-
-p172 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="into"];
-p177 [label="genotyping_ug"];
-p172 -> p177 [label="ch_damagemanipulation_for_genotyping_ug"];
-
-p174 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p177 [label="genotyping_ug"];
-p174 -> p177;
-
-p175 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p177 [label="genotyping_ug"];
-p175 -> p177;
-
-p176 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p177 [label="genotyping_ug"];
-p176 -> p177;
-
-p177 [label="genotyping_ug"];
-p206 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p177 -> p206 [label="ch_ug_for_multivcfanalyzer"];
-
-p177 [label="genotyping_ug"];
-p205 [label="vcf2genome"];
-p177 -> p205 [label="ch_ug_for_vcf2genome"];
-
-p177 [label="genotyping_ug"];
-p201 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p177 -> p201 [label="ch_ug_for_bcftools_stats"];
-
-p178 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p181 [label="genotyping_hc"];
-p178 -> p181;
-
-p179 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p181 [label="genotyping_hc"];
-p179 -> p181;
-
-p180 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p181 [label="genotyping_hc"];
-p180 -> p181;
-
-p181 [label="genotyping_hc"];
-p201 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p181 -> p201 [label="ch_hc_for_bcftools_stats"];
-
-p182 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p185 [label="genotyping_freebayes"];
-p182 -> p185;
-
-p183 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p185 [label="genotyping_freebayes"];
-p183 -> p185;
-
-p184 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p185 [label="genotyping_freebayes"];
-p184 -> p185;
-
-p185 [label="genotyping_freebayes"];
-p201 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p185 -> p201 [label="ch_fb_for_bcftools_stats"];
-
-p186 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p187 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p186 -> p187;
-
-p186 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
-p188 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p186 -> p188;
-
-p187 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p189 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p187 -> p189 [label="ch_prepped_for_pileupcaller_single"];
-
-p188 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
-p189 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p188 -> p189 [label="ch_prepped_for_pileupcaller_double"];
-
-p189 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p195 [label="genotyping_pileupcaller"];
-p189 -> p195;
-
-p190 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p195 [label="genotyping_pileupcaller"];
-p190 -> p195;
-
-p191 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p195 [label="genotyping_pileupcaller"];
-p191 -> p195;
-
-p192 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p195 [label="genotyping_pileupcaller"];
-p192 -> p195;
-
-p193 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p195 [label="genotyping_pileupcaller"];
-p193 -> p195;
-
-p194 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p195 [label="genotyping_pileupcaller"];
-p194 -> p195;
-
-p195 [label="genotyping_pileupcaller"];
-p196 [label="eigenstrat_snp_coverage"];
-p195 -> p196 [label="ch_for_eigenstrat_snp_coverage"];
-
-p196 [label="eigenstrat_snp_coverage"];
-p283 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p196 -> p283 [label="ch_eigenstrat_snp_cov_for_multiqc"];
-
-p197 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p200 [label="genotyping_angsd"];
-p197 -> p200;
-
-p198 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p200 [label="genotyping_angsd"];
-p198 -> p200;
-
-p199 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p200 [label="genotyping_angsd"];
-p199 -> p200;
-
-p201 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
-p203 [label="bcftools_stats"];
-p201 -> p203;
-
-p202 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p203 [label="bcftools_stats"];
-p202 -> p203;
-
-p203 [label="bcftools_stats"];
-p285 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p203 -> p285 [label="ch_bcftools_stats_for_multiqc"];
-
-p204 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p205 [label="vcf2genome"];
-p204 -> p205;
-
-p206 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p207 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p206 -> p207;
-
-p207 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p208 [label="multivcfanalyzer"];
-p207 -> p208 [label="ch_vcfs_for_multivcfanalyzer"];
-
-p208 [label="multivcfanalyzer"];
-p271 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p208 -> p271 [label="ch_multivcfanalyzer_for_multiqc"];
-
-p209 [label="mtnucratio"];
-p267 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p209 -> p267 [label="ch_mtnucratio_for_multiqc"];
-
-p210 [label="sexdeterrmine_prep"];
-p211 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p210 -> p211 [label="ch_prepped_for_sexdeterrmine"];
-
-p211 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p212 [label="sexdeterrmine"];
-p211 -> p212;
-
-p212 [label="sexdeterrmine"];
-p265 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p212 -> p265 [label="ch_sexdet_for_multiqc"];
-
-p213 [label="nuclear_contamination"];
-p214 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p213 -> p214 [label="ch_from_nuclear_contamination"];
-
-p214 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p215 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p214 -> p215;
-
-p215 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p216 [label="print_nuclear_contamination"];
-p215 -> p216;
-
-p216 [label="print_nuclear_contamination"];
-p281 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p216 -> p281 [label="ch_nuclear_contamination_for_multiqc"];
-
-p217 [label="metagenomic_complexity_filter"];
-p218 [shape=point];
-p217 -> p218 [label="ch_lowcomplexityfiltered_for_metagenomic"];
-
-p217 [label="metagenomic_complexity_filter"];
-p273 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p217 -> p273 [label="ch_metagenomic_complexity_filter_for_multiqc"];
-
-p219 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p221 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p219 -> p221 [label="ch_input_for_metagenomic_malt"];
-
-p220 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p227 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p220 -> p227 [label="ch_input_for_metagenomic_kraken"];
-
-p221 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p222 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p221 -> p222;
-
-p222 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p223 [label="malt"];
-p222 -> p223;
-
-p223 [label="malt"];
-p224 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p223 -> p224 [label="ch_rma_for_maltExtract"];
-
-p223 [label="malt"];
-p275 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p223 -> p275 [label="ch_malt_for_multiqc"];
-
-p224 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p225 [label="maltextract"];
-p224 -> p225;
-
-p225 [label="maltextract"];
-p279 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p225 -> p279 [label="ch_hops_for_multiqc"];
-
-p226 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
-p228 [label="kraken"];
-p226 -> p228 [label="ch_krakendb"];
-
-p227 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
-p228 [label="kraken"];
-p227 -> p228;
-
-p228 [label="kraken"];
-p229 [shape=point];
-p228 -> p229 [label="ch_kraken_out"];
-
-p228 [label="kraken"];
-p230 [label="kraken_parse"];
-p228 -> p230 [label="ch_kraken_report"];
-
-p228 [label="kraken"];
-p277 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p228 -> p277 [label="ch_kraken_for_multiqc"];
-
-p230 [label="kraken_parse"];
-p231 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p230 -> p231 [label="ch_kraken_parsed"];
-
-p231 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p232 [label="kraken_merge"];
-p231 -> p232;
-
-p233 [shape=point,label="",fixedsize=true,width=0.1];
-p235 [label="output_documentation"];
-p233 -> p235 [label="output_docs"];
-
-p234 [shape=point,label="",fixedsize=true,width=0.1];
-p235 [label="output_documentation"];
-p234 -> p235 [label="images"];
-
-p236 [label="get_software_versions"];
-p239 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p236 -> p239 [label="software_versions_yaml"];
-
-p237 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p238 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p237 -> p238;
-
-p238 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p238 -> p290;
-
-p239 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p240 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p239 -> p240;
-
-p240 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p240 -> p290;
-
-p241 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p242 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p241 -> p242;
-
-p242 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p242 -> p290;
-
-p243 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p244 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p243 -> p244;
-
-p244 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p244 -> p290;
-
-p245 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p246 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p245 -> p246;
-
-p246 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p246 -> p290;
-
-p247 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p248 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p247 -> p248;
-
-p248 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p248 -> p290;
-
-p249 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p250 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p249 -> p250;
-
-p250 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p250 -> p290;
-
-p251 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p252 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p251 -> p252;
-
-p252 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p252 -> p290;
-
-p253 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p254 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p253 -> p254;
-
-p254 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p254 -> p290;
-
-p255 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p256 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p255 -> p256;
-
-p256 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p256 -> p290;
-
-p257 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p258 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p257 -> p258;
-
-p258 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p258 -> p290;
-
-p259 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p260 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p259 -> p260;
-
-p260 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p260 -> p290;
-
-p261 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p262 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p261 -> p262;
-
-p262 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p262 -> p290;
-
-p263 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p264 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p263 -> p264;
-
-p264 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p264 -> p290;
-
-p265 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p266 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p265 -> p266;
-
-p266 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p266 -> p290;
-
-p267 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p268 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p267 -> p268;
-
-p268 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p268 -> p290;
-
-p269 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p270 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p269 -> p270;
-
-p270 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p270 -> p290;
-
-p271 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p272 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p271 -> p272;
-
-p272 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p272 -> p290;
-
-p273 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p274 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p273 -> p274;
-
-p274 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p274 -> p290;
-
-p275 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p276 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p275 -> p276;
-
-p276 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p276 -> p290;
-
-p277 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p278 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p277 -> p278;
-
-p278 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p278 -> p290;
-
-p279 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p280 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p279 -> p280;
-
-p280 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p280 -> p290;
-
-p281 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p282 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p281 -> p282;
-
-p282 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p282 -> p290;
-
-p283 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p284 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p283 -> p284;
-
-p284 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p284 -> p290;
-
-p285 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p286 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p285 -> p286;
-
-p286 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="ifEmpty"];
-p290 [label="multiqc"];
-p286 -> p290;
-
-p287 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collectFile"];
-p290 [label="multiqc"];
-p287 -> p290;
-
-p288 [shape=point,label="",fixedsize=true,width=0.1];
-p290 [label="multiqc"];
-p288 -> p290 [label="multiqc_config"];
-
-p289 [shape=point,label="",fixedsize=true,width=0.1];
-p290 [label="multiqc"];
-p289 -> p290 [label="logo"];
-
-p290 [label="multiqc"];
-p291 [shape=point];
-p290 -> p291 [label="ch_multiqc_report"];
-
+strict digraph "" {
+	0	 [label=unzip_reference];
+	1	 [label=makeBWAIndex];
+	0 -> 1;
+	2	 [label=makeFastaIndex];
+	0 -> 2;
+	3	 [label=makeSeqDict];
+	0 -> 3;
+	15	 [label=circulargenerator];
+	0 -> 15;
+	31	 [label=mask_reference_for_pmdtools];
+	0 -> 31;
+	44	 [label=multivcfanalyzer];
+	0 -> 44;
+	35	 [label=qualimap];
+	0 -> 35;
+	16	 [label=circularmapper];
+	0 -> 16;
+	29	 [label=damageprofiler];
+	0 -> 29;
+	32	 [label=pmdtools];
+	0 -> 32;
+	30	 [label=mapdamage_rescaling];
+	0 -> 30;
+	37	 [label=genotyping_hc];
+	0 -> 37;
+	41	 [label=genotyping_angsd];
+	0 -> 41;
+	38	 [label=genotyping_freebayes];
+	0 -> 38;
+	36	 [label=genotyping_ug];
+	0 -> 36;
+	43	 [label=vcf2genome];
+	0 -> 43;
+	39	 [label=genotyping_pileupcaller];
+	0 -> 39;
+	42	 [label=bcftools_stats];
+	0 -> 42;
+	14	 [label=bwamem];
+	1 -> 14;
+	13	 [label=bwa];
+	1 -> 13;
+	2 -> 37;
+	2 -> 41;
+	2 -> 38;
+	2 -> 36;
+	2 -> 39;
+	3 -> 37;
+	3 -> 41;
+	3 -> 38;
+	3 -> 36;
+	3 -> 39;
+	15 -> 16;
+	58	 [label=multiqc];
+	44 -> 58;
+	35 -> 58;
+	47	 [label=sexdeterrmine];
+	47 -> 58;
+	51	 [label=malt];
+	52	 [label=maltextract];
+	51 -> 52;
+	51 -> 58;
+	52 -> 58;
+	4	 [label=convertBam];
+	6	 [label=fastqc];
+	4 -> 6;
+	7	 [label=fastp];
+	4 -> 7;
+	8	 [label=adapter_removal];
+	4 -> 8;
+	9	 [label=post_ar_fastq_trimming];
+	4 -> 9;
+	12	 [label=fastqc_after_clipping];
+	4 -> 12;
+	10	 [label=lanemerge];
+	4 -> 10;
+	4 -> 16;
+	4 -> 14;
+	17	 [label=bowtie2];
+	4 -> 17;
+	4 -> 13;
+	5	 [label=indexinputbam];
+	18	 [label=hostremoval_input_fastq];
+	5 -> 18;
+	19	 [label=seqtype_merge];
+	5 -> 19;
+	20	 [label=samtools_flagstat];
+	5 -> 20;
+	21	 [label=samtools_filter];
+	5 -> 21;
+	24	 [label=dedup];
+	5 -> 24;
+	25	 [label=markduplicates];
+	5 -> 25;
+	22	 [label=samtools_flagstat_after_filter];
+	5 -> 22;
+	27	 [label=preseq];
+	5 -> 27;
+	6 -> 58;
+	7 -> 8;
+	7 -> 9;
+	7 -> 12;
+	7 -> 10;
+	7 -> 16;
+	7 -> 14;
+	7 -> 17;
+	7 -> 13;
+	7 -> 58;
+	8 -> 9;
+	8 -> 12;
+	8 -> 10;
+	8 -> 16;
+	8 -> 14;
+	8 -> 17;
+	8 -> 13;
+	8 -> 58;
+	12 -> 58;
+	10 -> 16;
+	10 -> 14;
+	10 -> 17;
+	10 -> 13;
+	16 -> 18;
+	16 -> 19;
+	16 -> 20;
+	16 -> 21;
+	16 -> 24;
+	16 -> 25;
+	16 -> 22;
+	16 -> 27;
+	14 -> 18;
+	14 -> 19;
+	14 -> 20;
+	14 -> 21;
+	14 -> 24;
+	14 -> 25;
+	14 -> 22;
+	14 -> 27;
+	17 -> 18;
+	17 -> 19;
+	17 -> 20;
+	17 -> 21;
+	17 -> 24;
+	17 -> 25;
+	17 -> 22;
+	17 -> 27;
+	17 -> 58;
+	13 -> 18;
+	13 -> 19;
+	13 -> 20;
+	13 -> 21;
+	13 -> 24;
+	13 -> 25;
+	13 -> 22;
+	13 -> 27;
+	11	 [label=lanemerge_hostremoval_fastq];
+	11 -> 18;
+	19 -> 20;
+	19 -> 21;
+	19 -> 24;
+	19 -> 25;
+	19 -> 22;
+	19 -> 27;
+	23	 [label=endorSpy];
+	20 -> 23;
+	20 -> 58;
+	50	 [label=metagenomic_complexity_filter];
+	21 -> 50;
+	21 -> 24;
+	21 -> 25;
+	21 -> 22;
+	21 -> 27;
+	50 -> 58;
+	24 -> 35;
+	48	 [label=nuclear_contamination];
+	24 -> 48;
+	24 -> 29;
+	45	 [label=mtnucratio];
+	24 -> 45;
+	26	 [label=library_merge];
+	24 -> 26;
+	24 -> 32;
+	28	 [label=bedtools];
+	24 -> 28;
+	24 -> 30;
+	33	 [label=bam_trim];
+	24 -> 33;
+	34	 [label=additional_library_merge];
+	24 -> 34;
+	46	 [label=sexdeterrmine_prep];
+	24 -> 46;
+	24 -> 37;
+	24 -> 41;
+	24 -> 38;
+	24 -> 36;
+	24 -> 39;
+	24 -> 58;
+	25 -> 35;
+	25 -> 48;
+	25 -> 29;
+	25 -> 45;
+	25 -> 26;
+	25 -> 32;
+	25 -> 28;
+	25 -> 30;
+	25 -> 33;
+	25 -> 34;
+	25 -> 46;
+	25 -> 37;
+	25 -> 41;
+	25 -> 38;
+	25 -> 36;
+	25 -> 39;
+	25 -> 58;
+	22 -> 23;
+	22 -> 58;
+	23 -> 58;
+	49	 [label=print_nuclear_contamination];
+	48 -> 49;
+	29 -> 58;
+	45 -> 58;
+	26 -> 35;
+	26 -> 32;
+	26 -> 28;
+	26 -> 30;
+	26 -> 33;
+	26 -> 34;
+	26 -> 46;
+	26 -> 37;
+	26 -> 41;
+	26 -> 38;
+	26 -> 36;
+	26 -> 39;
+	27 -> 58;
+	33 -> 35;
+	33 -> 34;
+	33 -> 46;
+	33 -> 37;
+	33 -> 41;
+	33 -> 38;
+	33 -> 36;
+	33 -> 39;
+	34 -> 35;
+	34 -> 46;
+	34 -> 37;
+	34 -> 41;
+	34 -> 38;
+	34 -> 36;
+	34 -> 39;
+	46 -> 47;
+	37 -> 42;
+	38 -> 42;
+	36 -> 44;
+	36 -> 43;
+	36 -> 42;
+	40	 [label=eigenstrat_snp_coverage];
+	39 -> 40;
+	40 -> 58;
+	42 -> 58;
+	49 -> 58;
+	53	 [label=kraken];
+	54	 [label=kraken_parse];
+	53 -> 54;
+	53 -> 58;
+	55	 [label=kraken_merge];
+	54 -> 55;
+	56	 [label=output_documentation];
+	57	 [label=get_software_versions];
+	57 -> 58;
 }
