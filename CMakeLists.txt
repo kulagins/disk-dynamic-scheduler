@@ -62,7 +62,7 @@ if (FONDA_BUILD_MEMDAG)
 endif ()
 
 find_package(PkgConfig)
-pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
+#pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 
 add_executable(fonda_scheduler "${PROJECT_SOURCE_DIR}/fonda_scheduler/main.cpp")
 
@@ -73,7 +73,7 @@ target_sources(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/fonda_scheduler/io
         "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSchedDisk.cpp"
 )
 
-target_link_libraries(fonda_scheduler PRIVATE memdag PkgConfig::Pistache)
+target_link_libraries(fonda_scheduler PRIVATE memdag)
 set_target_properties(fonda_scheduler PROPERTIES
         CXX_STANDARD ${FONDA_CXX_STANDARD}
         COMPILE_FLAGS "${FONDA_CXX_FLAGS}"
