@@ -9,53 +9,6 @@
 
 bool Debug;
 
-void takeOverChangesFromRunningTasks(json bodyjson, graph_t* currentWorkflow, vector<Assignment *> & assignments){
-    if (bodyjson.contains("running_tasks") && bodyjson["running_tasks"].is_array()) {
-        const auto &runningTasks = bodyjson["running_tasks"];
-        //cout << "num running tasks: " << runningTasks.size() << " ";
-        for (const auto &item: runningTasks) {
-            // Check if the required fields (name, start, machine) exist in each object
-            if (item.contains("name") && item.contains("start") && item.contains("machine")) {
-                string name = item["name"];
-                double start = item["start"];
-                int machine = item["machine"];
-                double realWork = item["work"];
-
-                // Print the values of the fields to the console
-                // std::cout << "Name: " << name << ", Start: " << start << ", Machine: " << machine << std::endl;
-                name = trimQuotes(name);
-                vertex_t *ver = findVertexByName(currentWorkflow, name);
-                ver->visited = true;
-                const vector<Assignment *>::iterator &it_assignm = std::find_if(assignments.begin(),
-                                                                                assignments.end(),
-                                                                                [name](Assignment *a) {
-                                                                                    string tn = a->task->name;
-                                                                                    transform(tn.begin(),
-                                                                                              tn.end(),
-                                                                                              tn.begin(),
-                                                                                              [](unsigned char c) {
-                                                                                                  return tolower(
-                                                                                                          c);
-                                                                                              });
-                                                                                    return tn == name;
-                                                                                });
-                if (it_assignm != assignments.end() && realWork>(*it_assignm)->task->time) {
-                    double realFinishTimeComputed = start + realWork /
-                                                            (*it_assignm)->processor->getProcessorSpeed();
-                    (*it_assignm)->startTime = start;
-                    (*it_assignm)->finishTime = realFinishTimeComputed;
-                }
-
-            } else {
-                cerr << "One or more fields missing in a running task object." << endl;
-            }
-        }
-
-    } else {
-        cout << "No running tasks found or wrong schema." << endl;
-    }
-}
-
 void delayEverythingBy(vector<Assignment*> &assignments, Assignment * startingPoint, double delayTime){
 
     for (auto &assignment: assignments){
@@ -93,37 +46,17 @@ std::string trimQuotes(const std::string& str) {
     return result;
 }
 
-string answerWithJson(vector<Assignment *> assignments, string workflowName){
 
-    nlohmann::json jsonObject;
-
-    jsonObject["id"] = workflowName;
-
-    //"schedule": {
-
-    nlohmann::json scheduleJson= nlohmann::json::array();
-
-    // Serialize each Assignment object and add to the schedule object with task name as key
-    for (const auto& assignment : assignments) {
-        if(!assignment->task->visited)
-            scheduleJson. push_back (assignment->toJson());
-    }
-
-    // Add the schedule to the main JSON object
-    jsonObject["schedule"] = scheduleJson;
-
-    return to_string(jsonObject);
-}
 
 void Cluster::printAssignment(){
     int counter =0;
     for (const auto &item: this->getProcessors()){
-        if(item->isBusy){
+        if(item.second->isBusy){
             counter++;
             cout<<"Processor"<<counter<<"."<<endl;
-            cout<<"\tMem: "<<item->getMemorySize()<<", Proc: "<<item->getProcessorSpeed()<<endl;
+            cout<<"\tMem: "<<item.second->getMemorySize()<<", Proc: "<<item.second->getProcessorSpeed()<<endl;
 
-            vertex_t *assignedVertex = item->getAssignedTask();
+            vertex_t *assignedVertex = item.second->getAssignedTask();
             if(assignedVertex==NULL)
                 cout<<"No assignment."<<endl;
             else{
@@ -178,5 +111,63 @@ void removeSourceAndTarget(graph_t *graph, vector<pair<vertex_t *, double>> &ran
     if(targetV!=NULL)
         remove_vertex(graph, targetV);
 
+}
+
+
+
+bool isLocatedNowhere(edge_t* edge){
+    auto it = std::find_if(edge->locations.begin(), edge->locations.end(),
+                           [](Location location) {
+                               return location.locationType == LocationType::Nowhere;
+                           });
+    return edge->locations.empty() || it != edge->locations.end();
+}
+
+bool isLocatedOnDisk(edge_t* edge){
+    return std::find_if(edge->locations.begin(), edge->locations.end(),
+                        [](Location location) {
+                            return location.locationType== LocationType::OnDisk;
+                        })
+           != edge->locations.end();
+}
+bool isLocatedOnThisProcessor(edge_t* edge, int id){
+    return std::find_if(edge->locations.begin(), edge->locations.end(),
+                        [id](Location location) {
+                            return location.locationType== LocationType::OnProcessor && location.processorId==id;
+                        })
+           != edge->locations.end();
+}
+
+void delocateFromThisProcessorToDisk(edge_t* edge, int id){
+    auto locationOnThisProcessor = std::find_if(edge->locations.begin(), edge->locations.end(),
+                                                [id](Location location) {
+                                                    return location.locationType == LocationType::OnProcessor &&
+                                                           location.processorId == id;
+                                                });
+   // cout<<"delocating "; print_edge(edge);
+    assert(locationOnThisProcessor  != edge->locations.end());
+    edge->locations.erase(locationOnThisProcessor);
+    if(!isLocatedOnDisk(edge))
+        edge->locations.emplace_back(LocationType::OnDisk);
+
+
+}
+
+void locateToThisProcessorFromDisk(edge_t* edge, int id){
+   // cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
+    assert(isLocatedOnDisk(edge));
+    auto locationOnDisk = std::find_if(edge->locations.begin(), edge->locations.end(),
+                                       [](Location location) {
+                                           return location.locationType == LocationType::OnDisk;
+                                       });
+    edge->locations.erase(locationOnDisk);
+    if(!isLocatedOnThisProcessor(edge, id))
+        edge->locations.emplace_back(LocationType::OnProcessor, id);
+}
+
+void locateToThisProcessorFromNowhere(edge_t* edge, int id){
+    //  cout<<"locating from nowhere to proc "<<id <<" edge "; print_edge(edge);
+    if(!isLocatedOnThisProcessor(edge, id))
+        edge->locations.emplace_back(LocationType::OnProcessor, id);
 }
 

@@ -85,7 +85,8 @@ int main(int argc, char *argv[]) {
     }
 
     Cluster * cluster = Fonda::buildClusterFromCsv(memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
-
+    double biggestMem = cluster->getMemBiggestFreeProcessor()->getMemorySize();
+    
     string filename = "../input/";
     string suffix = "00";
     bool isGenerated = workflowName.substr(workflowName.size() - suffix.size()) == suffix;
@@ -101,11 +102,16 @@ int main(int argc, char *argv[]) {
     currentAlgoNum = algoNumber;
     Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, cluster, 10);
 
+    
     vertex_t *pv = graphMemTopology->first_vertex;
     while(pv!=NULL){
         if(peakMemoryRequirementOfVertex(pv)> pv->memoryRequirement){
             pv->memoryRequirement=peakMemoryRequirementOfVertex(pv)+1000;
             //cout<<"peak "<<peakMemoryRequirementOfVertex(pv)<<endl;
+            if(outMemoryRequirement(pv)> biggestMem){
+                cout<<"WILL BE INVALID "<<endl;
+                return 0;
+            }
         }
         pv= pv->next;
     }
@@ -118,11 +124,14 @@ int main(int argc, char *argv[]) {
     start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
-    double d = new_heuristic(graphMemTopology, cluster, isBaseline);
+    double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
 
      end = std::chrono::system_clock::now();
      elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
     cout<<"makespan "<<d<<endl;
+
+    delete graphMemTopology;
+    delete cluster;
 }
 

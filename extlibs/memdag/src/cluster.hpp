@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <set>
 #include "graph.hpp"
+#include <unordered_map>
 
 
 enum ClusteringModes {
@@ -33,11 +34,11 @@ public:
     static auto comparePendingMemories(edge_t* a, edge_t*b) -> bool {
         if(a->weight==b->weight){
             if(a->head->id==b->head->id)
-                return a->tail->id< b->tail->id;
+                return a->tail->id> b->tail->id;
             else return a->head->id>b->head->id;
         }
         else
-            return a->weight<b->weight;
+            return a->weight>b->weight;
     }
     int id;
     string name;
@@ -139,72 +140,80 @@ public:
     std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge);
     void loadFromDisk(edge_t* edge);
     void loadFromNowhere(edge_t* edge);
+    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator removePendingMemory(edge_t * edgeToRemove){
+
+        auto it = pendingMemories.find(edgeToRemove);
+        auto iterator = it;
+        if (it != pendingMemories.end()) {
+            iterator = pendingMemories.erase(it);
+        }
+        else{
+           throw new runtime_error("not found edge in pending");
+        }
+        availableMemory+= edgeToRemove->weight;
+        assert(availableMemory< memorySize || abs(availableMemory- memorySize)<0.1);
+        return iterator;
+     }
+
+    void addPendingMemory(edge_t * edge){
+        auto it = pendingMemories.find(edge);
+        if (it != pendingMemories.end()) {
+            throw new runtime_error(" found edge in pending");
+        }
+        else{
+            pendingMemories.emplace(edge);
+        }
+        availableMemory-= edge->weight;
+        assert(availableMemory>= 0);
+    }
 
 };
 
 class Cluster {
 protected:
-
-    static Cluster *fixedCluster;
     vector<edge_t *> filesOnDisk;
     int maxSpeed = -1;
 public:
-    vector<shared_ptr<Processor>> processors;
+    std::unordered_map<int, std::shared_ptr<Processor>> processors;
+
 
 
     Cluster() {
-        processors.resize(0);
+        processors.clear();
 
     }
 
     Cluster(unsigned int clusterSize) {
-        processors.resize(clusterSize);
-        for (unsigned long i = 0; i < clusterSize; i++) {
-            processors.at(i) = make_shared<Processor>();
-        }
+        processors.reserve(clusterSize);
+        //for (unsigned long i = 0; i < clusterSize; i++) {
+     //       processors.at(i) = make_shared<Processor>();
+      //  }
 
 
 
     }
 
-    Cluster(vector<unsigned int> *groupSizes, vector<double> *memories, vector<double> *speeds) {
-        for (int i = 0; i < groupSizes->size(); i++) {
-            unsigned int groupSize = groupSizes->at(i);
-            for (unsigned int j = 0; j < groupSize; j++) {
-                this->processors.push_back(make_shared<Processor>(memories->at(i), speeds->at(i)));
-            }
-        }
-
-    }
-
-  //  Cluster(const Cluster * copy) ;
 
 
 public:
 
     void addProcessor(const shared_ptr<Processor>& p){
-        if(std::find_if(processors.begin(), processors.end(),[p](const shared_ptr<Processor>& p1){
-            return p->id==p1->id;
-        }) != processors.end()){
+        if( processors[p->id]!=NULL){
             throw new runtime_error("non-unique processor id "+ to_string(p->id));
         }
-        this->processors.emplace_back(p);
+        processors[p->id] = p;
+
+    }
+    void replaceProcessor(const shared_ptr<Processor>& p){
+        processors[p->id] = p;
     }
 
 
     void removeProcessor(Processor * toErase){
-        const vector<shared_ptr<Processor>>::iterator &iterator = std::find_if(this->processors.begin(), this->processors.end(),
-                                                                     [toErase](const shared_ptr<Processor>& p) {
-                                                                         return toErase->getMemorySize() ==
-                                                                                p->getMemorySize() &&
-                                                                                toErase->getProcessorSpeed() ==
-                                                                                p->getProcessorSpeed() && !p->isBusy;
-                                                                     });
-        this->processors.erase(iterator);
-        delete toErase;
+        this->processors.erase(toErase->id);
     }
 
-    vector<shared_ptr<Processor>> getProcessors() {
+    std::unordered_map<int, std::shared_ptr<Processor>> getProcessors() {
         return this->processors;
     }
 
@@ -212,40 +221,21 @@ public:
         return this->processors.size();
     }
 
-    unsigned int getNumberFreeProcessors() {
-        int res = count_if(this->processors.begin(), this->processors.end(),
-                           [](const shared_ptr<Processor>& i) { return !i->isBusy; });
-        return res;
-    }
 
-
-    void setMemorySizes(vector<double> &memories) {
-        //  memoryHomogeneous = false;
-        if (processors.size() != memories.size()) {
-            processors.resize(memories.size());
-            for (unsigned long i = 0; i < memories.size(); i++) {
-                processors.at(i) = make_shared<Processor>(memories.at(i));
-            }
-        } else {
-            for (unsigned long i = 0; i < memories.size(); i++) {
-                processors.at(i)->setMemorySize(memories.at(i));
-            }
-        }
-
-    }
 
     void printProcessors() {
-        for (auto iter = this->processors.begin(); iter < processors.end(); iter++) {
-            cout << "Processor " << (*iter)->id<< "with memory " << (*iter)->getMemorySize() << ", speed " << (*iter)->getProcessorSpeed()
-                 << " and busy? " << (*iter)->isBusy << "assigned " << ((*iter)->isBusy?(*iter)->getAssignedTaskId(): -1)
-                 << " ready time compute " << (*iter)->readyTimeCompute
-                 << " ready time read " << (*iter)->readyTimeRead
-                 << " ready time write " << (*iter)->readyTimeWrite
-                 //<< " ready time write soft " << (*iter)->softReadyTimeWrite
-                 //<< " avail memory " << (*iter)->availableMemory
-                 << " pending in memory "<<(*iter)->pendingMemories.size()<<" pcs: ";
 
-            for (const auto &item: (*iter)->pendingMemories){
+        for (const auto& [key, value] : this->processors) {
+            cout << "Processor " << value->id<< "with memory " << value->getMemorySize() << ", speed " << value->getProcessorSpeed()
+                 << " and busy? " << value->isBusy << "assigned " << (value->isBusy?value->getAssignedTaskId(): -1)
+                << " ready time compute " << value->readyTimeCompute
+                 << " ready time read " << value->readyTimeRead
+                 << " ready time write " << value->readyTimeWrite
+                 //<< " ready time write soft " << value->softReadyTimeWrite
+                 //<< " avail memory " << value->availableMemory
+                 << " pending in memory "<<value->pendingMemories.size()<<" pcs: ";
+
+            for (const auto &item: value->pendingMemories){
                 print_edge(item);
             }
             cout<< endl;
@@ -253,20 +243,6 @@ public:
     }
 
 
-    static void setFixedCluster(Cluster *cluster) {
-        Cluster::fixedCluster = cluster;
-    }
-
-    static Cluster *getFixedCluster() {
-        return Cluster::fixedCluster;
-    }
-    int getMaxSpeed(){
-        if(maxSpeed==-1){
-            sortProcessorsByProcSpeed();
-            maxSpeed = processors.at(0)->getProcessorSpeed();
-        }
-        return maxSpeed;
-    }
 
 
     shared_ptr<Processor>getMemBiggestFreeProcessor();
@@ -276,15 +252,17 @@ public:
     shared_ptr<Processor>getFirstFreeProcessorOrSmallest();
 
     shared_ptr<Processor> getProcessorById(int id){
-        for ( auto &item: getProcessors()){
-            if (item->id==id) return item;
+        if(processors[id]==NULL){
+            throw new runtime_error("Processor not found by id "+ to_string(id));
         }
-        throw new runtime_error("Processor not found by id "+ to_string(id));
+        return processors[id];
+
+
     }
 
     shared_ptr<Processor> getOneProcessorByName(string name){
-        for ( auto &item: getProcessors()){
-            if (item->name==name) return item;
+        for (const auto& [key, value] : this->processors) {
+            if (value->name==name) return value;
         }
         throw new runtime_error("Processor not found by name "+ name);
     }

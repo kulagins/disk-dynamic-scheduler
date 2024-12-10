@@ -76,24 +76,6 @@ namespace Fonda {
 
     }
 
-    Cluster *buildClusterFromJson(nlohmann::json query) {
-        Cluster *cluster = new Cluster();
-        int id = 0;
-        for (auto element: query["cluster"]["machines"]) {
-            shared_ptr<Processor>p;
-
-            if(   element.contains("speed")) {
-                p = make_shared<Processor>(element["memory"], element["speed"], id);
-            }
-            else p =make_shared<Processor>(element["memory"], 1, id);
-            id++;
-            cluster->addProcessor(p);
-
-        }
-
-        Cluster::setFixedCluster(cluster);
-        return cluster;
-    }
 
     void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology, std::unordered_map<std::string, std::vector<std::vector<std::string>>>
             workflow_rows, const string& workflow_name, Cluster * cluster, int memShorteningDivision) {

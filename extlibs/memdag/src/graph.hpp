@@ -234,6 +234,8 @@ vertex_t * findVertexByName(graph_t* graph, std::string toFind);
 vertex_t * findVertexById(graph_t* graph, int idToFind);
 void print_edge(edge_t * v);
 double peakMemoryRequirementOfVertex(const vertex_t * v);
+double inMemoryRequirement(const vertex_t * v);
+double outMemoryRequirement(const vertex_t * v);
 
 
 class Swap {
