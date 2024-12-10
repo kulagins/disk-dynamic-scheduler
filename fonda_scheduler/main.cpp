@@ -17,22 +17,7 @@
 #include <csignal>
 
 
-
-graph_t *currentWorkflow = NULL;
-string currentName;
-Cluster *currentCluster;
-vector<Assignment *> currentAssignment;
-
-double lastTimestamp = 0;
 int currentAlgoNum = 0;
-int updateCounter=0;
-int delayCnt=0;
-double lastAvgMem;
-
-vector<Assignment *> currentAssignmentWithNoRecalculation;
-bool isNoRecalculationStillValid= true;
-
-std::shared_ptr<Http::Endpoint> endpoint;
 
 /*
  *
