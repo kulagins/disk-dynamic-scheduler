@@ -5,9 +5,6 @@
 
 
 #include "../../extlibs/memdag/src/graph.hpp"
-#include <pistache/endpoint.h>
-#include <pistache/http.h>
-#include <pistache/router.h>
 #include "json.hpp"
 #include "cluster.hpp"
 
@@ -41,7 +38,7 @@ public:
 };
 
 
-using namespace Pistache;
+
 using json = nlohmann::json;
 
 using namespace std;
@@ -50,15 +47,15 @@ void printInlineDebug(string str);
 void checkForZeroMemories(graph_t *graph);
 std::string trimQuotes(const std::string& str);
 
-void completeRecomputationOfSchedule(Http::ResponseWriter &resp, const json &bodyjson, double timestamp, vertex_t * vertexThatHasAProblem);
+////void completeRecomputationOfSchedule(Http::ResponseWriter &resp, const json &bodyjson, double timestamp, vertex_t * vertexThatHasAProblem);
 void removeSourceAndTarget(graph_t *graph, vector<pair<vertex_t *, double>> &ranks);
 
 Cluster *
 prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vector<Assignment *> &tempAssignments);
 
 
-void delayOneTask(Http::ResponseWriter &resp, const json &bodyjson, string &nameOfTaskWithProblem, double newStartTime,
-                  Assignment *assignmOfProblem);
+//void delayOneTask(Http::ResponseWriter &resp, const json &bodyjson, string &nameOfTaskWithProblem, double newStartTime,
+ //                 Assignment *assignmOfProblem);
 void delayEverythingBy(vector<Assignment*> &assignments, Assignment * startingPoint, double delayTime);
 void takeOverChangesFromRunningTasks(json bodyjson, graph_t* currentWorkflow, vector<Assignment *> & assignments);
 
