@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include <fonda_scheduler/io/graphWeightsBuilder.hpp>
+#include <regex>
 #include "fonda_scheduler/common.hpp"
 #include "../extlibs/csv2/single_include/csv2/csv2.hpp"
 
