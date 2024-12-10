@@ -45,9 +45,8 @@ int main(int argc, char *argv[]) {
     auto start = std::chrono::system_clock::now();
     string workflowName = argv[1];
     workflowName = trimQuotes(workflowName);
-    currentName = workflowName;
     int algoNumber = std::stoi(argv[2]);
-    cout << "new, algo " << algoNumber << " " <<currentName<<" ";
+    cout << "new, algo " << algoNumber << " " <<workflowName<<" ";
     int memoryMultiplicator = stoi(argv[3]), speedMultiplicator = stoi(argv[4]);
     double readWritePenalty= stod(argv[5]), offloadPenalty= stod(argv[6]);
     bool isBaseline = (std::string(argv[7]) == "yes");
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]) {
             csv2::trim_policy::trim_whitespace> csv;
 
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows;
-    if (csv.mmap("../input/traces.csv")) {
+    if (csv.mmap("./input/traces.csv")) {
         for (const auto row: csv) {
             std::vector<std::string> row_data;
             std::string task_name, workflow_name;
@@ -84,22 +83,34 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    Cluster * cluster = Fonda::buildClusterFromCsv(memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    Cluster * cluster = Fonda::buildClusterFromCsv("./input/machines.csv", memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
     double biggestMem = cluster->getMemBiggestFreeProcessor()->getMemorySize();
-    
-    string filename = "../input/";
-    string suffix = "00";
-    bool isGenerated = workflowName.substr(workflowName.size() - suffix.size()) == suffix;
-    if (isGenerated) {
-        filename += "generated/";//+filename;
-    }
-    filename += workflowName;
 
-    filename += ".dot"; //isGenerated ? "_sparse.dot": ".dot";
+    string filename;
+    if(workflowName.rfind("/home", 0) == 0){
+        filename = workflowName.substr(0, workflowName.find("//")+1) + workflowName.substr(workflowName.find("//")+2, workflowName.size());
+
+    }
+    else{
+        filename= "../input/";
+        string suffix = "00";
+        bool isGenerated = workflowName.substr(workflowName.size() - suffix.size()) == suffix;
+        if (isGenerated) {
+            filename += "generated/";//+filename;
+        }
+        filename += workflowName;
+        filename += ".dot"; //isGenerated ? "_sparse.dot": ".dot";
+    }
+
     graph_t * graphMemTopology = read_dot_graph(filename.c_str(), NULL, NULL, NULL);
     checkForZeroMemories(graphMemTopology);
 
     currentAlgoNum = algoNumber;
+    workflowName = workflowName.substr(workflowName.find("//") + 2, workflowName.size());
+    unsigned long n4 = workflowName.find('_');
+    workflowName = workflowName.substr(0, n4);
+
+
     Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, cluster, 10);
 
     
@@ -109,7 +120,7 @@ int main(int argc, char *argv[]) {
             pv->memoryRequirement=peakMemoryRequirementOfVertex(pv)+1000;
             //cout<<"peak "<<peakMemoryRequirementOfVertex(pv)<<endl;
             if(outMemoryRequirement(pv)> biggestMem){
-                cout<<"WILL BE INVALID "<<endl;
+                cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< endl;
                 return 0;
             }
         }

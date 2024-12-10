@@ -9,14 +9,14 @@
 
 namespace Fonda {
 
-    Cluster * buildClusterFromCsv(int memoryMultiplicator, double readWritePenalty, double offloadPenalty, int speedMultiplicator){
+    Cluster * buildClusterFromCsv(const string& file, int memoryMultiplicator, double readWritePenalty, double offloadPenalty, int speedMultiplicator){
         csv2::Reader<csv2::delimiter<','>,
                 csv2::quote_character<'"'>,
                 csv2::first_row_is_header<true>,
                 csv2::trim_policy::trim_whitespace> csv;
 
         Cluster * cluster = new Cluster();
-        if (csv.mmap("../input/machines.csv")) {
+        if (csv.mmap(file)) {
             int id=0;
             for (const auto row: csv) {
                 std::vector<std::string> row_data;
@@ -96,7 +96,7 @@ namespace Fonda {
                                   c);
                       });
 
-           string nameToSearch =  workflow_name1+" "+lowercase_name;
+           string nameToSearch =  workflow_name1.append(" ").append(lowercase_name);
             if (workflow_rows.find(nameToSearch) != workflow_rows.end()) {
                 double avgMem=0, avgTime = 0, avgwchar=0, avgtinps=0;
 
