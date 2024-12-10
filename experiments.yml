@@ -2,8 +2,6 @@ instances:
   - repo: local
     items:
       - 'atacseq_10000.dot'
-      - 'atacseq_4000.dot'
-      - 'atacseq_10000.dot'
       - 'atacseq_25000.dot'
       - 'chipseq_18000.dot'
       - 'chipseq_8000.dot'
