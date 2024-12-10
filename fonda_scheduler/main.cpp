@@ -6,7 +6,8 @@
 #include "../include/fonda_scheduler/dynSched.hpp"
 #include "../include/fonda_scheduler/io/graphWeightsBuilder.hpp"
 #include "../extlibs/csv2/single_include/csv2/csv2.hpp"
-#include <iomanip>
+#include <iomanip>cd
+
 #include <chrono>
 #include <cstring>
 #include <csignal>
@@ -67,7 +68,7 @@ int main(int argc, char *argv[]) {
     double biggestMem = cluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     string filename;
-    if(workflowName.rfind("/home", 0) == 0){
+    if(workflowName.rfind("/home", 0) == 0 || workflowName.rfind("/work", 0) == 0){
         filename = workflowName.substr(0, workflowName.find("//")+1) + workflowName.substr(workflowName.find("//")+2, workflowName.size());
 
     }
