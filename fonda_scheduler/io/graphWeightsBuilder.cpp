@@ -79,7 +79,7 @@ namespace Fonda {
 
 
     void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology, std::unordered_map<std::string, std::vector<std::vector<std::string>>>
-            workflow_rows, const string& workflow_name, Cluster * cluster, int memShorteningDivision) {
+            workflow_rows, const string& workflow_name, long inputSize, Cluster * cluster, int memShorteningDivision) {
 
         double minMem= std::numeric_limits<double>::max(), minTime =  std::numeric_limits<double>::max(), minWchar= std::numeric_limits<double>::max(),
         mintt = std::numeric_limits<double>::max();
@@ -97,7 +97,7 @@ namespace Fonda {
                                   c);
                       });
 
-           string nameToSearch =  workflow_name1.append(" ").append(lowercase_name);
+           string nameToSearch =  workflow_name1.append(" ").append(lowercase_name).append(" ").append(to_string(inputSize));
             if (workflow_rows.find(nameToSearch) != workflow_rows.end()) {
                 double avgMem=0, avgTime = 0, avgwchar=0, avgtinps=0;
 

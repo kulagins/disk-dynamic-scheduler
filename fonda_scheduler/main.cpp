@@ -17,8 +17,8 @@ int currentAlgoNum = 0;
 
 /*
  *
- *  Call:  memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty, isBaseline
- *  1000000, 100, 1, 0.001, true
+ *  Call: workflow, inputSIze, memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty, isBaseline
+ *  1000000, 100, 1, 0.001, true ../
  *
  */
 
@@ -26,11 +26,14 @@ int main(int argc, char *argv[]) {
     auto start = std::chrono::system_clock::now();
     string workflowName = argv[1];
     workflowName = trimQuotes(workflowName);
-    int algoNumber = std::stoi(argv[2]);
+    long inputSize= stol(argv[2]);
+    int algoNumber = std::stoi(argv[3]);
     cout << "new, algo " << algoNumber << " " <<workflowName<<" ";
-    int memoryMultiplicator = stoi(argv[3]), speedMultiplicator = stoi(argv[4]);
-    double readWritePenalty= stod(argv[5]), offloadPenalty= stod(argv[6]);
-    bool isBaseline = (std::string(argv[7]) == "yes");
+
+    int memoryMultiplicator = stoi(argv[4]), speedMultiplicator = stoi(argv[5]);
+    double readWritePenalty= stod(argv[6]), offloadPenalty= stod(argv[7]);
+    bool isBaseline = (std::string(argv[8]) == "yes");
+    string dotPrefix= argv[9];
     //1000000, 100, 1, 0.001
     csv2::Reader<csv2::delimiter<','>,
             csv2::quote_character<'"'>,
@@ -38,10 +41,11 @@ int main(int argc, char *argv[]) {
             csv2::trim_policy::trim_whitespace> csv;
 
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows;
-    if (csv.mmap("./input/traces.csv")) {
+    string tracesFileName = dotPrefix+ "input/traces.csv";
+    if (csv.mmap(tracesFileName)) {
         for (const auto row: csv) {
             std::vector<std::string> row_data;
-            std::string task_name, workflow_name;
+            std::string task_name, workflow_name, inputSizeInRow;
 
             int col_idx = 0;
             for (const auto& cell : row) {
@@ -52,7 +56,10 @@ int main(int argc, char *argv[]) {
                 if (col_idx == 0) {
                     workflow_name = cell_value;
                 }
-                // Assuming the workflow name is in the first column (index 0)
+                if (col_idx == 1) {
+                    inputSizeInRow = cell_value;
+                }
+
                 if (col_idx == 2) {
                     task_name = cell_value;
                 }
@@ -60,11 +67,11 @@ int main(int argc, char *argv[]) {
             }
 
             // Store row in the map under the workflow name
-            workflow_rows[workflow_name.append(" ").append(task_name)].push_back(row_data);
+            workflow_rows[workflow_name.append(" ").append(task_name).append(" ").append(inputSizeInRow)].push_back(row_data);
         }
     }
 
-    Cluster * cluster = Fonda::buildClusterFromCsv("./input/machines.csv", memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    Cluster * cluster = Fonda::buildClusterFromCsv(dotPrefix +"input/machines.csv", memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
     double biggestMem = cluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     string filename;
@@ -87,12 +94,14 @@ int main(int argc, char *argv[]) {
     checkForZeroMemories(graphMemTopology);
 
     currentAlgoNum = algoNumber;
-    workflowName = workflowName.substr(workflowName.find("//") + 2, workflowName.size());
+    unsigned long i1 = workflowName.find("//");
+    workflowName = i1 == string::npos? workflowName :
+                   workflowName.substr(i1 + 2, workflowName.size());
     unsigned long n4 = workflowName.find('_');
     workflowName = workflowName.substr(0, n4);
 
 
-    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, cluster, 10);
+    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, cluster, 10);
 
     
     vertex_t *pv = graphMemTopology->first_vertex;
