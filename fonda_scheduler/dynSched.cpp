@@ -75,6 +75,7 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
        // checkIfPendingMemoryCorrect(bestProcessorToAssign);
 
       //  cout<<"delocating from other procs according to tentative "<<endl;
+       // bestProcessorToAssign->assignment+="started at "+ to_string(bestStartTime)+"; ";
         for (auto &modifiedProc: bestModifiedProcs){
            // cout<<" from "<<modifiedProc->id<<endl;
             auto procInClusterWithId = cluster->getProcessorById(modifiedProc->id);
@@ -104,7 +105,11 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
                 assert(modifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
               //  cout<<"erplacing "<<modifiedProc->id<<endl;
                 checkIfPendingMemoryCorrect(modifiedProc);
+             //   modifiedProc->assignment+= " ready time "+ to_string(modifiedProc->readyTimeCompute)+" write "+
+              //          to_string(modifiedProc->readyTimeWrite) + " read "+ to_string(modifiedProc->readyTimeRead)+ "; ";
                 cluster->replaceProcessor(modifiedProc);
+
+
 
 
         }

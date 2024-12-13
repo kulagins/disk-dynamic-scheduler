@@ -132,6 +132,10 @@ int main(int argc, char *argv[]) {
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
     cout<<"makespan "<<d<<endl;
 
+    //for (const auto &item: cluster->getProcessors()){
+   //     cout<< item.second->id<<": "<<item.second->assignment<<endl;
+   // }
+
     delete graphMemTopology;
     delete cluster;
 }

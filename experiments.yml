@@ -49,11 +49,14 @@ instances:
 
 instdir: 'input/generated'
 
+# memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty,
 variants:
   - axis: 'penalties'
     items:
       - name: 'normal'
         extra_args: ['1000000', '100', '1', '0.001']
+      - name: 'IOslower'
+        extra_args: [ '1000000', '10', '0.1', '0.00001' ]
 
 
 experiments:

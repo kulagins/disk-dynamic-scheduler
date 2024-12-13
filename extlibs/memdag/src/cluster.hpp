@@ -60,6 +60,8 @@ public:
     double writeSpeedDisk;
     double peakMemConsumption=0;
 
+    string assignment;
+
 
     Processor() {
         this->memorySize = 0;
