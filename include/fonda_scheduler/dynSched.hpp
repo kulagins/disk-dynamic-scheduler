@@ -22,6 +22,10 @@ vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int botto
 double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v, const shared_ptr<Processor>&pj);
 vector< shared_ptr<Processor>> tentativeAssignment(vertex_t *v, shared_ptr<Processor>pj, double &finishTime,
                                                    double & startTime, double &peakMem, int& resultingVariant, edge* &singleToKick, Cluster * cluster, bool isThisBaseline=false );
+vector<shared_ptr<Processor>>
+tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc,
+                        double &actualFinishTime, double &actualStartTime,  double &perceivedFinishTime, double &perceivedStartTime,
+                        double &peakMem, Cluster * cluster);
 
 graph_t *convertToNonMemRepresentation(graph_t *withMemories, map<int, int> &noMemToWithMem);
 void
@@ -31,7 +35,7 @@ void checkIfPendingMemoryCorrect(const shared_ptr<Processor>& p);
 bool hasDuplicates(const std::vector<shared_ptr<Processor>>& vec);
 void bestTentativeAssignment(Cluster *cluster, bool isHeft, vertex_t *vertex, vector<shared_ptr<Processor>> &bestModifiedProcs,
                              shared_ptr<Processor> &bestProcessorToAssign, double &bestFinishTime, double &bestStartTime, int &resultingVar,
-                             edge_t *&besttoKick);
+                             edge_t *&besttoKick, int &numberWithEvictedCases);
 
 
 #endif //RESHI_TXT_DYNSCHED_HPP
