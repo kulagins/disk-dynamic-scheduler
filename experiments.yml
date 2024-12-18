@@ -899,22 +899,22 @@ experiments:
     num_threads: 24
     #slurm_args: [ '--exclude', 'stark[01-10]']
   - name: A2
-    args: ['./build/fonda_scheduler', '@INSTANCE@', '2', '@EXTRA_ARGS@', 'no' , './'] #'@INSTANCE@',
+    args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '2', 'no' , './'] #'@INSTANCE@',
     stdout: out
     num_threads: 24
     #slurm_args: [ '--exclude', 'stark[01-10]']
   - name: A3
-    args: [ './build/fonda_scheduler', '@INSTANCE@', '3', '@EXTRA_ARGS@', 'no', './'] #'@INSTANCE@',
+    args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '3', 'no', './'] #'@INSTANCE@',
     stdout: out
     num_threads: 24
     #slurm_args: [ '--exclude', 'stark[01-10]']
   - name: BASE
-    args: [ './build/fonda_scheduler', '@INSTANCE@', '1', '@EXTRA_ARGS@', 'yes', './' ] #'@INSTANCE@',
+    args: [ './build/fonda_scheduler', '@EXTRA_ARGS@',  '1', 'yes', './' ] #'@INSTANCE@',
     stdout: out
     num_threads: 24
     #slurm_args: ['--exclude', 'stark[01-10]']
-
+##
 matrix:
   include:
-    - experiments: [A1, A2, A3, BASE]
+    - experiments: [ A1, A2, A3, BASE]
       axes: [penalties]
