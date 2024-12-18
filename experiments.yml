@@ -1,50 +1,876 @@
 instances:
   - repo: local
     items:
-      - 'atacseq_10000.dot'
-      - 'atacseq_25000.dot'
-      - 'chipseq_18000.dot'
-      - 'chipseq_8000.dot'
-      - 'eager_200.dot'
-      - 'methylseq_15000.dot'
-      - 'methylseq_4000.dot'
-      - 'atacseq_1000.dot'
-      - 'atacseq_30000.dot'
-      - 'chipseq_20000.dot'
-      - 'eager_10000.dot'
-      - 'eager_25000.dot'
-      - 'methylseq_18000.dot'
-      - 'methylseq_8000.dot'
-      - 'atacseq_15000.dot'
-      - 'atacseq_4000.dot'
-      - 'chipseq_2000.dot'
-      - 'eager_1000.dot'
-      - 'eager_30000.dot'
-      - 'methylseq_20000.dot'
-      - 'atacseq_18000.dot'
-      - 'atacseq_8000.dot'
-      - 'chipseq_200.dot'
-      - 'eager_15000.dot'
-      - 'eager_4000.dot'
-      - 'methylseq_2000.dot'
-      - 'atacseq_20000.dot'
-      - 'chipseq_10000.dot'
-      - 'chipseq_25000.dot'
-      - 'eager_18000.dot'
-      - 'eager_8000.dot'
-      - 'methylseq_200.dot'
-      - 'atacseq_2000.dot'
-      - 'chipseq_1000.dot'
-      - 'chipseq_30000.dot'
-      - 'eager_20000.dot'
-      - 'methylseq_10000.dot'
-      - 'methylseq_25000.dot'
-      - 'atacseq_200.dot'
-      - 'chipseq_15000.dot'
-      - 'chipseq_4000.dot'
-      - 'eager_2000.dot'
-      - 'methylseq_1000.dot'
-      - 'methylseq_30000.dot'
+      - name: atacseq_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq.dot', '2223941232' ]
+      - name: atacseq_1000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_1000.dot', '2223941232' ]
+      - name: atacseq_15000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_15000.dot', '2223941232' ]
+      - name: atacseq_2000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_2000.dot', '2223941232' ]
+      - name: atacseq_200_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_200.dot', '2223941232' ]
+      - name: atacseq_4000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_4000.dot', '2223941232' ]
+      - name: atacseq_8000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_8000.dot', '2223941232' ]
+      - name: atacseq_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq.dot', '3908761308' ]
+      - name: atacseq_10000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_10000.dot', '3908761308' ]
+      - name: atacseq_1000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_1000.dot', '3908761308' ]
+      - name: atacseq_18000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_18000.dot', '3908761308' ]
+      - name: atacseq_20000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_20000.dot', '3908761308' ]
+      - name: atacseq_2000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_2000.dot', '3908761308' ]
+      - name: atacseq_200_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_200.dot', '3908761308' ]
+      - name: atacseq_25000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_25000.dot', '3908761308' ]
+      - name: atacseq_30000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_30000.dot', '3908761308' ]
+      - name: atacseq_4000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_4000.dot', '3908761308' ]
+      - name: atacseq_8000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_8000.dot', '3908761308' ]
+      - name: atacseq_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq.dot', '11187378708' ]
+      - name: atacseq_10000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_10000.dot', '11187378708' ]
+      - name: atacseq_1000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_1000.dot', '11187378708' ]
+      - name: atacseq_15000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_15000.dot', '11187378708' ]
+      - name: atacseq_18000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_18000.dot', '11187378708' ]
+      - name: atacseq_20000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_20000.dot', '11187378708' ]
+      - name: atacseq_2000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_2000.dot', '11187378708' ]
+      - name: atacseq_200_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_200.dot', '11187378708' ]
+      - name: atacseq_25000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_25000.dot', '11187378708' ]
+      - name: atacseq_30000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_30000.dot', '11187378708' ]
+      - name: atacseq_4000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_4000.dot', '11187378708' ]
+      - name: atacseq_8000_11187378708
+        files: [ ]
+        extra_args: [ 'atacseq_8000.dot', '11187378708' ]
+      - name: atacseq_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq.dot', '11809629756' ]
+      - name: atacseq_10000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_10000.dot', '11809629756' ]
+      - name: atacseq_1000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_1000.dot', '11809629756' ]
+      - name: atacseq_15000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_15000.dot', '11809629756' ]
+      - name: atacseq_18000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_18000.dot', '11809629756' ]
+      - name: atacseq_20000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_20000.dot', '11809629756' ]
+      - name: atacseq_2000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_2000.dot', '11809629756' ]
+      - name: atacseq_200_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_200.dot', '11809629756' ]
+      - name: atacseq_25000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_25000.dot', '11809629756' ]
+      - name: atacseq_30000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_30000.dot', '11809629756' ]
+      - name: atacseq_4000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_4000.dot', '11809629756' ]
+      - name: atacseq_8000_11809629756
+        files: [ ]
+        extra_args: [ 'atacseq_8000.dot', '11809629756' ]
+      - name: atacseq_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq.dot', '14091675276' ]
+      - name: atacseq_10000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_10000.dot', '14091675276' ]
+      - name: atacseq_1000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_1000.dot', '14091675276' ]
+      - name: atacseq_15000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_15000.dot', '14091675276' ]
+      - name: atacseq_18000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_18000.dot', '14091675276' ]
+      - name: atacseq_20000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_20000.dot', '14091675276' ]
+      - name: atacseq_2000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_2000.dot', '14091675276' ]
+      - name: atacseq_200_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_200.dot', '14091675276' ]
+      - name: atacseq_25000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_25000.dot', '14091675276' ]
+      - name: atacseq_30000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_30000.dot', '14091675276' ]
+      - name: atacseq_4000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_4000.dot', '14091675276' ]
+      - name: atacseq_8000_14091675276
+        files: [ ]
+        extra_args: [ 'atacseq_8000.dot', '14091675276' ]
+      - name: bacass_3637252230
+        files: [ ]
+        extra_args: [ 'bacass.dot', '3637252230.dot' ]
+      - name: bacass_4352562006
+        files: [ ]
+        extra_args: [ 'bacass.dot', '4352562006' ]
+      - name: chipseq_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq.dot', '3793245764' ]
+      - name: chipseq_10000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_10000.dot', '3793245764' ]
+      - name: chipseq_1000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_1000.dot', '3793245764' ]
+      - name: chipseq_15000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_15000.dot', '3793245764' ]
+      - name: chipseq_18000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_18000.dot', '3793245764' ]
+      - name: chipseq_20000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_20000.dot', '3793245764' ]
+      - name: chipseq_2000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_2000.dot', '3793245764' ]
+      - name: chipseq_200_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_200.dot', '3793245764' ]
+      - name: chipseq_25000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_25000.dot', '3793245764' ]
+      - name: chipseq_30000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_30000.dot', '3793245764' ]
+      - name: chipseq_4000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_4000.dot', '3793245764' ]
+      - name: chipseq_8000_3793245764
+        files: [ ]
+        extra_args: [ 'chipseq_8000.dot', '3793245764' ]
+      - name: chipseq_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq.dot', '4605965334' ]
+      - name: chipseq_10000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_10000.dot', '4605965334' ]
+      - name: chipseq_1000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_1000.dot', '4605965334' ]
+      - name: chipseq_15000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_15000.dot', '4605965334' ]
+      - name: chipseq_18000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_18000.dot', '4605965334' ]
+      - name: chipseq_20000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_20000.dot', '4605965334' ]
+      - name: chipseq_2000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_2000.dot', '4605965334' ]
+      - name: chipseq_200_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_200.dot', '4605965334' ]
+      - name: chipseq_25000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_25000.dot', '4605965334' ]
+      - name: chipseq_30000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_30000.dot', '4605965334' ]
+      - name: chipseq_4000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_4000.dot', '4605965334' ]
+      - name: chipseq_8000_4605965334
+        files: [ ]
+        extra_args: [ 'chipseq_8000.dot', '4605965334' ]
+      - name: chipseq_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq', '4807293396' ]
+      - name: chipseq_10000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_10000.dot', '4807293396' ]
+      - name: chipseq_1000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_1000.dot', '4807293396' ]
+      - name: chipseq_15000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_15000.dot', '4807293396' ]
+      - name: chipseq_18000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_18000.dot', '4807293396' ]
+      - name: chipseq_20000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_20000.dot', '4807293396' ]
+      - name: chipseq_2000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_2000.dot', '4807293396' ]
+      - name: chipseq_200_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_200.dot', '4807293396' ]
+      - name: chipseq_25000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_25000.dot', '4807293396' ]
+      - name: chipseq_30000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_30000.dot', '4807293396' ]
+      - name: chipseq_4000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_4000.dot', '4807293396' ]
+      - name: chipseq_8000_4807293396
+        files: [ ]
+        extra_args: [ 'chipseq_8000.dot', '4807293396' ]
+      - name: chipseq_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq', '5058052541' ]
+      - name: chipseq_10000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_10000.dot', '5058052541' ]
+      - name: chipseq_1000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_1000.dot', '5058052541' ]
+      - name: chipseq_15000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_15000.dot', '5058052541' ]
+      - name: chipseq_18000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_18000.dot', '5058052541' ]
+      - name: chipseq_20000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_20000.dot', '5058052541' ]
+      - name: chipseq_2000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_2000.dot', '5058052541' ]
+      - name: chipseq_200_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_200.dot', '5058052541' ]
+      - name: chipseq_25000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_25000.dot', '5058052541' ]
+      - name: chipseq_30000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_30000.dot', '5058052541' ]
+      - name: chipseq_4000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_4000.dot', '5058052541' ]
+      - name: chipseq_8000_5058052541
+        files: [ ]
+        extra_args: [ 'chipseq_8000.dot', '5058052541' ]
+      - name: chipseq_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq', '32978181418' ]
+      - name: chipseq_10000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_10000.dot', '32978181418' ]
+      - name: chipseq_1000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_1000.dot', '32978181418' ]
+      - name: chipseq_15000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_15000.dot', '32978181418' ]
+      - name: chipseq_18000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_18000.dot', '32978181418' ]
+      - name: chipseq_20000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_20000.dot', '32978181418' ]
+      - name: chipseq_2000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_2000.dot', '32978181418' ]
+      - name: chipseq_200_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_200.dot', '32978181418' ]
+      - name: chipseq_25000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_25000.dot', '32978181418' ]
+      - name: chipseq_30000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_30000.dot', '32978181418' ]
+      - name: chipseq_4000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_4000.dot', '32978181418' ]
+      - name: chipseq_8000_32978181418
+        files: [ ]
+        extra_args: [ 'chipseq_8000.dot', '32978181418' ]
+      - name: chipseq_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq', '41366257414' ]
+      - name: chipseq_10000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_10000.dot', '41366257414' ]
+      - name: chipseq_1000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_1000.dot', '41366257414' ]
+      - name: chipseq_15000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_15000.dot', '41366257414' ]
+      - name: chipseq_18000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_18000.dot', '41366257414' ]
+      - name: chipseq_20000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_20000.dot', '41366257414' ]
+      - name: chipseq_2000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_2000.dot', '41366257414' ]
+      - name: chipseq_200_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_200.dot', '41366257414' ]
+      - name: chipseq_25000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_25000.dot', '41366257414' ]
+      - name: chipseq_30000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_30000.dot', '41366257414' ]
+      - name: chipseq_4000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_4000.dot', '41366257414' ]
+      - name: chipseq_8000_41366257414
+        files: [ ]
+        extra_args: [ 'chipseq_8000.dot', '41366257414' ]
+      - name: eager_8330435694
+        files: [ ]
+        extra_args: [ ' eager', '8330435694' ]
+      - name: eager_10000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_10000.dot', '8330435694' ]
+      - name: eager_1000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_1000.dot', '8330435694' ]
+      - name: eager_15000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_15000.dot', '8330435694' ]
+      - name: eager_18000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_18000.dot', '8330435694' ]
+      - name: eager_20000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_20000.dot', '8330435694' ]
+      - name: eager_2000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_2000.dot', '8330435694' ]
+      - name: eager_200_8330435694
+        files: [ ]
+        extra_args: [ ' eager_200.dot', '8330435694' ]
+      - name: eager_25000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_25000.dot', '8330435694' ]
+      - name: eager_30000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_30000.dot', '8330435694' ]
+      - name: eager_4000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_4000.dot', '8330435694' ]
+      - name: eager_8000_8330435694
+        files: [ ]
+        extra_args: [ ' eager_8000.dot', '8330435694' ]
+      - name: eager_14754556884
+        files: [ ]
+        extra_args: [ ' eager', '14754556884' ]
+      - name: eager_10000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_10000.dot', '14754556884' ]
+      - name: eager_1000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_1000.dot', '14754556884' ]
+      - name: eager_15000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_15000.dot', '14754556884' ]
+      - name: eager_18000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_18000.dot', '14754556884' ]
+      - name: eager_20000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_20000.dot', '14754556884' ]
+      - name: eager_2000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_2000.dot', '14754556884' ]
+      - name: eager_200_14754556884
+        files: [ ]
+        extra_args: [ ' eager_200.dot', '14754556884' ]
+      - name: eager_25000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_25000.dot', '14754556884' ]
+      - name: eager_30000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_30000.dot', '14754556884' ]
+      - name: eager_4000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_4000.dot', '14754556884' ]
+      - name: eager_8000_14754556884
+        files: [ ]
+        extra_args: [ ' eager_8000.dot', '14754556884' ]
+      - name: eager_19075314980
+        files: [ ]
+        extra_args: [ ' eager', '19075314980.dot' ]
+      - name: eager_10000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_10000.dot', '19075314980.dot' ]
+      - name: eager_1000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_1000.dot', '19075314980.dot' ]
+      - name: eager_15000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_15000.dot', '19075314980.dot' ]
+      - name: eager_18000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_18000.dot', '19075314980.dot' ]
+      - name: eager_20000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_20000.dot', '19075314980.dot' ]
+      - name: eager_2000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_2000.dot', '19075314980.dot' ]
+      - name: eager_200_19075314980
+        files: [ ]
+        extra_args: [ ' eager_200.dot', '19075314980.dot' ]
+      - name: eager_25000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_25000.dot', '19075314980.dot' ]
+      - name: eager_30000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_30000.dot', '19075314980.dot' ]
+      - name: eager_4000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_4000.dot', '19075314980.dot' ]
+      - name: eager_8000_19075314980
+        files: [ ]
+        extra_args: [ ' eager_8000.dot', '19075314980.dot' ]
+      - name: eager_19100037384
+        files: [ ]
+        extra_args: [ ' eager', '19100037384' ]
+      - name: eager_10000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_10000.dot', '19100037384' ]
+      - name: eager_1000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_1000.dot', '19100037384' ]
+      - name: eager_15000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_15000.dot', '19100037384' ]
+      - name: eager_18000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_18000.dot', '19100037384' ]
+      - name: eager_20000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_20000.dot', '19100037384' ]
+      - name: eager_2000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_2000.dot', '19100037384' ]
+      - name: eager_200_19100037384
+        files: [ ]
+        extra_args: [ ' eager_200.dot', '19100037384' ]
+      - name: eager_25000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_25000.dot', '19100037384' ]
+      - name: eager_30000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_30000.dot', '19100037384' ]
+      - name: eager_4000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_4000.dot', '19100037384' ]
+      - name: eager_8000_19100037384
+        files: [ ]
+        extra_args: [ ' eager_8000.dot', '19100037384' ]
+      - name: eager_19132169434
+        files: [ ]
+        extra_args: [ ' eager', '19132169434' ]
+      - name: eager_10000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_10000.dot', '19132169434' ]
+      - name: eager_1000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_1000.dot', '19132169434' ]
+      - name: eager_15000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_15000.dot', '19132169434' ]
+      - name: eager_18000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_18000.dot', '19132169434' ]
+      - name: eager_20000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_20000.dot', '19132169434' ]
+      - name: eager_2000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_2000.dot', '19132169434' ]
+      - name: eager_200_19132169434
+        files: [ ]
+        extra_args: [ ' eager_200.dot', '19132169434' ]
+      - name: eager_25000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_25000.dot', '19132169434' ]
+      - name: eager_30000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_30000.dot', '19132169434' ]
+      - name: eager_4000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_4000.dot', '19132169434' ]
+      - name: eager_8000_19132169434
+        files: [ ]
+        extra_args: [ ' eager_8000.dot', '19132169434' ]
+      - name: eager_25705994498
+        files: [ ]
+        extra_args: [ ' eager', '25705994498' ]
+      - name: eager_10000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_10000.dot', '25705994498' ]
+      - name: eager_1000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_1000.dot', '25705994498' ]
+      - name: eager_15000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_15000.dot', '25705994498' ]
+      - name: eager_18000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_18000.dot', '25705994498' ]
+      - name: eager_20000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_20000.dot', '25705994498' ]
+      - name: eager_2000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_2000.dot', '25705994498' ]
+      - name: eager_200_25705994498
+        files: [ ]
+        extra_args: [ ' eager_200.dot', '25705994498' ]
+      - name: eager_25000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_25000.dot', '25705994498' ]
+      - name: eager_30000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_30000.dot', '25705994498' ]
+      - name: eager_4000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_4000.dot', '25705994498' ]
+      - name: eager_8000_25705994498
+        files: [ ]
+        extra_args: [ ' eager_8000.dot', '25705994498' ]
+      - name: methylseq_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq', '6273818718' ]
+      - name: methylseq_10000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_10000.dot', '6273818718' ]
+      - name: methylseq_1000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_1000.dot', '6273818718' ]
+      - name: methylseq_15000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_15000.dot', '6273818718' ]
+      - name: methylseq_18000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_18000.dot', '6273818718' ]
+      - name: methylseq_20000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_20000.dot', '6273818718' ]
+      - name: methylseq_2000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_2000.dot', '6273818718' ]
+      - name: methylseq_200_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_200.dot', '6273818718' ]
+      - name: methylseq_25000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_25000.dot', '6273818718' ]
+      - name: methylseq_30000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_30000.dot', '6273818718' ]
+      - name: methylseq_4000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_4000.dot', '6273818718' ]
+      - name: methylseq_8000_6273818718
+        files: [ ]
+        extra_args: [ 'methylseq_8000.dot', '6273818718' ]
+      - name: methylseq_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq', '6761426956' ]
+      - name: methylseq_10000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_10000.dot', '6761426956' ]
+      - name: methylseq_1000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_1000.dot', '6761426956' ]
+      - name: methylseq_15000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_15000.dot', '6761426956' ]
+      - name: methylseq_18000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_18000.dot', '6761426956' ]
+      - name: methylseq_20000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_20000.dot', '6761426956' ]
+      - name: methylseq_2000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_2000.dot', '6761426956' ]
+      - name: methylseq_200_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_200.dot', '6761426956' ]
+      - name: methylseq_25000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_25000.dot', '6761426956' ]
+      - name: methylseq_30000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_30000.dot', '6761426956' ]
+      - name: methylseq_4000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_4000.dot', '6761426956' ]
+      - name: methylseq_8000_6761426956
+        files: [ ]
+        extra_args: [ 'methylseq_8000.dot', '6761426956' ]
+      - name: methylseq_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq', '8885797810.dot' ]
+      - name: methylseq_10000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_10000.dot', '8885797810.dot' ]
+      - name: methylseq_1000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_1000.dot', '8885797810.dot' ]
+      - name: methylseq_15000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_15000.dot', '8885797810.dot' ]
+      - name: methylseq_18000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_18000.dot', '8885797810.dot' ]
+      - name: methylseq_20000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_20000.dot', '8885797810.dot' ]
+      - name: methylseq_2000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_2000.dot', '8885797810.dot' ]
+      - name: methylseq_200_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_200.dot', '8885797810.dot' ]
+      - name: methylseq_25000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_25000.dot', '8885797810.dot' ]
+      - name: methylseq_30000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_30000.dot', '8885797810.dot' ]
+      - name: methylseq_4000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_4000.dot', '8885797810.dot' ]
+      - name: methylseq_8000_8885797810
+        files: [ ]
+        extra_args: [ 'methylseq_8000.dot', '8885797810.dot' ]
+      - name: methylseq_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq', '11897958606' ]
+      - name: methylseq_10000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_10000.dot', '11897958606' ]
+      - name: methylseq_1000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_1000.dot', '11897958606' ]
+      - name: methylseq_15000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_15000.dot', '11897958606' ]
+      - name: methylseq_18000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_18000.dot', '11897958606' ]
+      - name: methylseq_20000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_20000.dot', '11897958606' ]
+      - name: methylseq_2000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_2000.dot', '11897958606' ]
+      - name: methylseq_200_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_200.dot', '11897958606' ]
+      - name: methylseq_25000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_25000.dot', '11897958606' ]
+      - name: methylseq_30000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_30000.dot', '11897958606' ]
+      - name: methylseq_4000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_4000.dot', '11897958606' ]
+      - name: methylseq_8000_11897958606
+        files: [ ]
+        extra_args: [ 'methylseq_8000.dot', '11897958606' ]
+      - name: methylseq_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq', '17027257018' ]
+      - name: methylseq_10000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_10000.dot', '17027257018' ]
+      - name: methylseq_1000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_1000.dot', '17027257018' ]
+      - name: methylseq_15000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_15000.dot', '17027257018' ]
+      - name: methylseq_18000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_18000.dot', '17027257018' ]
+      - name: methylseq_20000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_20000.dot', '17027257018' ]
+      - name: methylseq_2000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_2000.dot', '17027257018' ]
+      - name: methylseq_200_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_200.dot', '17027257018' ]
+      - name: methylseq_25000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_25000.dot', '17027257018' ]
+      - name: methylseq_30000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_30000.dot', '17027257018' ]
+      - name: methylseq_4000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_4000.dot', '17027257018' ]
+      - name: methylseq_8000_17027257018
+        files: [ ]
+        extra_args: [ 'methylseq_8000.dot', '17027257018' ]
+      - name: methylseq_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq', '22500260922' ]
+      - name: methylseq_10000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_10000.dot', '22500260922' ]
+      - name: methylseq_1000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_1000.dot', '22500260922' ]
+      - name: methylseq_15000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_15000.dot', '22500260922' ]
+      - name: methylseq_18000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_18000.dot', '22500260922' ]
+      - name: methylseq_20000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_20000.dot', '22500260922' ]
+      - name: methylseq_2000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_2000.dot', '22500260922' ]
+      - name: methylseq_200_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_200.dot', '22500260922' ]
+      - name: methylseq_25000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_25000.dot', '22500260922' ]
+      - name: methylseq_30000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_30000.dot', '22500260922' ]
+      - name: methylseq_4000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_4000.dot', '22500260922' ]
+      - name: methylseq_8000_22500260922
+        files: [ ]
+        extra_args: [ 'methylseq_8000.dot', '22500260922' ]
+      - name: methylseq_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq', '110641579976' ]
+      - name: methylseq_10000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_10000.dot', '110641579976' ]
+      - name: methylseq_1000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_1000.dot', '110641579976' ]
+      - name: methylseq_15000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_15000.dot', '110641579976' ]
+      - name: methylseq_18000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_18000.dot', '110641579976' ]
+      - name: methylseq_20000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_20000.dot', '110641579976' ]
+      - name: methylseq_2000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_2000.dot', '110641579976' ]
+      - name: methylseq_200_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_200.dot', '110641579976' ]
+      - name: methylseq_25000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_25000.dot', '110641579976' ]
+      - name: methylseq_30000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_30000.dot', '110641579976' ]
+      - name: methylseq_4000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_4000.dot', '110641579976' ]
+      - name: methylseq_8000_110641579976
+        files: [ ]
+        extra_args: [ 'methylseq_8000.dot', '110641579976' ]
+      - name: atacseq_10000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_10000.dot', '2223941232' ]
+      - name: atacseq_18000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_18000.dot', '2223941232' ]
+      - name: atacseq_20000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_20000.dot', '2223941232' ]
+      - name: atacseq_25000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_25000.dot', '2223941232' ]
+      - name: atacseq_30000_2223941232
+        files: [ ]
+        extra_args: [ 'atacseq_30000.dot', '2223941232' ]
+      - name: atacseq_15000_3908761308
+        files: [ ]
+        extra_args: [ 'atacseq_15000.dot', '3908761308' ]
 
 
 instdir: 'input/generated'
@@ -56,30 +882,37 @@ variants:
       - name: 'normal'
         extra_args: ['1000000', '100', '1', '0.001']
       - name: 'IOslower'
-        extra_args: [ '1000000', '10', '0.1', '0.00001' ]
+        extra_args: [ '1000000', '100', '0.1', '0.00001' ]
+      - name: 'tightmem'
+        extra_args: [ '30000', '100', '0.1', '0.00001' ]
+      - name: 'IOfaster'
+        extra_args: [ '30000', '100', '10', '0.01' ]
+      - name: 'IOfaster2'
+        extra_args: [ '30000', '100', '100', '0.1' ]
 
 
+#args: ['./build/fonda_scheduler', '@INSTANCE@', '1', '@EXTRA_ARGS@', 'no'] #'@INSTANCE@',
 experiments:
   - name: A1
-    args: ['./build/fonda_scheduler', '@INSTANCE@', '1', '@EXTRA_ARGS@', 'no'] #'@INSTANCE@',
+    args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '1', 'no', './'] #'@INSTANCE@',
     stdout: out
     num_threads: 24
-    slurm_args: [ '--exclude', 'stark[01-10]']
+    #slurm_args: [ '--exclude', 'stark[01-10]']
   - name: A2
-    args: ['./build/fonda_scheduler', '@INSTANCE@', '2', '@EXTRA_ARGS@', 'no' ] #'@INSTANCE@',
+    args: ['./build/fonda_scheduler', '@INSTANCE@', '2', '@EXTRA_ARGS@', 'no' , './'] #'@INSTANCE@',
     stdout: out
     num_threads: 24
-    slurm_args: [ '--exclude', 'stark[01-10]']
+    #slurm_args: [ '--exclude', 'stark[01-10]']
   - name: A3
-    args: [ './build/fonda_scheduler', '@INSTANCE@', '3', '@EXTRA_ARGS@', 'no'] #'@INSTANCE@',
+    args: [ './build/fonda_scheduler', '@INSTANCE@', '3', '@EXTRA_ARGS@', 'no', './'] #'@INSTANCE@',
     stdout: out
     num_threads: 24
-    slurm_args: [ '--exclude', 'stark[01-10]']
+    #slurm_args: [ '--exclude', 'stark[01-10]']
   - name: BASE
-    args: [ './build/fonda_scheduler', '@INSTANCE@', '1', '@EXTRA_ARGS@', 'yes' ] #'@INSTANCE@',
+    args: [ './build/fonda_scheduler', '@INSTANCE@', '1', '@EXTRA_ARGS@', 'yes', './' ] #'@INSTANCE@',
     stdout: out
     num_threads: 24
-    slurm_args: ['--exclude', 'stark[01-10]']
+    #slurm_args: ['--exclude', 'stark[01-10]']
 
 matrix:
   include:

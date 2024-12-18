@@ -23,15 +23,21 @@ int currentAlgoNum = 0;
  */
 
 int main(int argc, char *argv[]) {
+
+    for (int i = 0; i < argc; ++i) {
+        std::cout << argv[i] << " ";
+    }
+    cout<<endl;
+
     auto start = std::chrono::system_clock::now();
-    string workflowName = argv[1];
+    string workflowName = argv[5];
     workflowName = trimQuotes(workflowName);
-    long inputSize= stol(argv[2]);
-    int algoNumber = std::stoi(argv[3]);
+    long inputSize= stol(argv[6]);
+    int algoNumber = std::stoi(argv[7]);
     cout << "new, algo " << algoNumber << " " <<workflowName<<" ";
 
-    int memoryMultiplicator = stoi(argv[4]), speedMultiplicator = stoi(argv[5]);
-    double readWritePenalty= stod(argv[6]), offloadPenalty= stod(argv[7]);
+    int memoryMultiplicator = stoi(argv[1]), speedMultiplicator = stoi(argv[2]);
+    double readWritePenalty= stod(argv[3]), offloadPenalty= stod(argv[4]);
     bool isBaseline = (std::string(argv[8]) == "yes");
     string dotPrefix= argv[9];
     //1000000, 100, 1, 0.001
@@ -73,23 +79,28 @@ int main(int argc, char *argv[]) {
 
     Cluster * cluster = Fonda::buildClusterFromCsv(dotPrefix +"input/machines.csv", memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
     double biggestMem = cluster->getMemBiggestFreeProcessor()->getMemorySize();
-
+    cout<<workflowName<<endl;
     string filename;
     if(workflowName.rfind("/home", 0) == 0 || workflowName.rfind("/work", 0) == 0){
         filename = workflowName.substr(0, workflowName.find("//")+1) + workflowName.substr(workflowName.find("//")+2, workflowName.size());
 
     }
     else{
-        filename= "../input/";
-        string suffix = "00";
-        bool isGenerated = workflowName.substr(workflowName.size() - suffix.size()) == suffix;
-        if (isGenerated) {
+        filename= dotPrefix+"input/";
+        //string suffix = "00";
+      //  bool isGenerated = workflowName.substr(workflowName.size() - suffix.size()) == suffix;
+       // if (isGenerated) {
             filename += "generated/";//+filename;
-        }
+      //  }
         filename += workflowName;
-        filename += ".dot"; //isGenerated ? "_sparse.dot": ".dot";
-    }
 
+        size_t pos = filename.find(".dot");
+        if(pos == std::string::npos){
+            filename += ".dot";
+        }
+
+    }
+    cout<<filename<<endl;
     graph_t * graphMemTopology = read_dot_graph(filename.c_str(), NULL, NULL, NULL);
     checkForZeroMemories(graphMemTopology);
 
