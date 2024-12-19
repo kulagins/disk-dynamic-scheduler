@@ -897,22 +897,22 @@ experiments:
     args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '1', 'no', './'] #'@INSTANCE@',
     stdout: out
     num_threads: 24
-    #slurm_args: [ '--exclude', 'stark[01-10]']
+    slurm_args: [ '--partition', 'core8a']
   - name: A2
     args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '2', 'no' , './'] #'@INSTANCE@',
     stdout: out
     num_threads: 24
-    #slurm_args: [ '--exclude', 'stark[01-10]']
+    slurm_args: [ '--partition', 'core8a']
   - name: A3
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '3', 'no', './'] #'@INSTANCE@',
     stdout: out
     num_threads: 24
-    #slurm_args: [ '--exclude', 'stark[01-10]']
+    slurm_args: [ '--partition', 'core8a']
   - name: BASE
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@',  '1', 'yes', './' ] #'@INSTANCE@',
     stdout: out
     num_threads: 24
-    #slurm_args: ['--exclude', 'stark[01-10]']
+    slurm_args: ['--partition', 'core8a']
 ##
 matrix:
   include:
