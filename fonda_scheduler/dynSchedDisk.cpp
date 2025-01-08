@@ -29,25 +29,47 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool
     int cntr=0;
     while(!events.empty()){
         cntr++;
-        cout<<"#events: "<<events.size()<<endl;
-        events.front().fire(cluster, events);
-       // scheduleReadyTasks();
-       // playOutExecution(readyTasks.front());
+        Event &firstEvent = events.front();
+        firstEvent.fire(cluster, events);
        events.pop();
     }
     cout<<cntr<<" "<<graph->number_of_vertices<<endl;
+    cout<<cluster->getMemBiggestFreeProcessor()->readyTimeCompute<<endl;
 
     return -1;
 }
 
-void playOutExecution(vertex_t* task) {
-
+void  Event::fireTaskStart(Cluster * cluster, queue<Event>& events){
+    cout<<"firing task start for "<<this->task->name<<endl;
+    std::vector<Event> pred, succ;
+    double timeStart= max(this->actualTimeFire, this->processor->readyTimeCompute);
+    double nextTime= timeStart+ this->task->time/this->processor->getProcessorSpeed();
+    events.emplace(this->task, nullptr, eventType::OnTaskFinish, cluster->getMemBiggestFreeProcessor(), nextTime,nextTime, pred,succ,false);
+    this->processor->setReadyTimeCompute(nextTime);
 }
-
-void scheduleReadyTasks() {
-
+void  Event::fireTaskFinish(Cluster * cluster, queue<Event>& events){
+    cout<<"firing task Finish for "<<this->task->name <<endl;
+    for(int i=0; i< this->task->out_degree;i++){
+        std::vector<Event> pred, succ;
+        if(this->task->out_edges[i]->head->status!= Status::Ready) {
+            events.emplace(this->task->out_edges[i]->head, nullptr, eventType::OnTaskStart,
+                           cluster->getMemBiggestFreeProcessor(), this->actualTimeFire, this->actualTimeFire, pred, succ, false);
+            this->task->out_edges[i]->head->status= Status::Ready;
+        }
+    }
 }
-
+void  Event::fireReadStart(Cluster * cluster, queue<Event>& events){
+    cout<<"firing read start for "; print_edge(this->edge);
+}
+void  Event::fireReadFinish(Cluster * cluster, queue<Event>& events){
+    cout<<"firing read finish for "; print_edge(this->edge);
+}
+void  Event::fireWriteStart(Cluster * cluster, queue<Event>& events){
+    cout<<"firing write start for "; print_edge(this->edge);
+}
+void  Event::fireWriteFinish(Cluster * cluster, queue<Event>& events){
+    cout<<"firing write finish for "; print_edge(this->edge);
+}
 vector<vertex_t*> getReadyTasks(graph_t *graph){
     vector<vertex_t*> res;
     vertex_t *vertex = graph->first_vertex;

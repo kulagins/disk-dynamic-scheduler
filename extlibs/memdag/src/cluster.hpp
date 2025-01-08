@@ -133,6 +133,10 @@ public:
         this->availableMemory = mem;
     }
 
+    void setReadyTimeCompute(double newTime){
+        cout<<"proc "<<this->id<<"now ready at "<<newTime<<endl;
+        this->readyTimeCompute = newTime;
+    }
     int getAssignedTaskId() const;
 
       vertex_t *getAssignedTask() const;

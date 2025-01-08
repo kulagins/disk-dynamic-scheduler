@@ -194,32 +194,5 @@ void Event::fire(Cluster * cluster, queue<Event>& events){
     }
 }
 
-void  Event::fireTaskStart(Cluster * cluster, queue<Event>& events){
-    cout<<"firing task start for "<<this->task->name<<endl;
-    std::vector<Event> pred, succ;
-    events.emplace(this->task, nullptr, eventType::OnTaskFinish, cluster->getMemBiggestFreeProcessor(), 0.0,0.0, pred,succ,false);
-}
-void  Event::fireTaskFinish(Cluster * cluster, queue<Event>& events){
-    cout<<"firing task Finish for "<<this->task->name<<endl;
-    for(int i=0; i< this->task->out_degree;i++){
-        std::vector<Event> pred, succ;
-        if(this->task->out_edges[i]->head->status!= Status::Ready) {
-            events.emplace(this->task->out_edges[i]->head, nullptr, eventType::OnTaskStart,
-                           cluster->getMemBiggestFreeProcessor(), 0.0, 0.0, pred, succ, false);
-            this->task->out_edges[i]->head->status= Status::Ready;
-        }
-    }
-}
-void  Event::fireReadStart(Cluster * cluster, queue<Event>& events){
-    cout<<"firing read start for "; print_edge(this->edge);
-}
-void  Event::fireReadFinish(Cluster * cluster, queue<Event>& events){
-    cout<<"firing read finish for "; print_edge(this->edge);
-}
-void  Event::fireWriteStart(Cluster * cluster, queue<Event>& events){
-    cout<<"firing write start for "; print_edge(this->edge);
-}
-void  Event::fireWriteFinish(Cluster * cluster, queue<Event>& events){
-    cout<<"firing write finish for "; print_edge(this->edge);
-}
+
 
