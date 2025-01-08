@@ -212,15 +212,15 @@ void bestTentativeAssignment(Cluster *cluster, bool isHeft, vertex_t *vertex, ve
         if(bestFinishTime> finTime){
         //    cout<<"best acutalize "<<endl;
             assert(modifiedProcs.size()>0);
-                bestModifiedProcs= modifiedProcs;
-                bestFinishTime= finTime; bestStartTime = startTime;
-                bestProcessorToAssign = ourModifiedProc;
-                resultingVar = resultingVariant;
-                besttoKick = toKick;
-                if(isHeft){
-                    bestActualFinishTime = actualFinishTime;
-                    bestActualStartTime = actualStartTime;
-                }
+            bestModifiedProcs= modifiedProcs;
+            bestFinishTime= finTime; bestStartTime = startTime;
+            bestProcessorToAssign = ourModifiedProc;
+            resultingVar = resultingVariant;
+            besttoKick = toKick;
+            if(isHeft){
+                bestActualFinishTime = actualFinishTime;
+                bestActualStartTime = actualStartTime;
+            }
         }
         else{
             if(bestFinishTime==finTime){
@@ -299,8 +299,7 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
 
     assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
     double initAvM= ourModifiedProc->availableMemory;
-    if(isThisBaseline ){
-        if( ourModifiedProc->availableMemory<sumOut) {
+    if(isThisBaseline && ourModifiedProc->availableMemory<sumOut) {
            // cout<<"sum out is "<<sumOut <<", kicking unexpectedly "<<endl;
             double stillNeedsToBeEvictedToRun = sumOut - ourModifiedProc->availableMemory;
             double writeTime = ourModifiedProc->readyTimeCompute;
@@ -335,9 +334,8 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
 
           //  cout<<endl;
 
-        }
-
     }
+
     if(!isThisBaseline)
         checkIfPendingMemoryCorrect(ourModifiedProc);
 

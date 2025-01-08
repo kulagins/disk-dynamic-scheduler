@@ -114,16 +114,16 @@ int main(int argc, char *argv[]) {
 
     Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, cluster, 10);
 
-    
+
     vertex_t *pv = graphMemTopology->first_vertex;
-    while(pv!=NULL){
+    while(pv!= nullptr){
         if(peakMemoryRequirementOfVertex(pv)> pv->memoryRequirement){
             pv->memoryRequirement=peakMemoryRequirementOfVertex(pv)+1000;
-            //cout<<"peak "<<peakMemoryRequirementOfVertex(pv)<<endl;
-            if(outMemoryRequirement(pv)> biggestMem){
-                cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< endl;
-                return 0;
-            }
+            cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
+        }
+        if(outMemoryRequirement(pv)> biggestMem){
+            cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< endl;
+            return 0;
         }
         pv= pv->next;
     }
