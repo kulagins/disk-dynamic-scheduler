@@ -7,6 +7,8 @@
 #include "../../extlibs/memdag/src/graph.hpp"
 #include "json.hpp"
 #include "cluster.hpp"
+#include <queue>
+
 
 class Assignment{
 
@@ -58,5 +60,51 @@ prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vec
  //                 Assignment *assignmOfProblem);
 void delayEverythingBy(vector<Assignment*> &assignments, Assignment * startingPoint, double delayTime);
 void takeOverChangesFromRunningTasks(json bodyjson, graph_t* currentWorkflow, vector<Assignment *> & assignments);
+
+
+
+enum eventType{
+    OnTaskStart,
+    OnTaskFinish,
+    OnReadStart,
+    OnReadFinish,
+    OnWriteStart,
+    OnWriteFinish
+};
+class Event{
+public:
+    vertex_t* task;
+    edge_t* edge;
+    eventType type;
+    shared_ptr<Processor> processor;
+    double expectedTimeFire;
+    double actualTimeFire;
+    vector<Event> predecessors, successors;
+    bool isEviction;
+
+    Event(vertex_t* task, edge_t* edge,
+          eventType type,  shared_ptr<Processor> processor,  double expectedTimeFire, double actualTimeFire,
+          vector<Event>& predecessors,  vector<Event>& successors, bool isEviction):
+                task(task),
+                edge(edge),
+                type(type),
+                processor(processor),
+                expectedTimeFire(expectedTimeFire),
+                actualTimeFire(actualTimeFire),
+                predecessors(predecessors),
+                successors(successors),
+                isEviction(isEviction) {}
+
+    void fire(Cluster * cluster, queue<Event>& events);
+    void fireTaskStart(Cluster * cluste, queue<Event>& events);
+    void fireTaskFinish(Cluster * cluste, queue<Event>& events);
+    void fireReadStart(Cluster * cluste, queue<Event>& events);
+    void fireReadFinish(Cluster * cluste, queue<Event>& events);
+    void fireWriteStart(Cluster * cluste, queue<Event>& events);
+    void fireWriteFinish(Cluster * cluste, queue<Event>& events);
+
+};
+
+
 
 #endif

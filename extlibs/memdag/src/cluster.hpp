@@ -287,24 +287,4 @@ public:
 
 vector<edge_t *> getBiggestPendingEdge(shared_ptr<Processor>pj);
 
-enum eventType{
-    OnTaskStart,
-    OnTaskFinish,
-    OnReadStart,
-    OnReadFinish,
-    OnWriteStart,
-    OnWriteFinish
-};
-class Event{
-public:
-    vertex_t* task;
-    edge_t* edge;
-    eventType type;
-    Processor * processor;
-    double expectedTimeFire;
-    double actualTimeFire;
-    vector<Event> predecessors, successors;
-    bool isEviction;
-
-};
 #endif

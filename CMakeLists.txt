@@ -96,6 +96,7 @@ IF (FONDA_UNIT_TESTS)
     target_sources(dagp-tests PRIVATE
             "${PROJECT_SOURCE_DIR}/fonda_scheduler/common.cpp"
             "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSched.cpp"
+            "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSchedDisk.cpp"
             "${PROJECT_SOURCE_DIR}/fonda_scheduler/cluster.cpp")
     target_link_libraries(dagp-tests
             PRIVATE

@@ -6,6 +6,7 @@
 #include "../include/fonda_scheduler/dynSched.hpp"
 #include "../include/fonda_scheduler/io/graphWeightsBuilder.hpp"
 #include "../extlibs/csv2/single_include/csv2/csv2.hpp"
+#include "fonda_scheduler/dynSchedDisk.hpp"
 #include <iomanip>
 
 #include <chrono>
@@ -136,7 +137,8 @@ int main(int argc, char *argv[]) {
     start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
-    double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
+    //double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
+    double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline);
 
      end = std::chrono::system_clock::now();
      elapsed_seconds = end - start;
