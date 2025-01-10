@@ -81,6 +81,8 @@ struct vertex_t {
   bool visited;
   Status status;
 
+  double actuallyUsedMemory=-1;
+
 } ;
 
 

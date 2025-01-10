@@ -171,7 +171,7 @@ void locateToThisProcessorFromNowhere(edge_t* edge, int id){
         edge->locations.emplace_back(LocationType::OnProcessor, id);
 }
 
-void Event::fire(Cluster * cluster, queue<Event>& events){
+void Event::fire(Cluster * cluster, EventManager& events){
     switch(this->type){
         case eventType::OnTaskStart:
             fireTaskStart(cluster, events);

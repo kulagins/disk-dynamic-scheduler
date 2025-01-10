@@ -3,10 +3,8 @@
 #include "fonda_scheduler/dynSchedDisk.hpp"
 #include "fonda_scheduler/dynSched.hpp"
 
-
-queue<vertex_t*> readyTasks;
 Cluster* cluster;
-queue<Event> events;
+EventManager events;
 
 double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft){
     algoNum = isHeft? 1: algoNum;
@@ -22,52 +20,99 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool
     while (vertex != nullptr) {
         if(vertex->in_degree==0){
             std::vector<Event> pred, succ;
-            events.emplace(vertex, nullptr, eventType::OnTaskStart, cluster->getMemBiggestFreeProcessor(), 0.0,0.0, pred,succ,false);
+            events.insert(Event(vertex, nullptr, eventType::OnTaskStart, cluster->getMemBiggestFreeProcessor(), 0.0,0.0, pred,succ,false, vertex->name+"-s"));
         }
         vertex = vertex->next;
     }
     int cntr=0;
     while(!events.empty()){
+        cout<<"NEXT "; //events.printAll();
         cntr++;
-        Event &firstEvent = events.front();
-        firstEvent.fire(cluster, events);
-       events.pop();
+        Event *firstEvent = events.getEarliest();
+        cout<<"event "<<firstEvent->id<<" at "<<firstEvent->actualTimeFire<<endl;
+        firstEvent->fire(cluster, events);
+        bool removed = events.remove(firstEvent->id);
+        assert(removed==true);
+        //cout<<"events now "; events.printAll();
     }
-    cout<<cntr<<" "<<graph->number_of_vertices<<endl;
+  //  cout<<cntr<<" "<<graph->number_of_vertices<<endl;
     cout<<cluster->getMemBiggestFreeProcessor()->readyTimeCompute<<endl;
 
     return -1;
 }
 
-void  Event::fireTaskStart(Cluster * cluster, queue<Event>& events){
-    cout<<"firing task start for "<<this->task->name<<endl;
-    std::vector<Event> pred, succ;
-    double timeStart= max(this->actualTimeFire, this->processor->readyTimeCompute);
-    double nextTime= timeStart+ this->task->time/this->processor->getProcessorSpeed();
-    events.emplace(this->task, nullptr, eventType::OnTaskFinish, cluster->getMemBiggestFreeProcessor(), nextTime,nextTime, pred,succ,false);
-    this->processor->setReadyTimeCompute(nextTime);
-}
-void  Event::fireTaskFinish(Cluster * cluster, queue<Event>& events){
-    cout<<"firing task Finish for "<<this->task->name <<endl;
-    for(int i=0; i< this->task->out_degree;i++){
+void  Event::fireTaskStart(Cluster * cluster, EventManager &eventsP){
+    cout<<"firing task start for "<<this->id<<endl;
+    double timeStart= 0;
+    if(!this->predecessors.empty()){
+        for (const auto &item: predecessors){
+            if(item.actualTimeFire>timeStart){
+                timeStart= item.actualTimeFire;
+            }
+        }
+        this->actualTimeFire= timeStart;
+        eventsP.insert(*this);
+    }
+    else{
         std::vector<Event> pred, succ;
-        if(this->task->out_edges[i]->head->status!= Status::Ready) {
-            events.emplace(this->task->out_edges[i]->head, nullptr, eventType::OnTaskStart,
-                           cluster->getMemBiggestFreeProcessor(), this->actualTimeFire, this->actualTimeFire, pred, succ, false);
-            this->task->out_edges[i]->head->status= Status::Ready;
+        //TODO maybe est ft - est st
+        double actualRuntime = deviation(this->task->time/this->processor->getProcessorSpeed());
+        double d = this->actualTimeFire + actualRuntime;
+        eventsP.insert(Event(this->task, nullptr, eventType::OnTaskFinish, cluster->getMemBiggestFreeProcessor(), d,
+                       d, pred, succ, false, this->task->name+"-f"));
+        this->processor->setReadyTimeCompute(d);
+    }
+}
+void  Event::fireTaskFinish(Cluster * cluster,EventManager &eventsP){
+    vertex_t *thisTask = this->task;
+    cout << "firing task Finish for " << this->id << endl;
+
+    // free its memory
+    this->processor->availableMemory+= task->actuallyUsedMemory;
+    //set its status to finished
+    thisTask->status= Status::Finished;
+    string thisId= this->id;
+
+    for ( Event successor: this->successors){
+        //deletes itself from successors' predecessors list
+        successor.predecessors.erase(find_if(successor.predecessors.begin(), successor.predecessors.end(), [thisId](Event e){
+            return thisId== e.id; // thisTask->name==e.task->name;
+        }));
+        // updates successors' fire time
+        successor.actualTimeFire= this->actualTimeFire;
+
+    }
+
+    //Then task goes over its successor tasks in the workflow and schedules ready ones.
+    for(int i=0; i < thisTask->out_degree; i++){
+        std::vector<Event> pred, succ;
+        vertex_t *childTask = thisTask->out_edges[i]->head;
+        cout<<"deal with child "<<childTask->name<<endl;
+        bool isReady=true;
+        for(int j=0; j < thisTask->in_degree; j++){
+              if(childTask->in_edges[j]->tail->status!= Status::Finished){
+                  isReady=false;
+              }
+        }
+
+        //TODO Can be two times in queue?
+        if(true) {//isReady
+            eventsP.insert(Event(childTask, nullptr, eventType::OnTaskStart,
+                           cluster->getMemBiggestFreeProcessor(), this->actualTimeFire, this->actualTimeFire, pred, succ, false, childTask->name+"-s"));
+            childTask->status= Status::Ready;
         }
     }
 }
-void  Event::fireReadStart(Cluster * cluster, queue<Event>& events){
+void  Event::fireReadStart(Cluster * clusterP, EventManager& eventsP){
     cout<<"firing read start for "; print_edge(this->edge);
 }
-void  Event::fireReadFinish(Cluster * cluster, queue<Event>& events){
+void  Event::fireReadFinish(Cluster * clusterP, EventManager &eventsP){
     cout<<"firing read finish for "; print_edge(this->edge);
 }
-void  Event::fireWriteStart(Cluster * cluster, queue<Event>& events){
+void  Event::fireWriteStart(Cluster * clusterP, EventManager& eventsP){
     cout<<"firing write start for "; print_edge(this->edge);
 }
-void  Event::fireWriteFinish(Cluster * cluster, queue<Event>& events){
+void  Event::fireWriteFinish(Cluster * clusterP, EventManager& eventsP){
     cout<<"firing write finish for "; print_edge(this->edge);
 }
 vector<vertex_t*> getReadyTasks(graph_t *graph){
@@ -118,4 +163,9 @@ void onTaskFinish(Event event){
 
 
 
+}
+
+
+double deviation(double in){
+    return in; //in* 2;
 }

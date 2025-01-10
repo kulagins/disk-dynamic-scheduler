@@ -17,5 +17,5 @@ vector<vertex_t*> getReadyTasks(graph_t *graph);
 void scheduleReadyTasks();
 void playOutExecution(vertex_t* task);
 
-
+double deviation(double in);
 #endif //RESHI_TXT_DYNSCHED_HPP
