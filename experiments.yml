@@ -881,16 +881,19 @@ variants:
     items:
       - name: 'normal'
         extra_args: ['1000000', '100', '1', '0.001']
+      - name: 'lessmem'
+        extra_args: [ '100000', '100', '1', '0.001' ]
+      - name: 'moremem'
+        extra_args: [ '10000000', '100', '1', '0.001' ]
       - name: 'IOslower'
-        extra_args: [ '1000000', '100', '0.1', '0.00001' ]
-      - name: 'tightmem'
-        extra_args: [ '30000', '100', '0.1', '0.00001' ]
-      - name: 'halftight'
-        extra_args: [ '100000', '100', '0.1', '0.00001' ]
+        extra_args: [ '1000000', '100', '0.1', '0.0001' ]
       - name: 'IOfaster'
         extra_args: [ '1000000', '100', '10', '0.01' ]
-      - name: 'IOfaster2'
-        extra_args: [ '1000000', '100', '100', '0.1' ]
+      - name: 'offloadfaster'
+        extra_args: [ '1000000', '100', '1', '1' ]
+      - name: 'offloadslower'
+        extra_args: [ '1000000', '100', '1', '0.00001' ]
+
 
 
 #args: ['./build/fonda_scheduler', '@INSTANCE@', '1', '@EXTRA_ARGS@', 'no'] #'@INSTANCE@',

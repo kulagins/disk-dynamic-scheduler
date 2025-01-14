@@ -29,7 +29,7 @@ tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc,
 
 graph_t *convertToNonMemRepresentation(graph_t *withMemories, map<int, int> &noMemToWithMem);
 void
-processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
+processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourDesiredProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
                      double &earliestStartingTimeToComputeVertex, Cluster *cluster);
 void checkIfPendingMemoryCorrect(const shared_ptr<Processor>& p);
 bool hasDuplicates(const std::vector<shared_ptr<Processor>>& vec);

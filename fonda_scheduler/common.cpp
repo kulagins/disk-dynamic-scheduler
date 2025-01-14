@@ -138,6 +138,14 @@ bool isLocatedOnThisProcessor(edge_t* edge, int id){
            != edge->locations.end();
 }
 
+bool isLocatedOnAnyProcessor(edge_t* edge){
+    return std::find_if(edge->locations.begin(), edge->locations.end(),
+                        [](Location location) {
+                            return location.locationType== LocationType::OnProcessor;
+                        })
+           != edge->locations.end();
+}
+
 void delocateFromThisProcessorToDisk(edge_t* edge, int id){
     auto locationOnThisProcessor = std::find_if(edge->locations.begin(), edge->locations.end(),
                                                 [id](Location location) {

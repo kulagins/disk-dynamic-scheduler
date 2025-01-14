@@ -165,6 +165,103 @@ void onTaskFinish(Event event){
 
 }
 
+vector<Event> tryScheduleTask(vertex_t* task){
+
+}
+
+
+
+void
+processIncomingEdges(Event &startComputingVertex, shared_ptr<Processor> &ourDesiredProc, double &earliestStartingTimeToComputeVertex,
+                     double timeNow) {
+    earliestStartingTimeToComputeVertex = ourDesiredProc->readyTimeCompute;
+    vertex_t* v = startComputingVertex.task;
+    for (int j = 0; j < v->in_degree; j++) {
+        edge *incomingEdge = v->in_edges[j];
+        vertex_t *predecessor = incomingEdge->tail;
+        string eventId = predecessor->name+"->"+v->name;
+        if(!isLocatedOnThisProcessor(incomingEdge, ourDesiredProc->id)){
+            if(isLocatedOnDisk(incomingEdge)){
+                Event *endWriteOfSameFile = events.find(eventId + "-w-f");
+                if(endWriteOfSameFile == nullptr){
+                    throw runtime_error("No write finish found");
+                }
+
+                double estimatedTimeOfRead= incomingEdge->weight / ourDesiredProc->readSpeedDisk;
+                double estimatedReadStart = earliestStartingTimeToComputeVertex - estimatedTimeOfRead;
+                estimatedReadStart= max(estimatedReadStart, endWriteOfSameFile->actualTimeFire);
+                //TODO IMPORTANT!! CHECK IF THE READ STARS DURING ANOTHER TASK AND RESCHEDULE IF NOT ENOUGH MEM!
+                std::vector<Event> pred, succ;
+                pred.emplace_back(*endWriteOfSameFile);
+                succ.emplace_back(startComputingVertex);
+                Event readFromDisk = Event(nullptr, incomingEdge, eventType::OnReadStart, ourDesiredProc,  estimatedReadStart,
+                                           estimatedReadStart, pred, succ,false, eventId+"s");
+                ourDesiredProc->readyTimeRead +=
+                earliestStartingTimeToComputeVertex = ourDesiredProc->readyTimeRead > earliestStartingTimeToComputeVertex ?
+                                                      ourDesiredProc->readyTimeRead : earliestStartingTimeToComputeVertex;
+            }
+            else if(isLocatedNowhere(incomingEdge)){
+                throw runtime_error("Located nowhere "+eventId);
+            }
+            else{
+                assert(isLocatedOnAnyProcessor(incomingEdge));
+
+                //ASSUMING IT IS LOCATED ON THE PROC OF PREDECESSOR!!
+                assert(isLocatedOnThisProcessor(incomingEdge, predecessor->assignedProcessorId));
+              //  Event writeToDisk = Event(nullptr, incomingEdge, eventType::OnWriteStart, ourDesiredProc,  estimatedReadStart,
+               // TODO                            estimatedReadStart, pred, succ,false, eventId+"s");
+
+            }
+
+        }
+        /*
+
+            if (isLocatedOnDisk(incomingEdge)) {
+                //we need to schedule read
+                ourDesiredProc->readyTimeRead += incomingEdge->weight / ourDesiredProc->readSpeedDisk;
+                earliestStartingTimeToComputeVertex = ourDesiredProc->readyTimeRead > earliestStartingTimeToComputeVertex ?
+                                                      ourDesiredProc->readyTimeRead : earliestStartingTimeToComputeVertex;
+                //TODO evict??
+            } else {
+                auto predecessorsProcessorsId = predecessor->assignedProcessorId;
+                assert(isLocatedOnThisProcessor(incomingEdge, predecessorsProcessorsId));
+                shared_ptr<Processor>  addedProc;
+                auto it = //modifiedProcs.size()==1?
+                        //  modifiedProcs.begin():
+                        std::find_if(modifiedProcs.begin(), modifiedProcs.end(),
+                                     [predecessorsProcessorsId](const shared_ptr<Processor>& p) {
+                                         return p->id == predecessorsProcessorsId;
+                                     });
+
+                if(it==modifiedProcs.end()){
+                    addedProc = make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
+                    // cout<<"adding modified proc "<<addedProc->id<<endl;
+                    modifiedProcs.emplace_back(addedProc);
+                    checkIfPendingMemoryCorrect(addedProc);
+                }
+                else{
+                    addedProc = *it;
+                }
+
+                assert(!hasDuplicates(modifiedProcs));
+
+                double timeToStartWriting= max(predecessor->makespan, addedProc->readyTimeWrite);
+                addedProc->readyTimeWrite= timeToStartWriting+ incomingEdge->weight / addedProc->writeSpeedDisk;
+                double startTimeOfRead = max(addedProc->readyTimeWrite, ourDesiredProc->readyTimeRead);
+                ourDesiredProc->readyTimeRead = startTimeOfRead + incomingEdge->weight / ourDesiredProc->readSpeedDisk;
+                earliestStartingTimeToComputeVertex = ourDesiredProc->readyTimeRead > earliestStartingTimeToComputeVertex ?
+                                                      ourDesiredProc->readyTimeRead : earliestStartingTimeToComputeVertex;
+                //int addpl  = addedProc->pendingMemories.size();
+                addedProc->removePendingMemory(incomingEdge);
+                // assert(addpl> addedProc->pendingMemories.size());
+                checkIfPendingMemoryCorrect(addedProc);
+            }
+            */
+        }
+
+
+}
+
 
 double deviation(double in){
     return in; //in* 2;

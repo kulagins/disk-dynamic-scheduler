@@ -211,6 +211,7 @@ vertex_t *next_vertex_in_sorted_topological_order(graph_t *graph, vertex_t *vert
 bool isLocatedNowhere(edge_t* edge);
 bool isLocatedOnDisk(edge_t* edge);
 bool isLocatedOnThisProcessor(edge_t* edge, int id);
+bool isLocatedOnAnyProcessor(edge_t* edge);
 void delocateFromThisProcessorToDisk(edge_t* edge, int id);
 void locateToThisProcessorFromDisk(edge_t* edge, int id);
 void locateToThisProcessorFromNowhere(edge_t* edge, int id);

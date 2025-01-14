@@ -25,10 +25,10 @@ int currentAlgoNum = 0;
 
 int main(int argc, char *argv[]) {
 
-    for (int i = 0; i < argc; ++i) {
+   /* for (int i = 0; i < argc; ++i) {
         std::cout << argv[i] << " ";
     }
-    cout<<endl;
+    cout<<endl; */
 
     auto start = std::chrono::system_clock::now();
     string workflowName = argv[5];
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     Cluster * cluster = Fonda::buildClusterFromCsv(dotPrefix +"input/machines.csv", memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
     double biggestMem = cluster->getMemBiggestFreeProcessor()->getMemorySize();
-    cout<<workflowName<<endl;
+
     string filename;
     if(workflowName.rfind("/home", 0) == 0 || workflowName.rfind("/work", 0) == 0){
         filename = workflowName.substr(0, workflowName.find("//")+1) + workflowName.substr(workflowName.find("//")+2, workflowName.size());
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
         }
 
     }
-    cout<<filename<<endl;
+
     graph_t * graphMemTopology = read_dot_graph(filename.c_str(), NULL, NULL, NULL);
     checkForZeroMemories(graphMemTopology);
 
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
     while(pv!= nullptr){
         if(peakMemoryRequirementOfVertex(pv)> pv->memoryRequirement){
             pv->memoryRequirement=peakMemoryRequirementOfVertex(pv)+1000;
-            cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
+            //cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
         }
         if(outMemoryRequirement(pv)> biggestMem){
             cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< endl;
@@ -137,8 +137,8 @@ int main(int argc, char *argv[]) {
     start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
-    //double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
-    double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline);
+    double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
+    //double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline);
 
      end = std::chrono::system_clock::now();
      elapsed_seconds = end - start;
