@@ -36,6 +36,6 @@ bool hasDuplicates(const std::vector<shared_ptr<Processor>>& vec);
 void bestTentativeAssignment(Cluster *cluster, bool isHeft, vertex_t *vertex, vector<shared_ptr<Processor>> &bestModifiedProcs,
                              shared_ptr<Processor> &bestProcessorToAssign, double &bestFinishTime, double &bestStartTime, int &resultingVar,
                              edge_t *&besttoKick, int &numberWithEvictedCases);
-
+void realSurplusOfOutgoingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, double &sumOut);
 
 #endif //RESHI_TXT_DYNSCHED_HPP

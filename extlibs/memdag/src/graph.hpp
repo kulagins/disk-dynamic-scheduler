@@ -215,6 +215,8 @@ bool isLocatedOnAnyProcessor(edge_t* edge);
 void delocateFromThisProcessorToDisk(edge_t* edge, int id);
 void locateToThisProcessorFromDisk(edge_t* edge, int id);
 void locateToThisProcessorFromNowhere(edge_t* edge, int id);
+
+double getSumOut(vertex_t* v);
 /** @name Macros to iterate over vertices*/
 ///@{
 #define first_vertex(graph) (graph->first_vertex)

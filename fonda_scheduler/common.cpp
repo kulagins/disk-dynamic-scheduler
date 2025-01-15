@@ -179,6 +179,15 @@ void locateToThisProcessorFromNowhere(edge_t* edge, int id){
         edge->locations.emplace_back(LocationType::OnProcessor, id);
 }
 
+double getSumOut(vertex_t * v){
+    double sumOut=0;
+    for (int i = 0; i < v->out_degree; i++) {
+        sumOut += v->out_edges[i]->weight;
+        //      cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
+    }
+    return sumOut;
+}
+
 void Event::fire(Cluster * cluster, EventManager& events){
     switch(this->type){
         case eventType::OnTaskStart:
