@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
     workflowName = trimQuotes(workflowName);
     long inputSize= stol(argv[6]);
     int algoNumber = std::stoi(argv[7]);
-    cout << "new, algo " << algoNumber << " " <<workflowName<<" ";
+    cout << "algo_nr " << algoNumber << " " <<workflowName<<" "<<"input_size "<<inputSize<<" ";
 
     int memoryMultiplicator = stoi(argv[1]), speedMultiplicator = stoi(argv[2]);
     double readWritePenalty= stod(argv[3]), offloadPenalty= stod(argv[4]);

@@ -24,7 +24,7 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
     int numberWithEvictedCases=0;
     for (auto &pair: ranks){
         auto vertex = pair.first;
-        cout<<"processing "<< vertex->name<<endl;
+       // cout<<"processing "<< vertex->name<<endl;
         vector<shared_ptr<Processor>> bestModifiedProcs;
         shared_ptr<Processor> bestProcessorToAssign;
         double bestFinishTime;
