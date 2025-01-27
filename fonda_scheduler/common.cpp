@@ -145,6 +145,9 @@ bool isLocatedOnAnyProcessor(edge_t* edge){
                         })
            != edge->locations.end();
 }
+std::string buildEdgeName(edge_t* edge){
+    return edge->tail->name+"-"+ edge->head->name;
+}
 
 void delocateFromThisProcessorToDisk(edge_t* edge, int id){
     auto locationOnThisProcessor = std::find_if(edge->locations.begin(), edge->locations.end(),
@@ -188,25 +191,25 @@ double getSumOut(vertex_t * v){
     return sumOut;
 }
 
-void Event::fire(Cluster * cluster, EventManager& events){
+void Event::fire(){
     switch(this->type){
         case eventType::OnTaskStart:
-            fireTaskStart(cluster, events);
+            fireTaskStart();
             break;
         case eventType::OnTaskFinish:
-            fireTaskFinish(cluster, events);
+            fireTaskFinish();
             break;
         case eventType::OnReadStart:
-            fireReadStart(cluster, events);
+            fireReadStart();
             break;
         case eventType::OnReadFinish:
-            fireReadFinish(cluster, events);
+            fireReadFinish();
             break;
         case eventType::OnWriteStart:
-            fireWriteStart(cluster, events);
+            fireWriteStart();
             break;
         case eventType::OnWriteFinish:
-            fireWriteFinish(cluster, events);
+            fireWriteFinish();
             break;
     }
 }

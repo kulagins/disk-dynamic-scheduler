@@ -34,9 +34,11 @@
  */
 
 
-enum Status {
-    Blocked,
-    Ready,
+enum Status {Unscheduled,
+        Scheduled,
+    //Blocked,
+  //  Ready,
+  Running,
     Finished
 };
 
@@ -79,7 +81,7 @@ struct vertex_t {
   double makespan;
 
   bool visited;
-  Status status;
+  Status status = Status::Unscheduled;
 
   double actuallyUsedMemory=-1;
 
@@ -215,6 +217,7 @@ bool isLocatedOnAnyProcessor(edge_t* edge);
 void delocateFromThisProcessorToDisk(edge_t* edge, int id);
 void locateToThisProcessorFromDisk(edge_t* edge, int id);
 void locateToThisProcessorFromNowhere(edge_t* edge, int id);
+std::string buildEdgeName(edge_t* edge);
 
 double getSumOut(vertex_t* v);
 /** @name Macros to iterate over vertices*/

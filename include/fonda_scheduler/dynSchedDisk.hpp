@@ -18,4 +18,18 @@ void scheduleReadyTasks();
 void playOutExecution(vertex_t* task);
 
 double deviation(double in);
+vector<shared_ptr<Processor>>
+tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc, int resultingEvictionVariant,
+                    double finTime, double startTime);
+void bestTentativeAssignment( vertex_t *vertex, vector<shared_ptr<Processor>> &bestModifiedProcs,
+                             shared_ptr<Processor> &bestProcessorToAssign, vector<shared_ptr<Event>> newEvents);
+std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleARead(const vertex_t *v, shared_ptr<Event>ourEvent, vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask,
+                                                              shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, double atThisTime=-1);
+shared_ptr<Processor> findPredecessorsProcessor(edge_t * incomingEdge, vector<shared_ptr<Processor>> &modifiedProcs);
+vector< shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc, double  weightToFit);
+void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event>ourEvent, vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask,
+                          shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, vector<std::shared_ptr<Processor>> &modifiedProcs);
+void
+processIncomingEdges(const vertex_t *v, shared_ptr<Event> ourEvent, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
+                    vector<shared_ptr<Event>> createdEvents, double startTimeOfTask);
 #endif //RESHI_TXT_DYNSCHED_HPP

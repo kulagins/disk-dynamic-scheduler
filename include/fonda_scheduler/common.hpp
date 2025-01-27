@@ -71,7 +71,7 @@ enum eventType{
     OnWriteStart,
     OnWriteFinish
 };
-class Event{
+class Event  : public std::enable_shared_from_this<Event> {
 public:
     string id;
     vertex_t* task;
@@ -80,12 +80,12 @@ public:
     shared_ptr<Processor> processor;
     double expectedTimeFire;
     double actualTimeFire;
-    vector<Event> predecessors, successors;
+    vector<shared_ptr<Event>> predecessors, successors;
     bool isEviction;
 
     Event(vertex_t* task, edge_t* edge,
           eventType type,  shared_ptr<Processor> processor,  double expectedTimeFire, double actualTimeFire,
-          vector<Event>& predecessors,  vector<Event>& successors, bool isEviction, string id):
+          vector<shared_ptr<Event>>& predecessors,  vector<shared_ptr<Event>>& successors, bool isEviction, string id):
                 task(task),
                 edge(edge),
                 type(type),
@@ -95,51 +95,56 @@ public:
                 predecessors(predecessors),
                 successors(successors),
                 isEviction(isEviction),
-                id(id){}
+                id(id){
+        cout<<"creating event "<<id<<endl;
+    }
 
-    void fire(Cluster * cluster, EventManager& events);
-    void fireTaskStart(Cluster * cluste, EventManager& events);
-    void fireTaskFinish(Cluster * cluste, EventManager& events);
-    void fireReadStart(Cluster * cluste, EventManager& events);
-    void fireReadFinish(Cluster * cluste, EventManager& events);
-    void fireWriteStart(Cluster * cluste, EventManager& events);
-    void fireWriteFinish(Cluster * cluste, EventManager& events);
+    void fire();
+    void fireTaskStart();
+    void fireTaskFinish();
+    void fireReadStart();
+    void fireReadFinish();
+    void fireWriteStart();
+    void fireWriteFinish();
 
+    void removeOurselfFromSuccessors(Event *us);
 };
 
 struct CompareByTimestamp {
-    bool operator()(const Event& a, const Event& b) const {
-        return a.actualTimeFire < b.actualTimeFire ||
-               (a.actualTimeFire == b.actualTimeFire && a.id < b.id);
+    bool operator()(const shared_ptr<Event> a, const shared_ptr<Event> b) const {
+        return a->actualTimeFire < b->actualTimeFire ||
+               (a->actualTimeFire == b->actualTimeFire && a->id < b->id);
     }
 };
 
 
 class EventManager {
 private:
-    std::multiset<Event, CompareByTimestamp> eventSet; // Sorted by timestamp
-    std::unordered_map<string, std::multiset<Event>::iterator> eventMap; // Fast lookup by ID
+    std::multiset<shared_ptr<Event>, CompareByTimestamp> eventSet; // Sorted by timestamp
+    std::unordered_map<string, std::multiset<shared_ptr<Event>>::iterator> eventMap; // Fast lookup by ID
+    std::unordered_map<int, std::vector<std::multiset<shared_ptr<Event>>::iterator>> eventByProcessorMap; // Fast lookup by ID
 public:
     // Insert a new event
-    void insert(const Event& event) {
-        cout<<"inserting "<<event.id<<" ";
-        auto foundIterator = eventMap.find(event.id);
+    void insert(const shared_ptr<Event>& event) {
+        cout<<"inserting "<<event->id<<" ";
+        auto foundIterator = eventMap.find(event->id);
         if (foundIterator != eventMap.end()) {
-            cout<<"updating "<<event.id<<" from "<< foundIterator->second->actualTimeFire<<" to "<<event.actualTimeFire<<endl;
-            if(foundIterator->second->actualTimeFire<event.actualTimeFire){
-                update(event.id, event.actualTimeFire);
+            cout<<"updating "<<event->id<<" from "<< foundIterator->second->get()->actualTimeFire<<" to "<<event->actualTimeFire<<endl;
+            if(foundIterator->second->get()->actualTimeFire<event->actualTimeFire){
+                update(event->id, event->actualTimeFire);
             }
 
         }
         else{
             auto it = eventSet.insert(event);
-            eventMap[event.id] = it;
+            eventMap[event->id] = it;
+            eventByProcessorMap[event->processor->id].emplace_back( it);
         }
     }
 
-    Event* find(string id) {
+    shared_ptr<Event> find(string id) {
         if (eventMap.find(id) != eventMap.end()) {
-            return const_cast<Event *>(&(*eventMap[id]));
+            return *eventMap[id];
         }
         return nullptr;
     }
@@ -150,11 +155,11 @@ public:
         auto it = eventMap.find(id);
         if (it != eventMap.end()) {
             // Remove from multiset
-            Event updatedEvent = *(it->second);
+            shared_ptr<Event> updatedEvent = *(it->second);
             eventSet.erase(it->second);
 
             // Update the timestamp and reinsert
-            updatedEvent.actualTimeFire = newTimestamp;
+            updatedEvent->actualTimeFire = newTimestamp;
             auto newIt = eventSet.insert(updatedEvent);
 
             // Update map entry
@@ -178,9 +183,9 @@ public:
     }
 
     // Get the earliest event (smallest timestamp)
-    Event* getEarliest() const {
+    shared_ptr<Event> getEarliest() const {
         if (!eventSet.empty()) {
-            return const_cast<Event *>(&(*eventSet.begin()));
+            return *eventSet.begin();
         }
         return nullptr; // Empty set
     }
@@ -188,14 +193,14 @@ public:
     // Print all events (for debugging)
     void printAll() const {
         for (const auto& event : eventSet) {
-            std::cout << "ID: " << event.id<<",\t";
+            std::cout << "ID: " << event->id<<",\t";
           //            << ", Timestamp: " << event.timestamp
          //             << ", Name: " << event.name << "\n";
         }
         cout<<endl<<"-------";cout<<endl;
 
         for (const auto& event : eventMap) {
-            std::cout << "ID: " << event.first<<" to "<< event.second->id<< ",\t";
+            std::cout << "ID: " << event.first<<" to "<< event.second->get()->id<< ",\t";
             //            << ", Timestamp: " << event.timestamp
             //             << ", Name: " << event.name << "\n";
         }

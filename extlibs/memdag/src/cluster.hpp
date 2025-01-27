@@ -22,6 +22,7 @@ enum ClusteringModes {
 };
 using namespace std;
 
+class Event;
 
 class Processor  : public std::enable_shared_from_this<Processor> {
 protected:
@@ -61,6 +62,12 @@ public:
     double peakMemConsumption=0;
 
     string assignment;
+    std::vector<std::weak_ptr<Event>> events; // Processor does not "own" the Events
+
+    std::weak_ptr<Event> lastReadEvent;
+    std::weak_ptr<Event> lastWriteEvent;
+    std::weak_ptr<Event> lastComputeEvent;
+
 
 
     Processor() {
@@ -171,6 +178,13 @@ public:
         }
         availableMemory-= edge->weight;
         assert(availableMemory>= 0);
+    }
+
+    void addEvent(std::shared_ptr<Event> event) {
+        events.push_back(event); // Add weak reference to avoid circular ownership
+    }
+    vector<weak_ptr<Event>>  getEvents(){
+        return this->events;
     }
 
 };
