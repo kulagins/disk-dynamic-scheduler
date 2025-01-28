@@ -19,8 +19,8 @@ void playOutExecution(vertex_t* task);
 
 double deviation(double in);
 vector<shared_ptr<Processor>>
-tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc, int resultingEvictionVariant,
-                    double finTime, double startTime);
+tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
+double &finTime, double &startTime, int &resultingVar,  vector<shared_ptr<Event>>  &newEvents);
 void bestTentativeAssignment( vertex_t *vertex, vector<shared_ptr<Processor>> &bestModifiedProcs,
                              shared_ptr<Processor> &bestProcessorToAssign, vector<shared_ptr<Event>> newEvents);
 std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleARead(const vertex_t *v, shared_ptr<Event>ourEvent, vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask,
@@ -32,4 +32,6 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event>ourEvent, vector<s
 void
 processIncomingEdges(const vertex_t *v, shared_ptr<Event> ourEvent, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
                     vector<shared_ptr<Event>> createdEvents, double startTimeOfTask);
+
+std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict);
 #endif //RESHI_TXT_DYNSCHED_HPP
