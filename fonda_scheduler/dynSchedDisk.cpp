@@ -19,10 +19,16 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool
     vertex_t *vertex = graph->first_vertex;
     while (vertex != nullptr) {
         if (vertex->in_degree == 0) {
-            std::vector<shared_ptr<Event> > pred, succ;
-            events.insert(
-                    make_shared<Event>(vertex, nullptr, eventType::OnTaskStart, cluster->getMemBiggestFreeProcessor(),
-                                       0.0, 0.0, pred, succ, false, vertex->name + "-s"));
+            vector<shared_ptr<Processor>> bestModifiedProcs;
+            shared_ptr<Processor> bestProcessorToAssign;
+            vector<shared_ptr<Event>> newEvents;
+            bestTentativeAssignment(vertex, bestModifiedProcs, bestProcessorToAssign, newEvents);
+
+            for (const auto &item: newEvents) {
+                events.insert(item);
+                item->processor->addEvent(item);
+            }
+            vertex->status = Status::Scheduled;
         }
         vertex = vertex->next;
     }
@@ -530,56 +536,6 @@ void Event::fireWriteFinish() {
     removeOurselfFromSuccessors(this);
 }
 
-vector<vertex_t *> getReadyTasks(graph_t *graph) {
-    vector<vertex_t *> res;
-    vertex_t *vertex = graph->first_vertex;
-    while (vertex != nullptr) {
-        bool isReady = true;
-        for (int i = 0; i < vertex->in_degree; i++) {
-            if (vertex->in_edges[i]->tail->status != Status::Finished) {
-                isReady = false;
-                break;
-            }
-        }
-        if (isReady) {
-            res.emplace_back(vertex);
-        }
-        vertex = vertex->next;
-    }
-    return res;
-}
-
-
-void onTaskFinish(Event event) {
-
-    assert(event.type == eventType::OnTaskFinish);
-    assert(event.task != NULL);
-
-    //free memory - not being done
-
-    //incoming edges are nowhere
-    for (int j = 0; j < event.task->in_degree; j++) {
-        event.task->in_edges[j]->locations = {Location(LocationType::Nowhere)};
-    }
-    //set event to ready
-    event.task->status = Status::Finished;
-
-    for (auto &successor: event.successors) {
-        successor->predecessors.erase(
-                std::remove_if(
-                        successor->predecessors.begin(),
-                        successor->predecessors.end(),
-                        [event](const shared_ptr<Event> event1) {
-                            return event1->task->name == event.task->name &&
-                                   event1->expectedTimeFire == event.expectedTimeFire;
-                        }
-                ),
-                successor->predecessors.end());
-    }
-
-
-}
-
 void Event::removeOurselfFromSuccessors(Event *us) {
     cout << "removing " << us->id;
 
@@ -604,9 +560,6 @@ void Event::removeOurselfFromSuccessors(Event *us) {
     }
 }
 
-vector<Event> tryScheduleTask(vertex_t *task) {
-
-}
 
 double deviation(double in) {
     return in; //in* 2;
