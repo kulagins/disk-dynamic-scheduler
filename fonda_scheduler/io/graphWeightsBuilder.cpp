@@ -78,8 +78,10 @@ namespace Fonda {
     }
 
 
-    void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology, std::unordered_map<std::string, std::vector<std::vector<std::string>>>
-            workflow_rows, const string& workflow_name, long inputSize, Cluster * cluster, int memShorteningDivision) {
+    void fillGraphWeightsFromExternalSource(graph_t *graphMemTopology,
+                                            std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows,
+                                            const string &workflow_name, long inputSize, Cluster *cluster,
+                                            int memShorteningDivision, double ioShorteningCoef) {
 
         double minMem= std::numeric_limits<double>::max(), minTime =  std::numeric_limits<double>::max(), minWchar= std::numeric_limits<double>::max(),
         mintt = std::numeric_limits<double>::max();
@@ -121,11 +123,11 @@ namespace Fonda {
                         }
                         if (col_idx == 6) {
                             //memory
-                            avgwchar+=stod(cell)/(memShorteningDivision*100);
+                            avgwchar+=stod(cell)/(memShorteningDivision*ioShorteningCoef);
                         }
                         if (col_idx == 7) {
                             //memory
-                            avgtinps+=stod(cell)/(memShorteningDivision*100);
+                            avgtinps+=stod(cell)/(memShorteningDivision*ioShorteningCoef);
                         }
                         col_idx++;
                     }

@@ -165,19 +165,21 @@ void delocateFromThisProcessorToDisk(edge_t* edge, int id){
 }
 
 void locateToThisProcessorFromDisk(edge_t* edge, int id){
-   // cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
-    assert(isLocatedOnDisk(edge));
+    cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
+    if(!isLocatedOnDisk(edge)){
+        cout<<"NOT located on disk yet! Write&Read? "<<buildEdgeName(edge)<<endl;
+    }
+   // assert(isLocatedOnDisk(edge));
     auto locationOnDisk = std::find_if(edge->locations.begin(), edge->locations.end(),
                                        [](Location location) {
                                            return location.locationType == LocationType::OnDisk;
                                        });
-    edge->locations.erase(locationOnDisk);
     if(!isLocatedOnThisProcessor(edge, id))
         edge->locations.emplace_back(LocationType::OnProcessor, id);
 }
 
 void locateToThisProcessorFromNowhere(edge_t* edge, int id){
-    //  cout<<"locating from nowhere to proc "<<id <<" edge "; print_edge(edge);
+    cout<<"locating from nowhere to proc "<<id <<" edge "; print_edge(edge);
     if(!isLocatedOnThisProcessor(edge, id))
         edge->locations.emplace_back(LocationType::OnProcessor, id);
 }
@@ -216,3 +218,39 @@ void Event::fire(){
 
 
 
+void Processor::updateFrom(const Processor& other){
+
+    assert(this->assignedTask== nullptr || this->assignedTask->id == other.assignedTask->id);
+
+
+    std::unordered_map<std::string, std::weak_ptr<Event>> updatedEvents;
+    // Keep valid old events and add new ones from 'other'
+    for (const auto& [key, weak_event] : other.events) {
+        if (auto shared_event = weak_event.lock()) {  // Ensure the weak_ptr is still valid
+            updatedEvents[key] = weak_event;  // Insert or update
+            shared_event->processor = shared_from_this();
+        }
+    }
+    // Swap the updated map into place
+    events.swap(updatedEvents);
+
+    this->readyTimeCompute= other.readyTimeCompute;
+    this->readyTimeRead = other.readyTimeRead;
+    this->readyTimeWrite = other.readyTimeWrite;
+
+    assert(other.availableMemory<= other.getMemorySize());
+    this->availableMemory = other.availableMemory;
+    std::set<edge_t*, decltype(comparePendingMemories)*> updatedMemories(comparePendingMemories);
+    // First, add elements that exist in both and new ones from 'other'
+    for (auto* mem : other.pendingMemories) {
+        updatedMemories.insert(mem);  // Only inserts new ones, duplicates are ignored
+    }
+    // Swap the updated set into place
+    pendingMemories.swap(updatedMemories);
+
+    this->lastReadEvent= other.lastReadEvent;
+    this->lastWriteEvent= other.lastWriteEvent;
+    this->lastComputeEvent= other.lastComputeEvent;
+
+
+}

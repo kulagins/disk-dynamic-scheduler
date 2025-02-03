@@ -23,6 +23,7 @@ int currentAlgoNum = 0;
  *
  */
 
+//1000000 100 1 1 bacass 3637252230 1 yes ../
 int main(int argc, char *argv[]) {
 
    /* for (int i = 0; i < argc; ++i) {
@@ -41,6 +42,7 @@ int main(int argc, char *argv[]) {
     double readWritePenalty= stod(argv[3]), offloadPenalty= stod(argv[4]);
     bool isBaseline = (std::string(argv[8]) == "yes");
     string dotPrefix= argv[9];
+    string machinesFile = (argc<10)?"input/machines.csv" : std::string("input/") + argv[10];
     //1000000, 100, 1, 0.001
     csv2::Reader<csv2::delimiter<','>,
             csv2::quote_character<'"'>,
@@ -78,7 +80,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    Cluster * cluster = Fonda::buildClusterFromCsv(dotPrefix +"input/machines.csv", memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    Cluster * cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
     double biggestMem = cluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     string filename;
@@ -112,8 +114,8 @@ int main(int argc, char *argv[]) {
     unsigned long n4 = workflowName.find('_');
     workflowName = workflowName.substr(0, n4);
 
-
-    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, cluster, 10);
+    //10, 100
+    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, cluster, 1, 1);
 
 
     vertex_t *pv = graphMemTopology->first_vertex;

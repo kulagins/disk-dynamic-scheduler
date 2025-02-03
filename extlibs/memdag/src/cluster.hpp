@@ -29,7 +29,7 @@ protected:
     double memorySize;
     double processorSpeed;
     vertex_t *assignedTask;
-
+    std::unordered_map<string, std::weak_ptr<Event>> events;
 
 public:
     static auto comparePendingMemories(edge_t* a, edge_t*b) -> bool {
@@ -62,7 +62,7 @@ public:
     double peakMemConsumption=0;
 
     string assignment;
-    std::vector<std::weak_ptr<Event>> events; // Processor does not "own" the Events
+
 
     std::weak_ptr<Event> lastReadEvent;
     std::weak_ptr<Event> lastWriteEvent;
@@ -153,25 +153,29 @@ public:
     std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge);
     void loadFromDisk(edge_t* edge);
     void loadFromNowhere(edge_t* edge);
-    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator removePendingMemory(edge_t * edgeToRemove){
+
+    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator
+    //bool
+    removePendingMemory(edge_t * edgeToRemove){
 
         auto it = pendingMemories.find(edgeToRemove);
-        auto iterator = it;
-        if (it != pendingMemories.end()) {
-            iterator = pendingMemories.erase(it);
+        if (it == pendingMemories.end()) {
+            throw std::runtime_error("not found edge in pending");
         }
-        else{
-           throw new runtime_error("not found edge in pending");
-        }
-        availableMemory+= edgeToRemove->weight;
-        assert(availableMemory< memorySize || abs(availableMemory- memorySize)<0.1);
-        return iterator;
+
+        auto nextIt = std::next(it);  // Get the next iterator before erasing
+        pendingMemories.erase(it);  // Now erase safely
+
+        availableMemory += edgeToRemove->weight;
+        assert(availableMemory < memorySize || std::abs(availableMemory - memorySize) < 0.1);
+
+        return nextIt;  // Return the next iterator, which is safe
      }
 
     void addPendingMemory(edge_t * edge){
         auto it = pendingMemories.find(edge);
         if (it != pendingMemories.end()) {
-            throw new runtime_error(" found edge in pending");
+            throw runtime_error(" found edge in pending");
         }
         else{
             pendingMemories.emplace(edge);
@@ -180,12 +184,12 @@ public:
         assert(availableMemory>= 0);
     }
 
-    void addEvent(std::shared_ptr<Event> event) {
-        events.push_back(event); // Add weak reference to avoid circular ownership
-    }
-    vector<weak_ptr<Event>>  getEvents(){
+    void addEvent(std::shared_ptr<Event> event);
+
+    std::unordered_map<string, std::weak_ptr<Event>>  getEvents(){
         return this->events;
     }
+    void updateFrom(const Processor& other);
 
 };
 
@@ -233,7 +237,7 @@ public:
         this->processors.erase(toErase->id);
     }
 
-    std::unordered_map<int, std::shared_ptr<Processor>> getProcessors() {
+    std::unordered_map<int, std::shared_ptr<Processor>>& getProcessors() {
         return this->processors;
     }
 
@@ -261,6 +265,8 @@ public:
             cout<< endl;
         }
     }
+
+    void printProcessorsEvents() ;
 
 
 

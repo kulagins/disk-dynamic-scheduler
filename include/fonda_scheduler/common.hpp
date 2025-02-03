@@ -129,10 +129,12 @@ public:
         cout<<"inserting "<<event->id<<" ";
         auto foundIterator = eventMap.find(event->id);
         if (foundIterator != eventMap.end()) {
-            cout<<"updating "<<event->id<<" from "<< foundIterator->second->get()->actualTimeFire<<" to "<<event->actualTimeFire<<endl;
+            cout<<"updating "<<event->id<<" from "<< foundIterator->second->get()->actualTimeFire<<" to "<<event->actualTimeFire;
             if(foundIterator->second->get()->actualTimeFire<event->actualTimeFire){
+                cout<<" updated";
                 update(event->id, event->actualTimeFire);
             }
+            cout <<endl;
 
         }
         else{
@@ -199,14 +201,22 @@ public:
         }
         cout<<endl<<"-------";cout<<endl;
 
-        for (const auto& event : eventMap) {
-            std::cout << "ID: " << event.first<<" to "<< event.second->get()->id<< ",\t";
+      //  for (const auto& event : eventMap) {
+       //     std::cout << "ID: " << event.first<<" to "<< event.second->get()->id<< ",\t";
             //            << ", Timestamp: " << event.timestamp
             //             << ", Name: " << event.name << "\n";
+        //}
+        //cout<<endl;
+       // cout<<"-------------------------------------------";
+        //cout<<endl;
+    }
+
+    void forAll(shared_ptr<Processor> newProc){
+        for (auto& event : eventSet) {
+           if(event->processor->id==newProc->id) {
+               event->processor= newProc;
+           }
         }
-        cout<<endl;
-        cout<<"-------------------------------------------";
-        cout<<endl;
     }
 
     bool empty(){

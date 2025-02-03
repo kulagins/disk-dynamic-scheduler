@@ -516,10 +516,12 @@ tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc, doub
 
 void realSurplusOfOutgoingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, double & sumOut) {
     for (int i = 0; i < v->in_degree; i++) {
-        if (isLocatedOnThisProcessor(v->in_edges[i], ourModifiedProc->id)) {
+        auto inEdge = v->in_edges[i];
+        if (isLocatedOnThisProcessor(inEdge, ourModifiedProc->id)) {
             //     cout<<"in is located here "; print_edge(v->in_edges[i]);
-            assert(ourModifiedProc->pendingMemories.find(v->in_edges[i]) != ourModifiedProc->pendingMemories.end());
-            sumOut -= v->in_edges[i]->weight;
+            auto pendingOfProc = ourModifiedProc->pendingMemories;
+            assert(pendingOfProc.find(inEdge) != pendingOfProc.end());
+            sumOut -= inEdge->weight;
         }
 
     }

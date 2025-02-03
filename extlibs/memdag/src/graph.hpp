@@ -60,7 +60,7 @@ struct vertex_t {
 
   /* graph structure around the vertex */
   struct vertex_t *next, *prev;
-  int in_degree, out_degree;
+  int in_degree=0, out_degree=0;
   int in_size, out_size;
   struct edge **in_edges;
   struct edge **out_edges;

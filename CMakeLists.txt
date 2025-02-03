@@ -16,7 +16,7 @@ set(FONDA_INSTALL_PKGCONFIG_DIR "lib/pkgconfig"
 set(FONDA_CXX_STANDARD "17"
         CACHE STRING "CXX Version to compile with. Currently fixed to 17")
 
-set(FONDA_CXX_FLAGS "-O0 -pg -g -fpermissive") #-pg -O0 -fsanitize=undefined -O3
+set(FONDA_CXX_FLAGS "-O0 -pg -g -fpermissive") #-pg -O0 -fsanitize=undefined -O3  -fsanitize=address
 set(FONDA_LINK_FLAGS "") #-fsanitize=undefined
 
 if (DEFINED ENV{CONDA_PREFIX})
