@@ -105,10 +105,65 @@ int Processor::getAssignedTaskId() const {
     return assignedTask->id;
 }
 
+void Processor::setPendingMemories( set<edge_t *, std::function<bool(edge_t*, edge_t*)>> &newSet) {
+  //  this->pendingMemories = pendingMemories;
+    this->pendingMemories.swap(newSet);
+}
+
+double Processor::getAfterAvailableMemory() const {
+    assert(afterAvailableMemory>=0 && afterAvailableMemory<= memorySize);
+    return afterAvailableMemory;
+}
+
+void Processor::setAfterAvailableMemory(double d) {
+    //cout<<"set after available memory of proc "<<this->id<<" to "<<d<<endl;
+    assert(d>=0 && d<= memorySize);
+     this->afterAvailableMemory = d;
+}
+
+void Processor::setAfterPendingMemories(set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> &memories) {
+   // this->afterPendingMemories = memories;
+    this->afterPendingMemories.swap(memories);
+}
+
 void Cluster::clean() {
     processors.clear();
 
 }
 
 
-Processor::Processor(const Processor & copy)= default;
+//Processor::Processor(const Processor & copy)= default;
+Processor::Processor(const Processor& copy)
+        : memorySize(copy.memorySize),
+          processorSpeed(copy.processorSpeed),
+          assignedTask(copy.assignedTask),
+          eventsOnProc(copy.eventsOnProc),
+          id(copy.id),
+          name(copy.name),
+          isBusy(copy.isBusy),
+          readyTimeCompute(copy.readyTimeCompute),
+          readyTimeRead(copy.readyTimeRead),
+          readyTimeWrite(copy.readyTimeWrite),
+          softReadyTimeWrite(copy.softReadyTimeWrite),
+          memoryOffloadingPenalty(copy.memoryOffloadingPenalty),
+          availableMemory(copy.availableMemory),
+          pendingMemories(copy.comparePendingMemories),  // Initialize with correct comparator
+          afterAvailableMemory(copy.afterAvailableMemory),
+          afterPendingMemories(copy.comparePendingMemories),  // Initialize with correct comparator
+          readSpeedDisk(copy.readSpeedDisk),
+          writeSpeedDisk(copy.writeSpeedDisk),
+          peakMemConsumption(copy.peakMemConsumption),
+          assignment(copy.assignment),
+          lastReadEvent(copy.lastReadEvent),
+          lastWriteEvent(copy.lastWriteEvent),
+          lastComputeEvent(copy.lastComputeEvent)
+{
+    // Copy elements manually to preserve set integrity
+    for (auto* mem : copy.pendingMemories) {
+        pendingMemories.insert(mem);
+    }
+
+    for (auto* mem : copy.afterPendingMemories) {
+        afterPendingMemories.insert(mem);
+    }
+}

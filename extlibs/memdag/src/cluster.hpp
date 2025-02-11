@@ -15,7 +15,7 @@
 #include <set>
 #include "graph.hpp"
 #include <unordered_map>
-
+#include <functional>
 
 enum ClusteringModes {
     treeDependent, staticClustering
@@ -29,10 +29,15 @@ protected:
     double memorySize;
     double processorSpeed;
     vertex_t *assignedTask;
-    std::unordered_map<string, std::weak_ptr<Event>> events;
+    std::unordered_map<string, std::weak_ptr<Event>> eventsOnProc;
 
 public:
     static auto comparePendingMemories(edge_t* a, edge_t*b) -> bool {
+        //std::cout << "Comparing: " << a << " vs " << b << std::endl;
+        if (!a || !b) {
+            cout<<"a or b invalid in comparison on memories"<<endl;
+            return false;  // Handle null pointers safely
+        }
         if(a->weight==b->weight){
             if(a->head->id==b->head->id)
                 return a->tail->id> b->tail->id;
@@ -51,12 +56,17 @@ public:
 
     double memoryOffloadingPenalty;
 
+protected:
     double availableMemory;
-    std::set<edge_t *, decltype(comparePendingMemories)*> pendingMemories{comparePendingMemories};
+   // std::set<edge_t *, decltype(comparePendingMemories)*> pendingMemories{comparePendingMemories};
+    std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>> pendingMemories;
 
     double afterAvailableMemory;
-    std::set<edge_t *, decltype(comparePendingMemories)*> afterPendingMemories{comparePendingMemories};
+   // std::set<edge_t *, decltype(comparePendingMemories)*> afterPendingMemories{comparePendingMemories};
+    std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>> afterPendingMemories;
 
+
+public:
     double readSpeedDisk;
     double writeSpeedDisk;
     double peakMemConsumption=0;
@@ -70,7 +80,7 @@ public:
 
 
 
-    Processor() {
+    Processor() : pendingMemories(comparePendingMemories){
         this->memorySize = 0;
         this->processorSpeed = 1;
         isBusy = false;
@@ -83,9 +93,10 @@ public:
 
     }
 
-    explicit Processor(double memorySize, int id=-1) {
+    explicit Processor(double memorySize, int id=-1): pendingMemories(comparePendingMemories) {
         this->memorySize = memorySize;
         this->availableMemory = memorySize;
+        this->afterAvailableMemory = memorySize;
         this->processorSpeed = 1;
         isBusy = false;
         assignedTask = nullptr;
@@ -96,9 +107,10 @@ public:
         this->softReadyTimeWrite=0;
     }
 
-    Processor(double memorySize, double processorSpeed, int id=-1) {
+    Processor(double memorySize, double processorSpeed, int id=-1): pendingMemories(comparePendingMemories) {
         this->memorySize = memorySize;
         this->availableMemory = memorySize;
+        this->afterAvailableMemory = memorySize;
         this->processorSpeed = processorSpeed;
         isBusy = false;
         assignedTask = nullptr;
@@ -134,9 +146,12 @@ public:
     }
 
     double getAvailableMemory(){
+        assert(availableMemory>=0 && availableMemory<= memorySize);
         return this->availableMemory;
     }
     void setAvailableMemory(double mem){
+       // cout<<"set available memory of proc "<<this->id<<" to "<<mem<<endl;
+        assert(mem>=0 && mem<= memorySize);
         this->availableMemory = mem;
     }
 
@@ -173,6 +188,12 @@ public:
      }
 
     void addPendingMemory(edge_t * edge){
+        if (!edge) {
+            throw std::runtime_error("Edge is null!");
+        }
+        if (!edge->head || !edge->tail) {
+            throw std::runtime_error("Edge has uninitialized fields!");
+        }
         auto it = pendingMemories.find(edge);
         if (it != pendingMemories.end()) {
             throw runtime_error(" found edge in pending");
@@ -184,13 +205,78 @@ public:
         assert(availableMemory>= 0);
     }
 
+    void addPendingMemoryAfter(edge_t * edge){
+        auto it = afterPendingMemories.find(edge);
+        if (it != afterPendingMemories.end()) {
+            throw runtime_error(" found edge in pending");
+        }
+        else{
+            afterPendingMemories.emplace(edge);
+        }
+        afterAvailableMemory-= edge->weight;
+        assert(afterAvailableMemory>= 0);
+    }
+
+    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator
+    //bool
+    removePendingMemoryAfter(edge_t * edgeToRemove){
+
+        auto it = afterPendingMemories.find(edgeToRemove);
+        if (it == afterPendingMemories.end()) {
+            throw std::runtime_error("not found edge in pending "+ buildEdgeName(edgeToRemove));
+        }
+
+        auto nextIt = std::next(it);  // Get the next iterator before erasing
+        afterPendingMemories.erase(it);  // Now erase safely
+
+        afterAvailableMemory += edgeToRemove->weight;
+        assert(afterAvailableMemory < memorySize || std::abs(afterAvailableMemory - memorySize) < 0.1);
+
+        return nextIt;  // Return the next iterator, which is safe
+    }
+
     void addEvent(std::shared_ptr<Event> event);
 
     std::unordered_map<string, std::weak_ptr<Event>>  getEvents(){
-        return this->events;
+        return this->eventsOnProc;
     }
     void updateFrom(const Processor& other);
 
+    std::set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> &getPendingMemories() {
+        return  pendingMemories;
+    }
+
+    void setPendingMemories( set<edge_t *,    std::function<bool(edge_t*, edge_t*)>> &pendingMemories);
+    void resetPendingMemories( ){
+        this->pendingMemories.clear();
+    }
+    void resetAfterPendingMemories( ){
+        this->afterPendingMemories.clear();
+    }
+
+    double getAfterAvailableMemory() const;
+
+    void setAfterAvailableMemory(double d);
+
+    std::set<edge_t *, std::function<bool(edge_t*, edge_t*)>> &getAfterPendingMemories(){
+        return afterPendingMemories;
+    }
+
+    void setAfterPendingMemories( set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> &memories);
+
+    edge_t * getBiggestPendingEdgeThatIsNotIncomingOf(vertex_t* v){
+        auto it = pendingMemories.begin();
+        while(it!= pendingMemories.end()){
+            if((*it)->head->name!=v->name){
+                return *it;
+            }
+            else{
+                it++;
+            }
+        }
+        //throw runtime_error("No pending memories that are not incoming edges of task "+v->name);
+        return nullptr;
+    }
 };
 
 class Cluster {
@@ -257,9 +343,9 @@ public:
                  << " ready time write " << value->readyTimeWrite
                  //<< " ready time write soft " << value->softReadyTimeWrite
                  //<< " avail memory " << value->availableMemory
-                 << " pending in memory "<<value->pendingMemories.size()<<" pcs: ";
+                 << " pending in memory "<<value->getPendingMemories().size()<<" pcs: ";
 
-            for (const auto &item: value->pendingMemories){
+            for (const auto &item: value->getPendingMemories()){
                 print_edge(item);
             }
             cout<< endl;

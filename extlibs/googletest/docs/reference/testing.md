@@ -924,7 +924,7 @@ and properties logged outside of individual test suites.
 
 `TestEventListeners& UnitTest::listeners()`
 
-Returns the list of event listeners that can be used to track events inside
+Returns the list of event listeners that can be used to track eventsOnProc inside
 GoogleTest. See [`TestEventListeners`](#TestEventListeners).
 
 ### TestEventListener {#TestEventListener}
@@ -932,7 +932,7 @@ GoogleTest. See [`TestEventListeners`](#TestEventListeners).
 `::testing::TestEventListener`
 
 The interface for tracing execution of tests. The methods below are listed in
-the order the corresponding events are fired.
+the order the corresponding eventsOnProc are fired.
 
 #### Public Methods {#TestEventListener-public}
 
@@ -1029,7 +1029,7 @@ Fired after all test activities have ended.
 
 `::testing::TestEventListeners`
 
-Lets users add listeners to track events in GoogleTest.
+Lets users add listeners to track eventsOnProc in GoogleTest.
 
 #### Public Methods {#TestEventListeners-public}
 

@@ -679,7 +679,7 @@ vertex_t * findVertexById(graph_t* graph, int idToFind){
 }
 
 void print_edge(edge_t * v){
-    std::cout<<v->tail->name<<" -> "<<v->head->name<<", "<<v->weight<<std::endl;
+    std::cout<< buildEdgeName(v)<<std::endl;//v->tail->name<<" -> "<<v->head->name<<", "<<v->weight<<std::endl;
 }
 
 double inMemoryRequirement(const vertex_t * v){

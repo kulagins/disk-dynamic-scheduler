@@ -1652,11 +1652,11 @@ functions called from them.
 ## Extending googletest by Handling Test Events
 
 googletest provides an **event listener API** to let you receive notifications
-about the progress of a test program and test failures. The events you can
+about the progress of a test program and test failures. The eventsOnProc you can
 listen to include the start and end of the test program, a test suite, or a test
 method, among others. You may use this API to augment or replace the standard
 console output, replace the XML output, or provide a completely different form
-of output, such as a GUI or a database. You can also use test events as
+of output, such as a GUI or a database. You can also use test eventsOnProc as
 checkpoints to implement a resource leak checker, for example.
 
 ### Defining Event Listeners

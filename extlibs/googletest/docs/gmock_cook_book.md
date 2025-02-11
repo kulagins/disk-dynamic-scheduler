@@ -2665,7 +2665,7 @@ One oft-encountered problem with gMock is that it can be hard to test
 asynchronous behavior. Suppose you had a `EventQueue` class that you wanted to
 test, and you created a separate `EventDispatcher` interface so that you could
 easily mock it out. However, the implementation of the class fired all the
-events on a background thread, which made test timings difficult. You could just
+eventsOnProc on a background thread, which made test timings difficult. You could just
 insert `sleep()` statements and hope for the best, but that makes your test
 behavior nondeterministic. A better way is to use gMock actions and
 `Notification` objects to force your asynchronous test to behave synchronously.

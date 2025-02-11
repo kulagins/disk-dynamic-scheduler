@@ -155,7 +155,7 @@ void delocateFromThisProcessorToDisk(edge_t* edge, int id){
                                                     return location.locationType == LocationType::OnProcessor &&
                                                            location.processorId == id;
                                                 });
-   // cout<<"delocating "; print_edge(edge);
+   cout<<"delocating "; print_edge(edge);
     assert(locationOnThisProcessor  != edge->locations.end());
     edge->locations.erase(locationOnThisProcessor);
     if(!isLocatedOnDisk(edge))
@@ -214,6 +214,7 @@ void Event::fire(){
             fireWriteFinish();
             break;
     }
+
 }
 
 
@@ -225,14 +226,14 @@ void Processor::updateFrom(const Processor& other){
 
     std::unordered_map<std::string, std::weak_ptr<Event>> updatedEvents;
     // Keep valid old events and add new ones from 'other'
-    for (const auto& [key, weak_event] : other.events) {
+    for (const auto& [key, weak_event] : other.eventsOnProc) {
         if (auto shared_event = weak_event.lock()) {  // Ensure the weak_ptr is still valid
             updatedEvents[key] = weak_event;  // Insert or update
             shared_event->processor = shared_from_this();
         }
     }
     // Swap the updated map into place
-    events.swap(updatedEvents);
+    eventsOnProc.swap(updatedEvents);
 
     this->readyTimeCompute= other.readyTimeCompute;
     this->readyTimeRead = other.readyTimeRead;
@@ -240,13 +241,23 @@ void Processor::updateFrom(const Processor& other){
 
     assert(other.availableMemory<= other.getMemorySize());
     this->availableMemory = other.availableMemory;
-    std::set<edge_t*, decltype(comparePendingMemories)*> updatedMemories(comparePendingMemories);
+    set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> updatedMemories(comparePendingMemories);
     // First, add elements that exist in both and new ones from 'other'
     for (auto* mem : other.pendingMemories) {
         updatedMemories.insert(mem);  // Only inserts new ones, duplicates are ignored
     }
     // Swap the updated set into place
     pendingMemories.swap(updatedMemories);
+
+    assert(other.afterAvailableMemory<= other.getMemorySize());
+    this->afterAvailableMemory = other.afterAvailableMemory;
+    updatedMemories.clear();
+    // First, add elements that exist in both and new ones from 'other'
+    for (auto* mem : other.afterPendingMemories) {
+        updatedMemories.insert(mem);  // Only inserts new ones, duplicates are ignored
+    }
+    // Swap the updated set into place
+    afterPendingMemories.swap(updatedMemories);
 
     this->lastReadEvent= other.lastReadEvent;
     this->lastWriteEvent= other.lastWriteEvent;

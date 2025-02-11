@@ -50,7 +50,8 @@ namespace Fonda {
                     }
                     if(cell_cntr==3){
                         p->setMemorySize(stod(cell_value)*memoryMultiplicator);
-                        p->availableMemory= p->getMemorySize();
+                        p->setAvailableMemory( p->getMemorySize());
+                        p->setAfterAvailableMemory( p->getMemorySize());
                     }
                     if(cell_cntr==8){
                         p->readSpeedDisk=stod(cell_value)*readWritePenalty;

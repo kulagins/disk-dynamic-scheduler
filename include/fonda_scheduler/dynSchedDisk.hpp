@@ -28,11 +28,14 @@ vector< shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisPro
 void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event>ourEvent, vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask,
                           shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, vector<std::shared_ptr<Processor>> &modifiedProcs);
 double
-processIncomingEdges(const vertex_t *v, shared_ptr<Event> ourEvent, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
-                    vector<shared_ptr<Event>> createdEvents, double startTimeOfTask);
+processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
+                    vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask);
 
 //std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict);
 set<edge_t *, bool (*)(edge_t *, edge_t *)>::iterator
 scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict,
                      std::pair<shared_ptr<Event>, shared_ptr<Event>> &writeEvents);
+void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t* ourVertex);
+void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc);
+bool dealWithPredecessors(shared_ptr<Event> us);
 #endif //RESHI_TXT_DYNSCHED_HPP
