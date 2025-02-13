@@ -188,6 +188,7 @@ void      free_graph(graph_t *graph);
 
 edge_t   *find_edge(vertex_t *tail, vertex_t *head);
 void      enforce_single_source_and_target(graph_t *graph, std::string suffix="");
+void enforce_single_source_and_target_with_minimal_weights(graph_t *graph, std::string suffix="");
 graph_t  *read_dot_graph(const char *filename, const char *memory_label, const char *timing_label, const char *node_memory_label);
 void      print_graph_to_dot_file(graph_t *graph, FILE *output);
 void print_graph_to_cout(graph_t *graph);

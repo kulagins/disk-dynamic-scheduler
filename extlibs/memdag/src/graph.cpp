@@ -609,6 +609,63 @@ void enforce_single_source_and_target(graph_t *graph, std::string suffix) {
   graph->target = target;
 }
 
+
+
+void enforce_single_source_and_target_with_minimal_weights(graph_t *graph, std::string suffix) {
+    vertex_t *source=NULL, *target=NULL;
+
+    /*
+     * Check if we find one or several source(s) and target(s)
+     */
+    int several_sources = 0;
+    int several_targets = 0;
+    for(vertex_t *v = graph->first_vertex; v; v=v->next) {
+        if (v->in_degree==0) {
+            if (source == NULL) { // If no current source, update
+                source = v;
+            } else {
+                source = NULL;
+                several_sources = 1;
+            }
+        }
+        if (v->out_degree==0) {
+            if (target == NULL) { // If no current target, update
+                target = v;
+            } else { // If several targets, remember it
+                target = NULL;
+                several_targets = 1;
+            }
+        }
+    }
+
+
+    /*
+     * If several sources are detected, create new vertex and connect it to existing sources
+     */
+    if (several_sources) {
+        source = new_vertex(graph, "GRAPH_SOURCE"+suffix, 0.1, NULL);
+        for(vertex_t *v = graph->first_vertex; v; v=v->next) {
+            if ((v->in_degree==0) && (v!= source)) {
+                new_edge(graph, source, v, 0.1, NULL);
+            }
+        }
+    }
+
+    /*
+     * If several targets are detected, create new vertex and connect existing targets to it
+     */
+    if (several_targets) {
+        target = new_vertex(graph, "GRAPH_TARGET"+suffix, 0.1, NULL);
+        for(vertex_t *v = graph->first_vertex; v; v=v->next) {
+            if ((v->out_degree==0) && (v!= target)) {
+                new_edge(graph, v, target, 0.1, NULL);
+            }
+        }
+    }
+    graph->source = source;
+    graph->target = target;
+}
+
 /**
  * Returns the edge going from the tail vertex to the head vertex in the graph
  *

@@ -78,12 +78,13 @@ public:
     edge_t* edge;
     eventType type;
     shared_ptr<Processor> processor;
-    double expectedTimeFire;
-    double actualTimeFire;
+
     vector<shared_ptr<Event>> predecessors, successors;
     bool isEviction;
     bool isDone= false;
 private:
+    double expectedTimeFire;
+    double actualTimeFire;
     Event(vertex_t* task, edge_t* edge,
           eventType type,  shared_ptr<Processor> processor,  double expectedTimeFire, double actualTimeFire,
          // vector<shared_ptr<Event>>& predecessors,  vector<shared_ptr<Event>>& successors,
@@ -160,6 +161,23 @@ public:
             succ->addPredecessor(shared_from_this());
         }
     }
+    void  setExpectedTimeFire(double d){
+        this->expectedTimeFire = d;
+    }
+    double getExpectedTimeFire(){
+        return this->expectedTimeFire;
+    }
+
+    void  setActualTimeFire(double d){
+        if(this->id=="MULTIQC-f"){
+            cout<<endl;
+        }
+        cout<<"changing actual time fire for "<<this->id<<" from "<<this->actualTimeFire<<" to "<<d<<endl;
+        this->actualTimeFire = d;
+    }
+    double getActualTimeFire(){
+        return this->actualTimeFire;
+    }
 
 };
 
@@ -169,22 +187,6 @@ public:
 
 struct CompareByTimestamp {
     bool customCharCompare(char a, char b) const {
-      /*  if(a=='s'&& b=='f'){
-            //cout<<a<<" "<<b<<endl;
-            return (b > a);
-        }
-        if(b=='s'&& a=='f'){
-           // cout<<a<<" "<<b<<" "<< (a < b)<<endl;
-            return -1 ;//(a < b);
-        }
-        if(b=='w'&& a=='r'){
-            // cout<<a<<" "<<b<<" "<< (a < b)<<endl;
-            return -1 ;//(a < b);
-        }
-        if(a=='w'&& b=='r'){
-            // cout<<a<<" "<<b<<" "<< (a < b)<<endl;
-            return false;//true;//-1;//-1 ;//(a < b);
-        } */
         if (tolower(a) == tolower(b)) {
             return islower(a) && isupper(b);  // Uppercase is "greater" if letters are same
         }
@@ -200,11 +202,11 @@ struct CompareByTimestamp {
         return a.size() < b.size();  // Compare by length if all chars are equal
     }
     bool operator()(const shared_ptr<Event> a, const shared_ptr<Event> b) const {
-     //   cout<<"compare by timestamp "<<a->id<<" and "<<b-> id<<" "<< ((a->id < b->id)?"less": "not less")<<endl;
+        //cout<<"compare by timestamp "<<a->id<<" and "<<b-> id<<" "<< ((a->id < b->id)?"less": "not less")<<endl;
         //return a->actualTimeFire < b->actualTimeFire ||
          //      (a->actualTimeFire == b->actualTimeFire && a->id < b->id);
-        if (a->actualTimeFire != b->actualTimeFire) {
-            return a->actualTimeFire < b->actualTimeFire;
+        if (a->getActualTimeFire() != b->getActualTimeFire()) {
+            return a->getActualTimeFire() < b->getActualTimeFire();
         }
         if(std::find(a->predecessors.begin(), a->predecessors.end(), b)!= a->predecessors.end()){
             //b is predecessor of a
@@ -232,9 +234,9 @@ public:
         auto foundIterator = eventMap.find(event->id);
         if (foundIterator != eventMap.end()) {
         //    cout<<"updating "<<event->id<<" from "<< foundIterator->second->get()->actualTimeFire<<" to "<<event->actualTimeFire;
-            if(foundIterator->second->get()->actualTimeFire<event->actualTimeFire){
+            if(foundIterator->second->get()->getActualTimeFire()<event->getActualTimeFire()){
           //      cout<<" updated";
-                update(event->id, event->actualTimeFire);
+                update(event->id, event->getActualTimeFire());
             }
        //     cout <<endl;
 
@@ -265,7 +267,7 @@ public:
             eventSet.erase(it->second);
 
             // Update the timestamp and reinsert
-            updatedEvent->actualTimeFire = newTimestamp;
+            updatedEvent->setActualTimeFire(newTimestamp);
             auto newIt = eventSet.insert(updatedEvent);
 
             // Update map entry
@@ -299,7 +301,7 @@ public:
     // Print all events (for debugging)
     void printAll() const {
         for (const auto& event : eventSet) {
-            std::cout << "ID: " << event->id<< " at"<< event->actualTimeFire <<",\t";
+            std::cout << "ID: " << event->id<< " at"<< event->getActualTimeFire() <<",\t";
           //            << ", Timestamp: " << event.timestamp
          //             << ", Name: " << event.name << "\n";
         }

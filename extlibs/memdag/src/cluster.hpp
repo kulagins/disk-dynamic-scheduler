@@ -214,7 +214,9 @@ public:
             afterPendingMemories.emplace(edge);
         }
         afterAvailableMemory-= edge->weight;
-        assert(afterAvailableMemory>= 0);
+        if(afterAvailableMemory< 0){
+            throw runtime_error("After avail mem <0");
+        }
     }
 
     std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator

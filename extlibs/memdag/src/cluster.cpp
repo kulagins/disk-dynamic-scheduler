@@ -117,7 +117,11 @@ double Processor::getAfterAvailableMemory() const {
 
 void Processor::setAfterAvailableMemory(double d) {
     //cout<<"set after available memory of proc "<<this->id<<" to "<<d<<endl;
-    assert(d>=0 && d<= memorySize);
+    if(abs(d-memorySize)<0.0001){
+        d=memorySize;
+    }
+
+    assert(d>=0 && d<= (memorySize+0.001));
      this->afterAvailableMemory = d;
 }
 

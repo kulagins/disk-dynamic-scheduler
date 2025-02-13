@@ -21,7 +21,7 @@ double &finTime, double &startTime, int &resultingVar,  vector<shared_ptr<Event>
                     double & actuallyUsedMemory);
 vector<shared_ptr<Event>>  bestTentativeAssignment( vertex_t *vertex, vector<shared_ptr<Processor>> &bestModifiedProcs,
                              shared_ptr<Processor> &bestProcessorToAssign);
-std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleARead(const vertex_t *v, shared_ptr<Event>ourEvent, vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask,
+std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask,
                                                               shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, double atThisTime=-1);
 shared_ptr<Processor> findPredecessorsProcessor(edge_t * incomingEdge, vector<shared_ptr<Processor>> &modifiedProcs);
 vector< shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc, double  weightToFit);
