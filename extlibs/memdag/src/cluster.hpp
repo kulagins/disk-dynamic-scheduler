@@ -49,9 +49,7 @@ public:
     int id;
     string name;
     bool isBusy;
-    double readyTimeCompute;
-    double readyTimeRead;
-    double readyTimeWrite;
+
     double softReadyTimeWrite;
 
     double memoryOffloadingPenalty;
@@ -73,12 +71,16 @@ public:
 
     string assignment;
 
-
+private:
     std::weak_ptr<Event> lastReadEvent;
     std::weak_ptr<Event> lastWriteEvent;
     std::weak_ptr<Event> lastComputeEvent;
 
+    double readyTimeCompute;
+    double readyTimeRead;
+    double readyTimeWrite;
 
+public:
 
     Processor() : pendingMemories(comparePendingMemories){
         this->memorySize = 0;
@@ -146,6 +148,9 @@ public:
     }
 
     double getAvailableMemory(){
+        if(abs(availableMemory - memorySize) <0.001){
+            availableMemory= memorySize;
+        }
         assert(availableMemory>=0 && availableMemory<= memorySize);
         return this->availableMemory;
     }
@@ -279,6 +284,38 @@ public:
         //throw runtime_error("No pending memories that are not incoming edges of task "+v->name);
         return nullptr;
     }
+
+    void setLastWriteEvent(shared_ptr<Event> lwe);
+    void setLastReadEvent(shared_ptr<Event> lwe);
+    void setLastComputeEvent(shared_ptr<Event> lwe);
+
+    weak_ptr<Event> getLastWriteEvent(){
+        return this->lastWriteEvent;
+    }
+    weak_ptr<Event> getLastReadEvent(){
+        return this->lastReadEvent;
+    }
+    weak_ptr<Event> getLastComputeEvent(){
+        return this->lastComputeEvent;
+    }
+    double getReadyTimeWrite() const{
+        return this->readyTimeWrite;
+    }
+    double getReadyTimeRead() const{
+        return this->readyTimeRead;
+    }
+    double getReadyTimeCompute() const{
+        return this->readyTimeCompute;
+    }
+    void setReadyTimeWrite(double rtw){
+        this->readyTimeWrite= rtw;
+    }
+    void setReadyTimeRead(double rtw){
+        this->readyTimeWrite= rtw;
+    }
+
+
+
 };
 
 class Cluster {
@@ -340,9 +377,9 @@ public:
         for (const auto& [key, value] : this->processors) {
             cout << "Processor " << value->id<< "with memory " << value->getMemorySize() << ", speed " << value->getProcessorSpeed()
                  << " and busy? " << value->isBusy << "assigned " << (value->isBusy?value->getAssignedTaskId(): -1)
-                << " ready time compute " << value->readyTimeCompute
-                 << " ready time read " << value->readyTimeRead
-                 << " ready time write " << value->readyTimeWrite
+                << " ready time compute " << value->getReadyTimeCompute()
+                 << " ready time read " << value->getReadyTimeRead()
+                 << " ready time write " << value->getReadyTimeWrite()
                  //<< " ready time write soft " << value->softReadyTimeWrite
                  //<< " avail memory " << value->availableMemory
                  << " pending in memory "<<value->getPendingMemories().size()<<" pcs: ";

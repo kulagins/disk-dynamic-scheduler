@@ -193,6 +193,15 @@ double getSumOut(vertex_t * v){
     return sumOut;
 }
 
+double getSumIn(vertex_t * v){
+    double sumIn=0;
+    for (int i = 0; i < v->in_degree; i++) {
+        sumIn += v->in_edges[i]->weight;
+        //      cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
+    }
+    return sumIn;
+}
+
 void Event::fire(){
     switch(this->type){
         case eventType::OnTaskStart:
@@ -249,7 +258,7 @@ void Processor::updateFrom(const Processor& other){
     // Swap the updated set into place
     pendingMemories.swap(updatedMemories);
 
-    assert(other.afterAvailableMemory<= other.getMemorySize());
+    assert(other.afterAvailableMemory < other.getMemorySize()|| abs(other.afterAvailableMemory - other.getMemorySize()) <0.01);
     this->afterAvailableMemory = other.afterAvailableMemory;
     updatedMemories.clear();
     // First, add elements that exist in both and new ones from 'other'

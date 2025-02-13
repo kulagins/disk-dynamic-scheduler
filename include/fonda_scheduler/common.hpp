@@ -148,6 +148,9 @@ public:
 
     void addSuccessor(shared_ptr<Event> succ){
         assert(succ!= nullptr);
+        if(succ->id == this->id){
+            throw runtime_error("ADDING OURSELVES AS SUCCESSOR!");
+        }
        // cout<<"add successor "<<succ->id<<" to event "<<this->id<<endl;
         this->successors.emplace_back(succ);
         if(succ->actualTimeFire< this->actualTimeFire){
@@ -169,7 +172,7 @@ public:
     }
 
     void  setActualTimeFire(double d){
-        if(this->id=="MULTIQC-f"){
+        if(this->id=="CHECK_DESIGN_00000674-f"){
             cout<<endl;
         }
         cout<<"changing actual time fire for "<<this->id<<" from "<<this->actualTimeFire<<" to "<<d<<endl;

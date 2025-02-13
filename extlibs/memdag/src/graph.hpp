@@ -221,6 +221,7 @@ void locateToThisProcessorFromNowhere(edge_t* edge, int id);
 std::string buildEdgeName(edge_t* edge);
 
 double getSumOut(vertex_t* v);
+double getSumIn(vertex_t * v);
 /** @name Macros to iterate over vertices*/
 ///@{
 #define first_vertex(graph) (graph->first_vertex)

@@ -107,7 +107,7 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
                     }
 
                 }
-                assert(modifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+                assert(modifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
               //  cout<<"erplacing "<<modifiedProc->id<<endl;
                 checkIfPendingMemoryCorrect(modifiedProc);
              //   modifiedProc->assignment+= " ready time "+ to_string(modifiedProc->readyTimeCompute)+" write "+
@@ -118,7 +118,7 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
 
 
         }
-        assert(bestProcessorToAssign->readyTimeCompute<  std::numeric_limits<double>::max());
+        assert(bestProcessorToAssign->getReadyTimeCompute()<  std::numeric_limits<double>::max());
         vertex->assignedProcessorId= bestProcessorToAssign->id;
 
         //checkIfPendingMemoryCorrect(bestProcessorToAssign);
@@ -198,7 +198,7 @@ void bestTentativeAssignment(Cluster *cluster, bool isHeft, vertex_t *vertex, ve
     for (auto& [id, processor] : cluster->getProcessors()) {
         double finTime=0, startTime=0, peakMem=0;
         double actualStartTime=0, actualFinishTime=0;
-        double ftBefore = processor->readyTimeCompute;
+        double ftBefore = processor->getReadyTimeCompute();
         int resultingVariant;
         auto ourModifiedProc = make_shared<Processor>(*processor);
         edge* toKick;
@@ -244,7 +244,7 @@ void bestTentativeAssignment(Cluster *cluster, bool isHeft, vertex_t *vertex, ve
                     }
                 }
             }
-            assert(ftBefore == processor->readyTimeCompute);
+            assert(ftBefore == processor->getReadyTimeCompute());
         }
     }
 
@@ -284,10 +284,10 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
     processIncomingEdges(v, ourModifiedProc, modifiedProcs, startTime, cluster);
 
 
-    assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
-    startTime = ourModifiedProc->readyTimeCompute> startTime? ourModifiedProc->readyTimeCompute: startTime;
+    assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
+    startTime = ourModifiedProc->getReadyTimeCompute()> startTime? ourModifiedProc->getReadyTimeCompute(): startTime;
 
-    assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+    assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
 
 
     if(!isThisBaseline)
@@ -314,14 +314,14 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
         double timeToWriteAllPending = 0;
 
         double startTimeFor1Evicted, startTimeForAllEvicted;
-        startTimeFor1Evicted = startTimeForAllEvicted = ourModifiedProc->readyTimeWrite> startTime?
-                                                        ourModifiedProc->readyTimeWrite: startTime;
+        startTimeFor1Evicted = startTimeForAllEvicted = ourModifiedProc->getReadyTimeWrite()> startTime?
+                                                        ourModifiedProc->getReadyTimeWrite(): startTime;
         if(!ourModifiedProc->getPendingMemories().empty()) {
             assert((*ourModifiedProc->getPendingMemories().begin())->weight>=(*ourModifiedProc->getPendingMemories().rbegin())->weight);
             auto biggestFileWeight = (*ourModifiedProc->getPendingMemories().begin())->weight;
             double amountToOffloadWithoutBiggestFile = (amountToOffload - biggestFileWeight) > 0 ? (amountToOffload -
                                                                                                     biggestFileWeight) : 0 ;
-            double finishTimeToWrite = ourModifiedProc->readyTimeWrite +
+            double finishTimeToWrite = ourModifiedProc->getReadyTimeWrite() +
                                        biggestFileWeight / ourModifiedProc->writeSpeedDisk;
             startTimeFor1Evicted = max(startTime, finishTimeToWrite);
             timeToFinishBiggestEvicted =
@@ -346,7 +346,7 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
                     amountToOffload - sumWeightsOfAllPending : 0 ;
 
             assert(amountToOffloadWithoutAllFiles>=0);
-            finishTimeToWrite = ourModifiedProc->readyTimeWrite +
+            finishTimeToWrite = ourModifiedProc->getReadyTimeWrite() +
                                 timeToWriteAllPending;
             startTimeForAllEvicted = max(startTimeForAllEvicted, finishTimeToWrite);
             timeToFinishAllEvicted = startTimeForAllEvicted + v->time / ourModifiedProc->getProcessorSpeed() +
@@ -361,17 +361,17 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
             finishTime= std::numeric_limits<double>::max();
             return {};
         }
-        assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
-        ourModifiedProc->readyTimeCompute = minTTF;
-        finishTime= ourModifiedProc->readyTimeCompute;
-        assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+        assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
+        ourModifiedProc->setReadyTimeCompute( minTTF);
+        finishTime= ourModifiedProc->getReadyTimeCompute();
+        assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
 
         if(timeToFinishBiggestEvicted == minTTF){
             toKick = (*ourModifiedProc->getPendingMemories().begin());
             //cout<<"best tentative with biggest Evicted "; print_edge(toKick);
             resultingvariant=2;
-            ourModifiedProc->readyTimeWrite +=
-                    (*ourModifiedProc->getPendingMemories().begin())->weight / ourModifiedProc->writeSpeedDisk;
+            ourModifiedProc->setReadyTimeWrite( ourModifiedProc->getReadyTimeWrite() +
+                    (*ourModifiedProc->getPendingMemories().begin())->weight / ourModifiedProc->writeSpeedDisk);
             // ourModifiedProc->pendingMemories.erase()
             //penMemsAsVector.erase(penMemsAsVector.begin());
             assert(startTime<=startTimeFor1Evicted);
@@ -383,7 +383,7 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
         if(timeToFinishAllEvicted==minTTF){
             resultingvariant=3;
            // cout<<"best tentative with all Evicted ";
-            ourModifiedProc->readyTimeWrite += timeToWriteAllPending;
+            ourModifiedProc->setReadyTimeWrite( ourModifiedProc->getReadyTimeWrite() + timeToWriteAllPending);
             assert(startTime<=startTimeForAllEvicted);
             startTime= startTimeForAllEvicted;
             //penMemsAsVector.resize(0);
@@ -395,8 +395,8 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
     else{
         //startTime =  ourModifiedProc->readyTimeCompute;
         // printInlineDebug("should be successful");
-        ourModifiedProc->readyTimeCompute= startTime + v->time/ ourModifiedProc->getProcessorSpeed();
-        finishTime= ourModifiedProc->readyTimeCompute;
+        ourModifiedProc->setReadyTimeCompute(startTime + v->time/ ourModifiedProc->getProcessorSpeed());
+        finishTime= ourModifiedProc->getReadyTimeCompute();
 
     }
    // cout<<endl;
@@ -411,7 +411,7 @@ tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc, doub
                         double &peakMem, Cluster * cluster) {
 
     //cout<<"tent on proc "<<ourModifiedProc->id<< " ";
-    assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+    assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
 
 
     double sumOut= getSumOut(v); bool kicked=false;
@@ -432,17 +432,18 @@ tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc, doub
     processIncomingEdges(v, ourModifiedProc, modifiedProcs, perceivedStartTime, cluster);
 
 
-    assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
-    actualStartTime = perceivedStartTime =  ourModifiedProc->readyTimeCompute> perceivedStartTime? ourModifiedProc->readyTimeCompute: perceivedStartTime;
+    assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
+    actualStartTime = perceivedStartTime =  ourModifiedProc->getReadyTimeCompute()> perceivedStartTime?
+            ourModifiedProc->getReadyTimeCompute(): perceivedStartTime;
 
-    assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+    assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
     double initAvM= ourModifiedProc->getAvailableMemory();
 
     if( ourModifiedProc->getAvailableMemory()<sumOut) {
         kicked=true;
        // cout<<"sum out is "<<sumOut <<", kicking unexpectedly "<<endl;
         double stillNeedsToBeEvictedToRun = sumOut - ourModifiedProc->getAvailableMemory();
-        double writeTime = actualStartTime > ourModifiedProc->readyTimeCompute? actualStartTime: ourModifiedProc->readyTimeCompute;
+        double writeTime = actualStartTime > ourModifiedProc->getReadyTimeCompute()? actualStartTime: ourModifiedProc->getReadyTimeCompute();
 
         for (auto it = ourModifiedProc->getPendingMemories().begin();
              it != ourModifiedProc->getPendingMemories().end() && stillNeedsToBeEvictedToRun > 0;) {
@@ -461,8 +462,9 @@ tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc, doub
         assert(stillNeedsToBeEvictedToRun<=0);
         assert(ourModifiedProc->getAvailableMemory()>= sumOut);
         actualStartTime= writeTime;
-        ourModifiedProc->readyTimeWrite= writeTime; ourModifiedProc->readyTimeCompute= writeTime;
-        assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+        ourModifiedProc->setReadyTimeWrite( writeTime);
+        ourModifiedProc->setReadyTimeCompute(writeTime);
+        assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
        // cout<<"ednded up with "<<ourModifiedProc->availableMemory<<endl;
         //checkIfPendingMemoryCorrect(ourModifiedProc);
 
@@ -496,9 +498,9 @@ tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc, doub
             actualFinishTime= std::numeric_limits<double>::max();
             return {};
         }
-        assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
-        ourModifiedProc->readyTimeCompute = actualFinishTime;
-        assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
+        assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
+        ourModifiedProc->setReadyTimeCompute( actualFinishTime);
+        assert(ourModifiedProc->getReadyTimeCompute()<  std::numeric_limits<double>::max());
         assert(perceivedStartTime<= actualStartTime);
         assert(perceivedFinishTime<= actualFinishTime);
         if(kicked){
@@ -512,8 +514,8 @@ tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc, doub
     else{
         //startTime =  ourModifiedProc->readyTimeCompute;
         // printInlineDebug("should be successful");
-        ourModifiedProc->readyTimeCompute= actualStartTime + v->time/ ourModifiedProc->getProcessorSpeed();
-        actualFinishTime= ourModifiedProc->readyTimeCompute;
+        ourModifiedProc->setReadyTimeCompute( actualStartTime + v->time/ ourModifiedProc->getProcessorSpeed());
+        actualFinishTime= ourModifiedProc->getReadyTimeCompute();
         perceivedFinishTime= actualFinishTime;
     }
  //    cout<<endl;
@@ -546,7 +548,7 @@ void realSurplusOfOutgoingEdges(const vertex_t *v, shared_ptr<Processor> &ourMod
 void
 processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
                      double &earliestStartingTimeToComputeVertex, Cluster * cluster) {
-    earliestStartingTimeToComputeVertex = ourModifiedProc->readyTimeCompute;
+    earliestStartingTimeToComputeVertex = ourModifiedProc->getReadyTimeCompute();
     for (int j = 0; j < v->in_degree; j++) {
         edge *incomingEdge = v->in_edges[j];
         vertex_t *predecessor = incomingEdge->tail;
@@ -554,18 +556,18 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, 
         if (predecessor->assignedProcessorId == ourModifiedProc->id) {
             if(!isLocatedOnThisProcessor(incomingEdge, ourModifiedProc->id)){
                 assert(isLocatedOnDisk(incomingEdge));
-                ourModifiedProc->readyTimeRead += incomingEdge->weight / ourModifiedProc->readSpeedDisk;
-                earliestStartingTimeToComputeVertex =  ourModifiedProc->readyTimeRead>earliestStartingTimeToComputeVertex?
-                                                       ourModifiedProc->readyTimeRead: earliestStartingTimeToComputeVertex;
+                ourModifiedProc->setReadyTimeRead(ourModifiedProc->getReadyTimeRead() + incomingEdge->weight / ourModifiedProc->readSpeedDisk);
+                earliestStartingTimeToComputeVertex =  ourModifiedProc->getReadyTimeRead()>earliestStartingTimeToComputeVertex?
+                                                       ourModifiedProc->getReadyTimeRead(): earliestStartingTimeToComputeVertex;
             }
 
         }
         else{
             if (isLocatedOnDisk(incomingEdge)) {
                 //we need to schedule read
-                ourModifiedProc->readyTimeRead += incomingEdge->weight / ourModifiedProc->readSpeedDisk;
-                earliestStartingTimeToComputeVertex =  ourModifiedProc->readyTimeRead>earliestStartingTimeToComputeVertex?
-                                                       ourModifiedProc->readyTimeRead: earliestStartingTimeToComputeVertex;
+                ourModifiedProc->setReadyTimeRead( ourModifiedProc->getReadyTimeRead()+ incomingEdge->weight / ourModifiedProc->readSpeedDisk);
+                earliestStartingTimeToComputeVertex =  ourModifiedProc->getReadyTimeRead()>earliestStartingTimeToComputeVertex?
+                                                       ourModifiedProc->getReadyTimeRead(): earliestStartingTimeToComputeVertex;
                 //TODO evict??
             } else {
                 auto predecessorsProcessorsId = predecessor->assignedProcessorId;
@@ -590,12 +592,12 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, 
 
                 assert(!hasDuplicates(modifiedProcs));
 
-                double timeToStartWriting= max(predecessor->makespan, addedProc->readyTimeWrite);
-                addedProc->readyTimeWrite= timeToStartWriting+ incomingEdge->weight / addedProc->writeSpeedDisk;
-                double startTimeOfRead = max(addedProc->readyTimeWrite, ourModifiedProc->readyTimeRead);
-                ourModifiedProc->readyTimeRead = startTimeOfRead + incomingEdge->weight / ourModifiedProc->readSpeedDisk;
-                earliestStartingTimeToComputeVertex =  ourModifiedProc->readyTimeRead>earliestStartingTimeToComputeVertex?
-                                                       ourModifiedProc->readyTimeRead: earliestStartingTimeToComputeVertex;
+                double timeToStartWriting= max(predecessor->makespan, addedProc->getReadyTimeWrite());
+                addedProc->setReadyTimeWrite( timeToStartWriting+ incomingEdge->weight / addedProc->writeSpeedDisk);
+                double startTimeOfRead = max(addedProc->getReadyTimeWrite(), ourModifiedProc->getReadyTimeRead());
+                ourModifiedProc->setReadyTimeRead(startTimeOfRead + incomingEdge->weight / ourModifiedProc->readSpeedDisk);
+                earliestStartingTimeToComputeVertex =  ourModifiedProc->getReadyTimeRead()>earliestStartingTimeToComputeVertex?
+                                                       ourModifiedProc->getReadyTimeRead(): earliestStartingTimeToComputeVertex;
                 //int addpl  = addedProc->pendingMemories.size();
                 addedProc->removePendingMemory(incomingEdge);
                // assert(addpl> addedProc->pendingMemories.size());
