@@ -78,7 +78,7 @@ struct vertex_t {
   graph_t * subgraph;
   int leader=-1;
  int assignedProcessorId=-1;
-  double makespan;
+  double makespan=-1;
 
   bool visited;
   Status status = Status::Unscheduled;

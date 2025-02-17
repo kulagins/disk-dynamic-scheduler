@@ -49,7 +49,7 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
             return -1;
         }
         else{
-           // cout<<"best "<<bestStartTime<<" "<<bestFinishTime<<" on proc "<<bestProcessorToAssign->id<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
+            cout<< " for "<< vertex->name<<" best "<<bestStartTime<<" "<<bestFinishTime<<" on proc "<<bestProcessorToAssign->id<<endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
         }
 
 
@@ -267,9 +267,17 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
                     double &peakMem, int& resultingvariant, edge * &toKick, Cluster * cluster, bool isThisBaseline) {
     assert(isThisBaseline==false);
 
-  //  cout<<"tent on proc "<<ourModifiedProc->id<< " ";
+    //cout<<"tent on proc "<<ourModifiedProc->id<< " ";
   //  assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
     resultingvariant=1;
+
+    if(v->name=="MAKE_GENOME_FILTER_00000881"){
+        cout<<endl;
+    }
+
+    if(v->name=="TRIMGALORE_00000002" && ourModifiedProc->id==17){
+        cout<<endl;
+    }
 
     double sumOut= getSumOut(v);
     if(ourModifiedProc->getMemorySize()<sumOut){
@@ -534,7 +542,7 @@ void realSurplusOfOutgoingEdges(const vertex_t *v, shared_ptr<Processor> &ourMod
                 sumOut -= inEdge->weight;
             }
             else{
-                cout<<"edge "<<buildEdgeName(inEdge)<<" not anymore found in pending mems of processor "<<ourModifiedProc->id<<endl;
+               // cout<<"edge "<<buildEdgeName(inEdge)<<" not anymore found in pending mems of processor "<<ourModifiedProc->id<<endl;
             }
 
         }
@@ -595,9 +603,10 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, 
                 double timeToStartWriting= max(predecessor->makespan, addedProc->getReadyTimeWrite());
                 addedProc->setReadyTimeWrite( timeToStartWriting+ incomingEdge->weight / addedProc->writeSpeedDisk);
                 double startTimeOfRead = max(addedProc->getReadyTimeWrite(), ourModifiedProc->getReadyTimeRead());
-                ourModifiedProc->setReadyTimeRead(startTimeOfRead + incomingEdge->weight / ourModifiedProc->readSpeedDisk);
-                earliestStartingTimeToComputeVertex =  ourModifiedProc->getReadyTimeRead()>earliestStartingTimeToComputeVertex?
-                                                       ourModifiedProc->getReadyTimeRead(): earliestStartingTimeToComputeVertex;
+                double endTimeOfRead = startTimeOfRead + incomingEdge->weight / ourModifiedProc->readSpeedDisk;
+                ourModifiedProc->setReadyTimeRead(endTimeOfRead);
+
+                earliestStartingTimeToComputeVertex = max(earliestStartingTimeToComputeVertex, endTimeOfRead);
                 //int addpl  = addedProc->pendingMemories.size();
                 addedProc->removePendingMemory(incomingEdge);
                // assert(addpl> addedProc->pendingMemories.size());
@@ -750,6 +759,24 @@ std::vector < std::pair< vertex_t *, double> >  calculateMMBottomUpRank(graph_t 
     }
 
     return double_vector;
+}
+
+vector<pair<vertex_t *, double>>buildRanksWalkOver(graph_t *graph){
+    vector<pair<vertex_t *, double > > ranks;
+    enforce_single_source_and_target(graph);
+    int rank=0;
+    vertex_t *vertex = graph->first_vertex;
+    while (vertex != nullptr) {
+        if (vertex->in_degree == 0) {
+            ranks.emplace_back(vertex,rank);
+        }
+    }
+    for (auto &item: ranks){
+        for (int i = 0; i < item.first->out_degree; i++) {
+        //    if(find)
+        }
+    }
+
 }
 
 vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int bottomLevelVariant) {

@@ -3,51 +3,56 @@
 #define FONDA_SCHED_COMMON_HPP
 
 
-
 #include "../../extlibs/memdag/src/graph.hpp"
 #include "json.hpp"
 #include "cluster.hpp"
 #include <queue>
 
 
-class Assignment{
+class Assignment {
 
 
 public:
-    vertex_t * task;
-    Processor * processor;
+    vertex_t *task;
+    Processor *processor;
     double startTime;
     double finishTime;
 
-    Assignment(vertex_t * t, Processor * p, double st, double ft){
-        this->task =t;
-        this->processor =p;
+    Assignment(vertex_t *t, Processor *p, double st, double ft) {
+        this->task = t;
+        this->processor = p;
         this->startTime = st;
         this->finishTime = ft;
     }
-    ~Assignment(){
+
+    ~Assignment() {
 
     }
 
     nlohmann::json toJson() const {
         string tn = task->name;
         std::transform(tn.begin(), tn.end(), tn.begin(),
-                       [](unsigned char c){ return std::tolower(c); });
+                       [](unsigned char c) { return std::tolower(c); });
         return nlohmann::json{
-                {"task", tn},
-                {"start", startTime}, {"machine", processor->id}, {"finish", finishTime}};
+                {"task",    tn},
+                {"start",   startTime},
+                {"machine", processor->id},
+                {"finish",  finishTime}};
     }
 };
-
 
 
 using json = nlohmann::json;
 
 using namespace std;
+
 void printDebug(string str);
+
 void printInlineDebug(string str);
+
 void checkForZeroMemories(graph_t *graph);
-std::string trimQuotes(const std::string& str);
+
+std::string trimQuotes(const std::string &str);
 
 ////void completeRecomputationOfSchedule(Http::ResponseWriter &resp, const json &bodyjson, double timestamp, vertex_t * vertexThatHasAProblem);
 void removeSourceAndTarget(graph_t *graph, vector<pair<vertex_t *, double>> &ranks);
@@ -57,13 +62,14 @@ prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vec
 
 
 //void delayOneTask(Http::ResponseWriter &resp, const json &bodyjson, string &nameOfTaskWithProblem, double newStartTime,
- //                 Assignment *assignmOfProblem);
-void delayEverythingBy(vector<Assignment*> &assignments, Assignment * startingPoint, double delayTime);
-void takeOverChangesFromRunningTasks(json bodyjson, graph_t* currentWorkflow, vector<Assignment *> & assignments);
+//                 Assignment *assignmOfProblem);
+void delayEverythingBy(vector<Assignment *> &assignments, Assignment *startingPoint, double delayTime);
+
+void takeOverChangesFromRunningTasks(json bodyjson, graph_t *currentWorkflow, vector<Assignment *> &assignments);
 
 class EventManager;
 
-enum eventType{
+enum eventType {
     OnTaskStart,
     OnTaskFinish,
     OnReadStart,
@@ -71,121 +77,152 @@ enum eventType{
     OnWriteStart,
     OnWriteFinish
 };
-class Event  : public std::enable_shared_from_this<Event> {
+
+class Event : public std::enable_shared_from_this<Event> {
 public:
     string id;
-    vertex_t* task;
-    edge_t* edge;
+    vertex_t *task;
+    edge_t *edge;
     eventType type;
     shared_ptr<Processor> processor;
 
     vector<shared_ptr<Event>> predecessors, successors;
     bool isEviction;
-    bool isDone= false;
+    bool isDone = false;
 private:
-    double expectedTimeFire;
-    double actualTimeFire;
-    Event(vertex_t* task, edge_t* edge,
-          eventType type,  shared_ptr<Processor> processor,  double expectedTimeFire, double actualTimeFire,
-         // vector<shared_ptr<Event>>& predecessors,  vector<shared_ptr<Event>>& successors,
-          bool isEviction, string id):
-                task(task),
-                edge(edge),
-                type(type),
-                processor(processor),
-                expectedTimeFire(expectedTimeFire),
-                actualTimeFire(actualTimeFire),
-               // predecessors(predecessors),
-               // successors(successors),
-                isEviction(isEviction),
-                id(id){
-       // cout<<"creating event "<<id<<endl;
+    double expectedTimeFire = -1;
+    double actualTimeFire = -1;
+
+    Event(vertex_t *task, edge_t *edge,
+          eventType type, shared_ptr<Processor> processor, double expectedTimeFire, double actualTimeFire,
+            // vector<shared_ptr<Event>>& predecessors,  vector<shared_ptr<Event>>& successors,
+          bool isEviction, string idN) :
+            task(task),
+            edge(edge),
+            type(type),
+            processor(processor),
+            expectedTimeFire(expectedTimeFire),
+            actualTimeFire(actualTimeFire),
+            predecessors({}),
+            successors({}),
+            isEviction(isEviction),
+            id(idN) {
+        // cout<<"creating event "<<id<<endl;
     }
 
 
-    void initialize(const std::vector<std::shared_ptr<Event>>& predecessors,
-                    const std::vector<std::shared_ptr<Event>>& successors) {
-        for (const auto& pred : predecessors) {
+    void initialize(const std::vector<std::shared_ptr<Event>> &predecessors,
+                    const std::vector<std::shared_ptr<Event>> &successors) {
+        for (const auto &pred: predecessors) {
             this->addPredecessor(pred);
         }
-        for (const auto& succ : successors) {
+        for (const auto &succ: successors) {
             this->addSuccessor(succ);
         }
     }
+
 public:
-    static std::shared_ptr<Event> createEvent(vertex_t* task, edge_t* edge,
+    static std::shared_ptr<Event> createEvent(vertex_t *task, edge_t *edge,
                                               eventType type, std::shared_ptr<Processor> processor,
                                               double expectedTimeFire, double actualTimeFire,
-                                              const std::vector<std::shared_ptr<Event>>& predecessors,
-                                              const std::vector<std::shared_ptr<Event>>& successors,
-                                              bool isEviction, const std::string& id) {
-        auto event = std::shared_ptr<Event>(new Event(task, edge, type, processor, expectedTimeFire, actualTimeFire, isEviction, id));
+                                              const std::vector<std::shared_ptr<Event>> &predecessors,
+                                              const std::vector<std::shared_ptr<Event>> &successors,
+                                              bool isEviction, const std::string &id) {
+        auto event = std::shared_ptr<Event>(
+                new Event(task, edge, type, processor, expectedTimeFire, actualTimeFire, isEviction, id));
         event->initialize(predecessors, successors);
         return event;
     }
+
     void fire();
+
     void fireTaskStart();
+
     void fireTaskFinish();
+
     void fireReadStart();
+
     void fireReadFinish();
+
     void fireWriteStart();
+
     void fireWriteFinish();
 
     void removeOurselfFromSuccessors(Event *us);
 
-    void addPredecessor(shared_ptr<Event> pred){
-        if(pred->id == this->id){
+    void addPredecessor(shared_ptr<Event> pred) {
+        if (pred->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS PREDECESSOR!");
         }
         //cout<<"pred "<<pred->id<<" -> "<<this->id<<endl;
         this->predecessors.emplace_back(pred);
-        if(pred->actualTimeFire> this->actualTimeFire){
-            this->actualTimeFire= pred->actualTimeFire;
-            this->expectedTimeFire= pred->actualTimeFire;
+        if (pred->actualTimeFire > this->actualTimeFire) {
+            double diff = pred->actualTimeFire - this->actualTimeFire;
+            this->setActualTimeFire(pred->actualTimeFire);
+            this->setExpectedTimeFire(pred->actualTimeFire);
+
+            propagateChain(shared_from_this(), diff);
         }
+
         pred->addSuccessor(shared_from_this());
     }
 
-    void addSuccessor(shared_ptr<Event> succ){
-        assert(succ!= nullptr);
-        if(succ->id == this->id){
+    void propagateChain(shared_ptr<Event> event, double add) {
+        for (auto &successor: event->successors) {
+            double newTime = successor->getActualTimeFire() + add;
+            successor->setActualTimeFire(newTime);
+            successor->setExpectedTimeFire(newTime);
+
+            propagateChain(successor, add);
+        }
+    }
+
+    void addSuccessor(shared_ptr<Event> succ) {
+        assert(succ != nullptr);
+        if (succ->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS SUCCESSOR!");
         }
-       // cout<<"add successor "<<succ->id<<" to event "<<this->id<<endl;
+        // cout<<"add successor "<<succ->id<<" to event "<<this->id<<endl;
         this->successors.emplace_back(succ);
-        if(succ->actualTimeFire< this->actualTimeFire){
-            succ->actualTimeFire= this->actualTimeFire;
-            succ->expectedTimeFire= this->actualTimeFire;
+        if (succ->actualTimeFire < this->actualTimeFire) {
+            succ->setActualTimeFire(this->actualTimeFire);
+            succ->setExpectedTimeFire(this->actualTimeFire);
         }
-        string thisId=this->id;
-        auto it = find_if(succ->predecessors.begin(), succ->predecessors.end(), [&thisId](const shared_ptr<Event> obj) {return obj->id == thisId;});
+        string thisId = this->id;
+        auto it = find_if(succ->predecessors.begin(), succ->predecessors.end(),
+                          [&thisId](const shared_ptr<Event> obj) { return obj->id == thisId; });
 
-        if(it==succ->predecessors.end()) {
+        if (it == succ->predecessors.end()) {
             succ->addPredecessor(shared_from_this());
         }
     }
-    void  setExpectedTimeFire(double d){
+
+    void setExpectedTimeFire(double d) {
         this->expectedTimeFire = d;
     }
-    double getExpectedTimeFire(){
+
+    double getExpectedTimeFire() const {
         return this->expectedTimeFire;
     }
 
-    void  setActualTimeFire(double d){
-        if(this->id=="CHECK_DESIGN_00000674-f"){
-            cout<<endl;
+    void setActualTimeFire(double d) {
+        if (d != this->actualTimeFire) {
+         //   cout << "changing actual time fire for " << this->id << " from " << this->actualTimeFire << " to " << d
+          //       << endl;
+            this->actualTimeFire = d;
         }
-        cout<<"changing actual time fire for "<<this->id<<" from "<<this->actualTimeFire<<" to "<<d<<endl;
-        this->actualTimeFire = d;
     }
-    double getActualTimeFire(){
+
+    double getActualTimeFire() {
         return this->actualTimeFire;
     }
 
+    void setBothTimesFire(double d) {
+        setActualTimeFire(d);
+        setExpectedTimeFire(d);
+    }
+
 };
-
-
-
 
 
 struct CompareByTimestamp {
@@ -196,7 +233,7 @@ struct CompareByTimestamp {
         return tolower(a) < tolower(b);
     }
 
-    bool customIDCompare(const std::string& a, const std::string& b) const {
+    bool customIDCompare(const std::string &a, const std::string &b) const {
         size_t min_len = std::min(a.size(), b.size());
         for (size_t i = 0; i < min_len; ++i) {
             if (a[i] != b[i])
@@ -204,20 +241,24 @@ struct CompareByTimestamp {
         }
         return a.size() < b.size();  // Compare by length if all chars are equal
     }
+
     bool operator()(const shared_ptr<Event> a, const shared_ptr<Event> b) const {
         //cout<<"compare by timestamp "<<a->id<<" and "<<b-> id<<" "<< ((a->id < b->id)?"less": "not less")<<endl;
-        //return a->actualTimeFire < b->actualTimeFire ||
-         //      (a->actualTimeFire == b->actualTimeFire && a->id < b->id);
-        if (a->getActualTimeFire() != b->getActualTimeFire()) {
-            return a->getActualTimeFire() < b->getActualTimeFire();
+
+        if(a->id=="CHECK_DESIGN_00000074-MACS2_00000053-r-s"
+        || b->id=="CHECK_DESIGN_00000074-MACS2_00000053-r-s"
+        ){
+            cout<<endl;
         }
-        if(std::find(a->predecessors.begin(), a->predecessors.end(), b)!= a->predecessors.end()){
+        if (std::find(a->predecessors.begin(), a->predecessors.end(), b) != a->predecessors.end()) {
             //b is predecessor of a
             return false;
-        }
-        else if(std::find(b->predecessors.begin(), b->predecessors.end(), a)!= b->predecessors.end()) {
+        } else if (std::find(b->predecessors.begin(), b->predecessors.end(), a) != b->predecessors.end()) {
             //a is predecessor of b
             return true;
+        }
+        if (a->getActualTimeFire() != b->getActualTimeFire()) {
+            return a->getActualTimeFire() < b->getActualTimeFire();
         }
         bool compare = customIDCompare(a->id, b->id);
         return compare;
@@ -232,23 +273,22 @@ private:
     std::unordered_map<int, std::vector<std::multiset<shared_ptr<Event>>::iterator>> eventByProcessorMap; // Fast lookup by ID
 public:
     // Insert a new event
-    void insert(const shared_ptr<Event>& event) {
+    void insert(const shared_ptr<Event> &event) {
         //cout<<"inserting "<<event->id<<" ";
         auto foundIterator = eventMap.find(event->id);
         if (foundIterator != eventMap.end()) {
-        //    cout<<"updating "<<event->id<<" from "<< foundIterator->second->get()->actualTimeFire<<" to "<<event->actualTimeFire;
-            if(foundIterator->second->get()->getActualTimeFire()<event->getActualTimeFire()){
-          //      cout<<" updated";
+            //    cout<<"updating "<<event->id<<" from "<< foundIterator->second->get()->actualTimeFire<<" to "<<event->actualTimeFire;
+            if (foundIterator->second->get()->getActualTimeFire() < event->getActualTimeFire()) {
+                //      cout<<" updated";
                 update(event->id, event->getActualTimeFire());
             }
-       //     cout <<endl;
+            //     cout <<endl;
 
-        }
-        else{
+        } else {
             auto it = eventSet.insert(event);
             eventMap[event->id] = it;
-            eventByProcessorMap[event->processor->id].emplace_back( it);
-           // cout<<endl;
+            eventByProcessorMap[event->processor->id].emplace_back(it);
+            // cout<<endl;
         }
     }
 
@@ -262,9 +302,9 @@ public:
 
     // Update an event's timestamp
     bool update(string id, double newTimestamp) {
-        cout<<"update event "<<id <<" to time "<<newTimestamp<<endl;
         auto it = eventMap.find(id);
-        if (it != eventMap.end()) {
+        if (it != eventMap.end() && (*it->second)->getActualTimeFire() != newTimestamp) {
+            //  cout<<"update event "<<id <<" to time "<<newTimestamp<<endl;
             // Remove from multiset
             shared_ptr<Event> updatedEvent = *(it->second);
             eventSet.erase(it->second);
@@ -282,7 +322,7 @@ public:
 
     // Remove an event by ID
     bool remove(string id) {
-      //  cout<<"removing "<<id<<endl;
+        //  cout<<"removing "<<id<<endl;
         auto it = eventMap.find(id);
         if (it != eventMap.end()) {
             // Remove from multiset and map
@@ -303,32 +343,33 @@ public:
 
     // Print all events (for debugging)
     void printAll() const {
-        for (const auto& event : eventSet) {
-            std::cout << "ID: " << event->id<< " at"<< event->getActualTimeFire() <<",\t";
-          //            << ", Timestamp: " << event.timestamp
-         //             << ", Name: " << event.name << "\n";
-        }
-        cout<<endl<<"-------";cout<<endl;
-
-      //  for (const auto& event : eventMap) {
-       //     std::cout << "ID: " << event.first<<" to "<< event.second->get()->id<< ",\t";
+        for (const auto &event: eventSet) {
+            std::cout << "ID: " << event->id << " at" << event->getActualTimeFire() << ",\t";
             //            << ", Timestamp: " << event.timestamp
             //             << ", Name: " << event.name << "\n";
+        }
+        cout << endl << "-------";
+        cout << endl;
+
+        //  for (const auto& event : eventMap) {
+        //     std::cout << "ID: " << event.first<<" to "<< event.second->get()->id<< ",\t";
+        //            << ", Timestamp: " << event.timestamp
+        //             << ", Name: " << event.name << "\n";
         //}
         //cout<<endl;
-       // cout<<"-------------------------------------------";
+        // cout<<"-------------------------------------------";
         //cout<<endl;
     }
 
-    void forAll(shared_ptr<Processor> newProc){
-        for (auto& event : eventSet) {
-           if(event->processor->id==newProc->id) {
-               event->processor= newProc;
-           }
+    void forAll(shared_ptr<Processor> newProc) {
+        for (auto &event: eventSet) {
+            if (event->processor->id == newProc->id) {
+                event->processor = newProc;
+            }
         }
     }
 
-    bool empty(){
+    bool empty() {
         return eventSet.empty();
     }
 };

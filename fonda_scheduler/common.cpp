@@ -155,7 +155,7 @@ void delocateFromThisProcessorToDisk(edge_t* edge, int id){
                                                     return location.locationType == LocationType::OnProcessor &&
                                                            location.processorId == id;
                                                 });
-   cout<<"delocating "; print_edge(edge);
+   //cout<<"delocating "; print_edge(edge);
     assert(locationOnThisProcessor  != edge->locations.end());
     edge->locations.erase(locationOnThisProcessor);
     if(!isLocatedOnDisk(edge))
@@ -165,7 +165,7 @@ void delocateFromThisProcessorToDisk(edge_t* edge, int id){
 }
 
 void locateToThisProcessorFromDisk(edge_t* edge, int id){
-    cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
+  //  cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
     if(!isLocatedOnDisk(edge)){
         cout<<"NOT located on disk yet! Write&Read? "<<buildEdgeName(edge)<<endl;
     }
@@ -179,7 +179,7 @@ void locateToThisProcessorFromDisk(edge_t* edge, int id){
 }
 
 void locateToThisProcessorFromNowhere(edge_t* edge, int id){
-    cout<<"locating from nowhere to proc "<<id <<" edge "; print_edge(edge);
+  //  cout<<"locating from nowhere to proc "<<id <<" edge "; print_edge(edge);
     if(!isLocatedOnThisProcessor(edge, id))
         edge->locations.emplace_back(LocationType::OnProcessor, id);
 }

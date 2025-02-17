@@ -161,7 +161,7 @@ public:
     }
 
     void setReadyTimeCompute(double newTime){
-        cout<<"proc "<<this->id<<"now ready at "<<newTime<<endl;
+       // cout<<"proc "<<this->id<<"now ready at "<<newTime<<endl;
         this->readyTimeCompute = newTime;
     }
     int getAssignedTaskId() const;
@@ -177,6 +177,7 @@ public:
     std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator
     //bool
     removePendingMemory(edge_t * edgeToRemove){
+       // cout<<"removing pending memory "<<buildEdgeName(edgeToRemove)<<endl;
 
         auto it = pendingMemories.find(edgeToRemove);
         if (it == pendingMemories.end()) {
@@ -193,6 +194,10 @@ public:
      }
 
     void addPendingMemory(edge_t * edge){
+        //cout<<"Add pending memory "<<buildEdgeName(edge)<<endl;
+        if(buildEdgeName(edge)=="PLOTPROFILE_00007544-MULTIQC_00007541"){
+            cout<<endl;
+        }
         if (!edge) {
             throw std::runtime_error("Edge is null!");
         }

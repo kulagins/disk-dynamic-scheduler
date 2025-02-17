@@ -26,6 +26,7 @@ int currentAlgoNum = 0;
 //1000000 100 1 1 bacass 3637252230 1 yes ../
 //100000000 100 1 1 chipseq 3793245764 1 yes ../ machines.csv
 //1 1 1 1 debug 10 1 yes ../ machines_debug.csv
+//1000000 100 1 0.001 chipseq_1000 3793245764 1 no ../ machines.csv -> für beide gültig
 int main(int argc, char *argv[]) {
 
    /* for (int i = 0; i < argc; ++i) {
@@ -117,7 +118,7 @@ int main(int argc, char *argv[]) {
     workflowName = workflowName.substr(0, n4);
 
     //10, 100
-    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, cluster, 1, 1);
+    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, cluster, 10, 100);
 
 
     vertex_t *pv = graphMemTopology->first_vertex;
@@ -141,13 +142,16 @@ int main(int argc, char *argv[]) {
     start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
-   // double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
+    //double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
+    //delete cluster;
+    //cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    //cout<<"makespan 1 "<<d<<", ";
     double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline);
 
      end = std::chrono::system_clock::now();
      elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
-    cout<<"makespan "<<d<<endl;
+    cout<<"makespan 2 "<<d<<endl;
 
     //for (const auto &item: cluster->getProcessors()){
    //     cout<< item.second->id<<": "<<item.second->assignment<<endl;

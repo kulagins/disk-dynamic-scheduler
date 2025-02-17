@@ -21,7 +21,8 @@ vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int botto
 
 double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v, const shared_ptr<Processor>&pj);
 vector< shared_ptr<Processor>> tentativeAssignment(vertex_t *v, shared_ptr<Processor>pj, double &finishTime,
-                                                   double & startTime, double &peakMem, int& resultingVariant, edge* &singleToKick, Cluster * cluster, bool isThisBaseline=false );
+                                                   double & startTime, double &peakMem, int& resultingVariant, edge* &singleToKick, Cluster * cluster,
+                                                   bool isThisBaseline=false );
 vector<shared_ptr<Processor>>
 tentativeAssignmentHEFT(vertex_t *v, shared_ptr<Processor> ourModifiedProc,
                         double &actualFinishTime, double &actualStartTime,  double &perceivedFinishTime, double &perceivedStartTime,
