@@ -244,12 +244,6 @@ struct CompareByTimestamp {
 
     bool operator()(const shared_ptr<Event> a, const shared_ptr<Event> b) const {
         //cout<<"compare by timestamp "<<a->id<<" and "<<b-> id<<" "<< ((a->id < b->id)?"less": "not less")<<endl;
-
-        if(a->id=="CHECK_DESIGN_00000074-MACS2_00000053-r-s"
-        || b->id=="CHECK_DESIGN_00000074-MACS2_00000053-r-s"
-        ){
-            cout<<endl;
-        }
         if (std::find(a->predecessors.begin(), a->predecessors.end(), b) != a->predecessors.end()) {
             //b is predecessor of a
             return false;

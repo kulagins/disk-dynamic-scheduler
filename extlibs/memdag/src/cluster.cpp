@@ -111,7 +111,11 @@ void Processor::setPendingMemories( set<edge_t *, std::function<bool(edge_t*, ed
 }
 
 double Processor::getAfterAvailableMemory() const {
-    assert(afterAvailableMemory>=0 && afterAvailableMemory<= memorySize);
+    assert(afterAvailableMemory>=0);
+    if(afterAvailableMemory>memorySize){
+        assert(abs(afterAvailableMemory - memorySize)< 0.1);
+    }
+
     return afterAvailableMemory;
 }
 

@@ -271,14 +271,6 @@ tentativeAssignment(vertex_t *v, shared_ptr<Processor> ourModifiedProc,  double 
   //  assert(ourModifiedProc->readyTimeCompute<  std::numeric_limits<double>::max());
     resultingvariant=1;
 
-    if(v->name=="MAKE_GENOME_FILTER_00000881"){
-        cout<<endl;
-    }
-
-    if(v->name=="TRIMGALORE_00000002" && ourModifiedProc->id==17){
-        cout<<endl;
-    }
-
     double sumOut= getSumOut(v);
     if(ourModifiedProc->getMemorySize()<sumOut){
      //  cout<<"too large outs absolutely"<<endl;

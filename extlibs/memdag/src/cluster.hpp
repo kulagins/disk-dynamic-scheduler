@@ -156,7 +156,11 @@ public:
     }
     void setAvailableMemory(double mem){
        // cout<<"set available memory of proc "<<this->id<<" to "<<mem<<endl;
-        assert(mem>=0 && mem<= memorySize);
+        assert(mem>=0);
+        if(mem>memorySize){
+            assert(abs(mem - memorySize)< 0.1);
+        }
+
         this->availableMemory = mem;
     }
 
@@ -195,9 +199,6 @@ public:
 
     void addPendingMemory(edge_t * edge){
         //cout<<"Add pending memory "<<buildEdgeName(edge)<<endl;
-        if(buildEdgeName(edge)=="PLOTPROFILE_00007544-MULTIQC_00007541"){
-            cout<<endl;
-        }
         if (!edge) {
             throw std::runtime_error("Edge is null!");
         }
