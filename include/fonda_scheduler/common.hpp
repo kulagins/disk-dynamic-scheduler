@@ -185,8 +185,11 @@ public:
         // cout<<"add successor "<<succ->id<<" to event "<<this->id<<endl;
         this->successors.emplace_back(succ);
         if (succ->actualTimeFire < this->actualTimeFire) {
+            double diff = abs( succ->actualTimeFire - this->actualTimeFire);
             succ->setActualTimeFire(this->actualTimeFire);
             succ->setExpectedTimeFire(this->actualTimeFire);
+
+            propagateChain(succ, diff);
         }
         string thisId = this->id;
         auto it = find_if(succ->predecessors.begin(), succ->predecessors.end(),

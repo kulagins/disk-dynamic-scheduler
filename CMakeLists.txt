@@ -64,13 +64,16 @@ endif ()
 find_package(PkgConfig)
 #pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 
-add_executable(fonda_scheduler "${PROJECT_SOURCE_DIR}/fonda_scheduler/main.cpp")
+add_executable(fonda_scheduler "${PROJECT_SOURCE_DIR}/fonda_scheduler/main.cpp"
+        )
 
 target_include_directories(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/include")
 target_sources(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/fonda_scheduler/io/graphWeightsBuilder.cpp"
         "${PROJECT_SOURCE_DIR}/fonda_scheduler/common.cpp"
         "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSched.cpp"
         "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSchedDisk.cpp"
+        "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSchedDiskPlanning.cpp"
+
 )
 
 target_link_libraries(fonda_scheduler PRIVATE memdag)

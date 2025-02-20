@@ -12,6 +12,10 @@
 #include "common.hpp"
 #include "json.hpp"
 
+extern Cluster *cluster;
+extern EventManager events;
+
+
 double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft);
 
 double deviation(double in);
@@ -38,4 +42,5 @@ scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict,
 void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t* ourVertex);
 void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc);
 bool dealWithPredecessors(shared_ptr<Event> us);
+void checkBestEvents(vector<shared_ptr<Event>> &bestEvents);
 #endif //RESHI_TXT_DYNSCHED_HPP

@@ -148,7 +148,7 @@ public:
     }
 
     double getAvailableMemory(){
-        if(abs(availableMemory - memorySize) <0.001){
+        if(abs(availableMemory - memorySize) <0.01){
             availableMemory= memorySize;
         }
         assert(availableMemory>=0 && availableMemory<= memorySize);

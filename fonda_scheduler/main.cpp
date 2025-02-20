@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
     start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
-    //double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
+   // double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
     //delete cluster;
     //cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
     //cout<<"makespan 1 "<<d<<", ";
