@@ -304,15 +304,9 @@ public:
     weak_ptr<Event> getLastComputeEvent(){
         return this->lastComputeEvent;
     }
-    double getReadyTimeWrite() const{
-        return this->readyTimeWrite;
-    }
-    double getReadyTimeRead() const{
-        return this->readyTimeRead;
-    }
-    double getReadyTimeCompute() const{
-        return this->readyTimeCompute;
-    }
+    double getReadyTimeWrite() ;
+    double getReadyTimeRead() ;
+    double getReadyTimeCompute();
     void setReadyTimeWrite(double rtw){
         this->readyTimeWrite= rtw;
     }

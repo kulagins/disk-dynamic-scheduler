@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
     unsigned long n4 = workflowName.find('_');
     workflowName = workflowName.substr(0, n4);
 
-    //10, 100
+    //10, 100                                                               memShorteningDivision, ioShorteningCoef
     Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, cluster, 10, 100);
 
 

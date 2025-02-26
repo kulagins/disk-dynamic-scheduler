@@ -6,7 +6,7 @@
 Cluster *cluster;
 EventManager events;
 
-
+string lastEventName;
 
 double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, bool isHeft) {
     double resMakespan = -1;
@@ -41,8 +41,17 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
         bool removed = events.remove(firstEvent->id);
         assert(removed == true);
 
+        if(firstEvent->id==lastEventName){
+            events.insert(firstEvent);
+            firstEvent= firstEvent->predecessors.at(0);
+            removed = events.remove(firstEvent->id);
+            assert(removed == true);
+            cout<<"FIRED PREDECESSOR INSTEAD, "<<firstEvent->id<<endl;
+
+        }
         firstEvent->fire();
         resMakespan = max(resMakespan, firstEvent->getActualTimeFire());
+        lastEventName= firstEvent->id;
         //cout<<"events now "; events.printAll();
     }
     //  cout<<cntr<<" "<<graph->number_of_vertices<<endl;
@@ -53,7 +62,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
 
 void Event::fireTaskStart() {
     string thisid = this->id;
-  //  cout << "task start for " << thisid << " at " << this->actualTimeFire << " on proc " << this->processor->id << endl;
+    cout << "task start for " << thisid << " at " << this->actualTimeFire << " on proc " << this->processor->id << endl;
     double timeStart = 0;
 
     auto canRun = dealWithPredecessors(shared_from_this());
@@ -79,13 +88,22 @@ void Event::fireTaskStart() {
         // cout << "on start  setting finish time from "<< ourFinishEvent->actualTimeFire <<" to " << d << endl;
         ourFinishEvent->setActualTimeFire(d);
         this->isDone = true;
+
+        for (auto successor = successors.begin(); successor != successors.end();) {
+           // cout << " from " << (*successor)->id << "'s predecessors" << endl;
+           if((*successor)->task== nullptr){
+               throw runtime_error("edge-based event depends on task start "+this->id);
+           }
+           successor++;
+        }
+
     }
 }
 
 
 void Event::fireTaskFinish() {
     vertex_t *thisTask = this->task;
-  //  cout << "firing task Finish for " << this->id << endl;
+    cout << "firing task Finish for " << this->id << endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
@@ -142,6 +160,14 @@ void Event::fireTaskFinish() {
             }
         }
         this->isDone = true;
+
+        for (auto successor = successors.begin(); successor != successors.end();) {
+            if((*successor)->getActualTimeFire()< this->getActualTimeFire()){
+                (*successor)->setActualTimeFire(this->getActualTimeFire());
+            }
+            successor++;
+        }
+
     }
     //  cout << "for " <<//"task finish FINISHED " <<
     // this->task->name<<" best " <<this->actualTimeFire<< " on proc "<<this->processor->id<< endl;
@@ -179,16 +205,19 @@ shared_ptr<Processor> findPredecessorsProcessor(edge_t *incomingEdge, vector<sha
 
 
 void Event::fireReadStart() {
-   // cout << "firing read start for ";
-   // print_edge(this->edge);
+    cout << "firing read start for ";
+    print_edge(this->edge);
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        assert(events.find(this->predecessors.at(0)->id) != nullptr);
+        cout<<"cannot run due to "<<this->predecessors.at(0)->id<<endl;
+        auto predInEvents = events.find(this->predecessors.at(0)->id);
         this->setActualTimeFire(
                 this->getActualTimeFire() + +std::numeric_limits<double>::epsilon() * this->getActualTimeFire());
-        assert(this->actualTimeFire >= this->predecessors.at(0)->actualTimeFire);
+        assert(this->actualTimeFire < 1 || this->actualTimeFire > this->predecessors.at(0)->actualTimeFire);
         events.insert(shared_from_this());
+        events.remove(predInEvents->id);
+        events.insert(predInEvents);
     } else {
         removeOurselfFromSuccessors(this);
         double durationOfRead = this->edge->weight / this->processor->readSpeedDisk;
@@ -201,20 +230,31 @@ void Event::fireReadStart() {
         }
 
         this->isDone = true;
+
+        for (auto successor = successors.begin(); successor != successors.end();) {
+            if((*successor)->getActualTimeFire()< this->getActualTimeFire()){
+                (*successor)->setActualTimeFire(this->getActualTimeFire());
+            }
+            successor++;
+        }
+
     }
 
 
 }
 
 void Event::fireReadFinish() {
-  //  cout << "firing read finish for ";
-  //  print_edge(this->edge);
-
+    cout << "firing read finish for ";
+    print_edge(this->edge);
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
+        cout<<"cannot run due to "<<this->predecessors.at(0)->id<<endl;
+        auto predInEvents = events.find(this->predecessors.at(0)->id);
         this->setActualTimeFire(
                 this->getActualTimeFire() + +std::numeric_limits<double>::epsilon() * this->getActualTimeFire());
         events.insert(shared_from_this());
+        events.remove(predInEvents->id);
+        events.insert(predInEvents);
     } else {
         removeOurselfFromSuccessors(this);
         if (!isLocatedOnDisk(this->edge)) {
@@ -225,17 +265,29 @@ void Event::fireReadFinish() {
         }
         locateToThisProcessorFromDisk(this->edge, this->processor->id);
         this->isDone = true;
+
+
+        for (auto successor = successors.begin(); successor != successors.end();) {
+            if((*successor)->getActualTimeFire()< this->getActualTimeFire()){
+                (*successor)->setActualTimeFire(this->getActualTimeFire());
+            }
+            successor++;
+        }
     }
 }
 
 void Event::fireWriteStart() {
-   // cout << "firing write start for ";
-  //  print_edge(this->edge);
+    cout << "firing write start for ";
+    print_edge(this->edge);
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
+        cout<<"cannot run due to "<<this->predecessors.at(0)->id<<endl;
+        auto predInEvents = events.find(this->predecessors.at(0)->id);
         this->setActualTimeFire(
                 this->getActualTimeFire() + +std::numeric_limits<double>::epsilon() * this->getActualTimeFire());
         events.insert(shared_from_this());
+        events.remove(predInEvents->id);
+        events.insert(predInEvents);
     } else {
         removeOurselfFromSuccessors(this);
 
@@ -252,35 +304,57 @@ void Event::fireWriteStart() {
             events.update(buildEdgeName(this->edge) + "-w-f", actualTimeFireFinish);
         }
         this->isDone = true;
+
+
+        for (auto successor = successors.begin(); successor != successors.end();) {
+            if((*successor)->getActualTimeFire()< this->getActualTimeFire()){
+                (*successor)->setActualTimeFire(this->getActualTimeFire());
+            }
+            successor++;
+        }
     }
 }
 
 void Event::fireWriteFinish() {
-   // cout << "firing write finish for ";
-   // print_edge(this->edge);
+    cout << "firing write finish for ";
+    print_edge(this->edge);
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
+        cout<<"cannot run due to "<<this->predecessors.at(0)->id<<endl;
+        const shared_ptr<Event> &predInEvents = events.find(this->predecessors[0]->id);
+        assert(predInEvents != nullptr);
+        events.remove(predInEvents->id);
+        events.insert(predInEvents);
         this->setActualTimeFire(
                 this->getActualTimeFire() + +std::numeric_limits<double>::epsilon() * this->getActualTimeFire());
         events.insert(shared_from_this());
+
         //cout << "reiniserting. events now " << endl;
         // events.printAll();
     } else {
         removeOurselfFromSuccessors(this);
         delocateFromThisProcessorToDisk(this->edge, this->processor->id);
         this->isDone = true;
+
+
+        for (auto successor = successors.begin(); successor != successors.end();) {
+            if((*successor)->getActualTimeFire()< this->getActualTimeFire()){
+                (*successor)->setActualTimeFire(this->getActualTimeFire());
+            }
+            successor++;
+        }
     }
 }
 
 void Event::removeOurselfFromSuccessors(Event *us) {
-    //   cout << "removing from successors us, " << us->id;
+      // cout << "removing from successors us, " << us->id;
 
     for (auto successor = successors.begin(); successor != successors.end();) {
-        //   cout << " from " << (*successor)->id << "'s predecessors" << endl;
+     //      cout << " from " << (*successor)->id << "'s predecessors" << endl;
 //
         for (auto succspred = (*successor)->predecessors.begin(); succspred != (*successor)->predecessors.end();) {
             if ((*succspred)->id == us->id) {
-                //    cout << "removed" << endl;
+                  //  cout << "removed" << endl;
                 succspred = (*successor)->predecessors.erase(succspred);
             } else {
                 // Move to the next element
@@ -298,9 +372,6 @@ void Event::removeOurselfFromSuccessors(Event *us) {
 }
 
 
-double deviation(double in) {
-    return in; //in* 2;
-}
 
 void Cluster::printProcessorsEvents() {
 
@@ -377,9 +448,10 @@ bool dealWithPredecessors(shared_ptr<Event> us) {
         for (const auto &item: us->predecessors) {
             //      cout << "predecessor " << item->id << ", ";
             if (item->getActualTimeFire() > us->getActualTimeFire()) {
-                if(abs(item->getActualTimeFire() - us->getActualTimeFire())>0.1){
+                cout<<"predecessor "<<item->id<<"'s fire time is larger than ours. "<<item->getActualTimeFire()<<" vs "<<us->getActualTimeFire()<<endl;
+              //  if(abs(item->getActualTimeFire() - us->getActualTimeFire())>0.01){
                     us->setActualTimeFire(item->getActualTimeFire());
-                }
+             //   }
             }
         }
         //   cout << endl;
@@ -408,49 +480,10 @@ void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc) {
 }
 
 
-void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t *ourVertex) {
-    assert(ourVertex->memoryRequirement == 0 ||
-           (ourVertex->actuallyUsedMemory != -1 && ourVertex->actuallyUsedMemory != 0));
-    //   cout << "act used " << ourVertex->actuallyUsedMemory << endl;
-    // ourModifiedProc->setAfterAvailableMemory(ourModifiedProc->getAvailableMemory() + ourVertex->actuallyUsedMemory);
-    ourModifiedProc->setAfterAvailableMemory(ourModifiedProc->getMemorySize());
-    bool wasMemWrong = false;
-    for (auto &item: ourModifiedProc->getPendingMemories()) {
-        try {
-            ourModifiedProc->addPendingMemoryAfter(item);
-        }
-        catch (...) {
-            cout << "memor temporaroly wrong!" << endl;
-            wasMemWrong = true;
-        }
-    }
-    //  assert(ourModifiedProc->getAfterAvailableMemory() >= 0);
-    //cout << "after adding " << endl;
-    for (int j = 0; j < ourVertex->in_degree; j++) {
-        if (ourModifiedProc->getAfterPendingMemories().find(ourVertex->in_edges[j]) ==
-            ourModifiedProc->getAfterPendingMemories().end()) {
-            //  cout << "edge " << buildEdgeName(ourVertex->in_edges[j]) << " not found in after pending mems on proc "
-            //      << ourModifiedProc->id << endl;
-        } else {
-            ourModifiedProc->removePendingMemoryAfter(ourVertex->in_edges[j]);
-        }
-    }
-    for (int j = 0; j < ourVertex->out_degree; j++) {
-        ourModifiedProc->addPendingMemoryAfter(ourVertex->out_edges[j]);
-        assert(ourModifiedProc->getAfterPendingMemories().find(ourVertex->out_edges[j])
-               != ourModifiedProc->getPendingMemories().end());
-    }
-    //ourModifiedProc->setAfterAvailableMemory(
-    //       min( ourModifiedProc->getMemorySize(),
-    //      ourModifiedProc->getAfterAvailableMemory()+ourVertex->actuallyUsedMemory));
-
-    if (wasMemWrong) {
-        assert(ourModifiedProc->getAvailableMemory() >= 0 &&
-               ourModifiedProc->getAvailableMemory() < ourModifiedProc->getMemorySize());
-        assert(ourModifiedProc->getAfterAvailableMemory() >= 0 &&
-               ourModifiedProc->getAfterAvailableMemory() < ourModifiedProc->getMemorySize());
-    }
+double deviation(double in) {
+    return in* 2;
 }
+
 
 
 void Processor::setLastWriteEvent(shared_ptr<Event> lwe) {
@@ -466,4 +499,23 @@ void Processor::setLastReadEvent(shared_ptr<Event> lre) {
 void Processor::setLastComputeEvent(shared_ptr<Event> lce) {
     this->lastComputeEvent = lce;
     this->readyTimeCompute = lce->getActualTimeFire();
+}
+double Processor::getReadyTimeCompute() {
+    if(!this->lastComputeEvent.expired() && this->lastComputeEvent.lock()->getActualTimeFire()!= this->readyTimeCompute){
+        this->readyTimeCompute= lastComputeEvent.lock()->getActualTimeFire();
+    }
+        return this->readyTimeCompute;
+}
+
+double Processor::getReadyTimeWrite() {
+    if(!this->lastWriteEvent.expired() && this->lastWriteEvent.lock()->getActualTimeFire()!= this->readyTimeWrite){
+        this->readyTimeWrite= lastWriteEvent.lock()->getActualTimeFire();
+    }
+    return this->readyTimeWrite;
+}
+double Processor::getReadyTimeRead() {
+    if(!this->lastReadEvent.expired() && this->lastReadEvent.lock()->getActualTimeFire()!= this->readyTimeRead){
+        this->readyTimeRead= lastReadEvent.lock()->getActualTimeFire();
+    }
+    return this->readyTimeRead;
 }

@@ -51,7 +51,7 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
     // cout<< " for "<< vertex->name<<" best "<<bestStartTime<<" "<<bestFinishTime<<" on proc "<<bestProcessorToAssign->id<<endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
 
 
-    // checkBestEvents(bestEvents);
+     checkBestEvents(bestEvents);
 
     vertex->assignedProcessorId = bestProcessorToAssign->id;
     vertex->actuallyUsedMemory = bestReallyUsedMem;
@@ -117,9 +117,6 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
                     double &actuallyUsedMemory, double notEarlierTHan) {
     // cout << "try " << ourModifiedProc->id << " for " << vertex->name << endl;
     assert(ourModifiedProc->getAvailableMemory() <= ourModifiedProc->getMemorySize());
-    if(vertex->name=="output_documentation_00001963" && ourModifiedProc->id==14){
-        cout<<endl;
-    }
 
     vector<std::shared_ptr<Processor>> modifiedProcs;
     modifiedProcs.emplace_back(ourModifiedProc);
@@ -325,18 +322,11 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
         //         ourModifiedProc->getAvailableMemory() - peakMemoryRequirementOfVertex(vertex));
     }
 
-    if (eventStartTask->getExpectedTimeFire() >= eventFinishTask->getExpectedTimeFire()) {
-          throw runtime_error("event Start taks over EventFinish Task");
-    }
-    startTime = max(max(ourModifiedProc->getReadyTimeCompute(), ourModifiedProc->getReadyTimeRead()), startTime);
+    startTime = max(max(max(ourModifiedProc->getReadyTimeCompute(), ourModifiedProc->getReadyTimeRead()), startTime), eventStartTask->getExpectedTimeFire());
 
     eventStartTask->setBothTimesFire(startTime);
 
-    finishTime = startTime + vertex->time / ourModifiedProc->getProcessorSpeed();
-    eventFinishTask->setBothTimesFire(finishTime);
 
-    assert(vertex->time == 0 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
-    assert(eventStartTask->getExpectedTimeFire()== eventStartTask->getActualTimeFire());
 
     for (auto &newEvent: newEvents) {
         if (newEvent->id.find("-f") != std::string::npos) {
@@ -358,6 +348,9 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
     }
 
     eventFinishTask->setBothTimesFire(finishTime);
+
+    assert(vertex->time == 0 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
+    assert(eventStartTask->getExpectedTimeFire()== eventStartTask->getActualTimeFire());
 
     newEvents.emplace_back(eventStartTask);
     newEvents.emplace_back(eventFinishTask);
@@ -392,6 +385,9 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
     for (int p = 0; p < ind; p++) {
         edge *incomingEdge = v->in_edges[p];
         vertex_t *predecessor = incomingEdge->tail;
+        if(predecessor->makespan>0){
+            ourEvent->setExpectedTimeFire(max(ourEvent->getExpectedTimeFire(), predecessor->makespan));
+        }
         if (ourModifiedProc->getPendingMemories().find(incomingEdge) != ourModifiedProc->getPendingMemories().end()) {
             //    cout<<"already on proc, judginbg from proc"<<endl;
         } else if (isLocatedNowhere(incomingEdge)) {
@@ -751,4 +747,50 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
     assert(eventFinishWrite->getActualTimeFire() ==
            eventStartWrite->getActualTimeFire() + incomingEdge->weight / predecessorsProc->writeSpeedDisk);
 
+}
+
+
+
+void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t *ourVertex) {
+    assert(ourVertex->memoryRequirement == 0 ||
+           (ourVertex->actuallyUsedMemory != -1 && ourVertex->actuallyUsedMemory != 0));
+    //   cout << "act used " << ourVertex->actuallyUsedMemory << endl;
+    // ourModifiedProc->setAfterAvailableMemory(ourModifiedProc->getAvailableMemory() + ourVertex->actuallyUsedMemory);
+    ourModifiedProc->setAfterAvailableMemory(ourModifiedProc->getMemorySize());
+    bool wasMemWrong = false;
+    for (auto &item: ourModifiedProc->getPendingMemories()) {
+        try {
+            ourModifiedProc->addPendingMemoryAfter(item);
+        }
+        catch (...) {
+            cout << "memor temporaroly wrong!" << endl;
+            wasMemWrong = true;
+        }
+    }
+    //  assert(ourModifiedProc->getAfterAvailableMemory() >= 0);
+    //cout << "after adding " << endl;
+    for (int j = 0; j < ourVertex->in_degree; j++) {
+        if (ourModifiedProc->getAfterPendingMemories().find(ourVertex->in_edges[j]) ==
+            ourModifiedProc->getAfterPendingMemories().end()) {
+            //  cout << "edge " << buildEdgeName(ourVertex->in_edges[j]) << " not found in after pending mems on proc "
+            //      << ourModifiedProc->id << endl;
+        } else {
+            ourModifiedProc->removePendingMemoryAfter(ourVertex->in_edges[j]);
+        }
+    }
+    for (int j = 0; j < ourVertex->out_degree; j++) {
+        ourModifiedProc->addPendingMemoryAfter(ourVertex->out_edges[j]);
+        assert(ourModifiedProc->getAfterPendingMemories().find(ourVertex->out_edges[j])
+               != ourModifiedProc->getPendingMemories().end());
+    }
+    //ourModifiedProc->setAfterAvailableMemory(
+    //       min( ourModifiedProc->getMemorySize(),
+    //      ourModifiedProc->getAfterAvailableMemory()+ourVertex->actuallyUsedMemory));
+
+    if (wasMemWrong) {
+        assert(ourModifiedProc->getAvailableMemory() >= 0 &&
+               ourModifiedProc->getAvailableMemory() < ourModifiedProc->getMemorySize());
+        assert(ourModifiedProc->getAfterAvailableMemory() >= 0 &&
+               ourModifiedProc->getAfterAvailableMemory() < ourModifiedProc->getMemorySize());
+    }
 }
