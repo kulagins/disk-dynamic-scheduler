@@ -18,7 +18,7 @@ extern EventManager events;
 
 double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft);
 
-double deviation(double in);
+double deviation(double &in);
 vector<shared_ptr<Processor>>
 tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
 double &finTime, double &startTime, int &resultingVar,  vector<shared_ptr<Event>>  &newEvents,
@@ -33,7 +33,7 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event>ourEvent, vector<s
                           shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, vector<std::shared_ptr<Processor>> &modifiedProcs);
 double
 processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<Processor> &ourModifiedProc, vector<std::shared_ptr<Processor>> &modifiedProcs,
-                    vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask);
+                    vector<shared_ptr<Event>> &createdEvents);
 
 //std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict);
 set<edge_t *, bool (*)(edge_t *, edge_t *)>::iterator

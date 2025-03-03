@@ -223,7 +223,7 @@ void Event::fire(){
             fireWriteFinish();
             break;
     }
-
+    this->timesFired++;
 }
 
 

@@ -27,6 +27,8 @@ int currentAlgoNum = 0;
 //100000000 100 1 1 chipseq 3793245764 1 yes ../ machines.csv
 //1 1 1 1 debug 10 1 yes ../ machines_debug.csv
 //1000000 100 1 0.001 chipseq_1000 3793245764 1 no ../ machines.csv -> für beide gültig
+//100000000 100 1 1 chipseq_2000 3793245764 1 yes ../ machines.csv
+//1000000 100 1 0.001 eager_2000 25705994498 1 no ../ machines.csv
 int main(int argc, char *argv[]) {
 
    /* for (int i = 0; i < argc; ++i) {
