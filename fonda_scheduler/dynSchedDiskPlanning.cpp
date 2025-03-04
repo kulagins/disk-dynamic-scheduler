@@ -574,7 +574,10 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
     assert(eventFinishRead->getActualTimeFire() == eventFinishRead->getExpectedTimeFire());
     assert(eventFinishRead->getExpectedTimeFire() > eventStartRead->getExpectedTimeFire());
     auto actualLength = eventFinishRead->getExpectedTimeFire() - eventStartRead->getExpectedTimeFire();
-    assert(abs(actualLength - incomingEdge->weight / ourModifiedProc->readSpeedDisk) < 0.00001);
+    if(abs(actualLength - incomingEdge->weight / ourModifiedProc->readSpeedDisk) > 0.00001){
+        cerr<<"WRONG LENGTH OF READ PLANNED ON "<<buildEdgeName(incomingEdge)<<" actual length "<<actualLength<<" should be "<<to_string(incomingEdge->weight / ourModifiedProc->readSpeedDisk)<<endl;
+    }
+  assert(abs(actualLength - incomingEdge->weight / ourModifiedProc->readSpeedDisk) < 0.00001);
     // cout<<"reads at "<<eventStartRead->getActualTimeFire()<<" and "<<eventFinishRead->getActualTimeFire()<<endl;
     return {eventStartRead, eventFinishRead};
 }
