@@ -359,7 +359,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
         endl;
 
     }
-    assert(vertex->time < 0.01 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
+    assert(vertex->time / ourModifiedProc->getProcessorSpeed() < 0.001 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
     assert(eventStartTask->getExpectedTimeFire()== eventStartTask->getActualTimeFire());
 
     newEvents.emplace_back(eventStartTask);
@@ -371,11 +371,11 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
     if(eventStartTask->getExpectedTimeFire() >= eventFinishTask->getExpectedTimeFire()){
         cout<<" BAD START/FINSH TIME TASK "<< eventStartTask->getExpectedTimeFire()<<" "<< eventFinishTask->getExpectedTimeFire()
             <<"FOR TASK "<<vertex->name<<
-            " vertex time  "<< vertex->time<<
+            " vertex time  "<< vertex->time<< " duarion "<<vertex->time / ourModifiedProc->getProcessorSpeed()<<
             endl;
 
     }
-    assert(vertex->time < 0.01 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
+    assert(vertex->time / ourModifiedProc->getProcessorSpeed() < 0.001 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
 
     eventFinishTask->addPredecessor(eventStartTask);
     if (!ourModifiedProc->getLastComputeEvent().expired() && !ourModifiedProc->getLastComputeEvent().lock()->isDone) {
