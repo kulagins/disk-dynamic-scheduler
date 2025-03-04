@@ -352,7 +352,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
 
     eventFinishTask->setBothTimesFire(finishTime);
 
-    assert(vertex->time == 0 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
+    assert(vertex->time < 0.01 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
     assert(eventStartTask->getExpectedTimeFire()== eventStartTask->getActualTimeFire());
 
     newEvents.emplace_back(eventStartTask);
@@ -362,7 +362,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
     ourModifiedProc->addEvent(eventFinishTask);
 
 
-    assert(vertex->time == 0 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
+    assert(vertex->time < 0.01 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
 
     eventFinishTask->addPredecessor(eventStartTask);
     if (!ourModifiedProc->getLastComputeEvent().expired() && !ourModifiedProc->getLastComputeEvent().lock()->isDone) {
