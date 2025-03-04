@@ -879,8 +879,8 @@ instdir: 'input/generated'
 variants:
   - axis: 'penalties'
     items:
-     # - name: 'normal'
-     #   extra_args: ['1000000', '100', '1', '0.001']
+      - name: 'normal'
+        extra_args: ['1000000', '100', '1', '0.001']
      # - name: 'lessmem'
      #   extra_args: [ '100000', '100', '1', '0.001' ]
      # - name: 'moremem'
@@ -894,55 +894,55 @@ variants:
      # - name: 'offloadslower'
      #   extra_args: [ '1000000', '100', '1', '0.00001' ]
 
-      - name: '0.00001'
-        extra_args: [ '1000000', '100', '1', '0.00001' ]
-      - name: '0.00005'
-        extra_args: [ '1000000', '100', '1', '0.00005' ]
-      - name: '0.0001'
-        extra_args: [ '1000000', '100', '1', '0.0001' ]
-      - name: '0.0005'
-        extra_args: [ '1000000', '100', '1', '0.0005' ]
-      - name: '0.001'
-        extra_args: ['1000000', '100', '1', '0.001']
-      - name: '0.005'
-        extra_args: [ '1000000', '100', '1', '0.005' ]
-      - name: '0.01'
-        extra_args: [ '1000000', '100', '1', '0.01' ]
-      - name: '0.05'
-        extra_args: [ '1000000', '100', '1', '0.05' ]
-      - name: '0.1'
-        extra_args: [ '1000000', '100', '1', '0.1' ]
-      - name: '0.5'
-        extra_args: [ '1000000', '100', '1', '0.5' ]
-      - name: '1'
-        extra_args: [ '1000000', '100', '1', '1' ]
+      #- name: '0.00001'
+      #  extra_args: [ '1000000', '100', '1', '0.00001' ]
+      ##- name: '0.00005'
+      #  extra_args: [ '1000000', '100', '1', '0.00005' ]
+      #- name: '0.0001'
+     #   extra_args: [ '1000000', '100', '1', '0.0001' ]
+     # - name: '0.0005'
+     #   extra_args: [ '1000000', '100', '1', '0.0005' ]
+     # - name: '0.001'
+      #  extra_args: ['1000000', '100', '1', '0.001']
+     # - name: '0.005'
+      #  extra_args: [ '1000000', '100', '1', '0.005' ]
+      #- name: '0.01'
+       # extra_args: [ '1000000', '100', '1', '0.01' ]
+      #- name: '0.05'
+      #  extra_args: [ '1000000', '100', '1', '0.05' ]
+     # - name: '0.1'
+     #   extra_args: [ '1000000', '100', '1', '0.1' ]
+     # - name: '0.5'
+     #   extra_args: [ '1000000', '100', '1', '0.5' ]
+     # - name: '1'
+     #   extra_args: [ '1000000', '100', '1', '1' ]
 
 
 
 #args: ['./build/fonda_scheduler', '@INSTANCE@', '1', '@EXTRA_ARGS@', 'no'] #'@INSTANCE@',
 experiments:
   - name: A1
-    args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '1', 'no', './'] #'@INSTANCE@',
+    args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '1', 'no', './', 'machines.csv']
     stdout: out
     num_threads: 24
-    slurm_args: [ '--partition', 'core8a', 'priority', '1']
-  - name: A2
-    args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '2', 'no' , './'] #'@INSTANCE@',
-    stdout: out
-    num_threads: 24
-    slurm_args: [ '--partition', 'core8a', 'priority', '1']
-  - name: A3
-    args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '3', 'no', './'] #'@INSTANCE@',
-    stdout: out
-    num_threads: 24
-    slurm_args: [ '--partition', 'core8a', 'priority', '1']
-  - name: BASE
-    args: [ './build/fonda_scheduler', '@EXTRA_ARGS@',  '1', 'yes', './' ] #'@INSTANCE@',
-    stdout: out
-    num_threads: 24
-    slurm_args: ['--partition', 'core8a', 'priority', '1']
+   # slurm_args: [ '--partition', 'core8a', 'priority', '1']
+  #- name: A2
+  #  args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '2', 'no' , './'] #'@INSTANCE@',
+  #  stdout: out
+  #  num_threads: 24
+  #  slurm_args: [ '--partition', 'core8a', 'priority', '1']
+  #- name: A3
+   # args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '3', 'no', './'] #'@INSTANCE@',
+   # stdout: out
+   # num_threads: 24
+   # slurm_args: [ '--partition', 'core8a', 'priority', '1']
+  #- name: BASE
+   # args: [ './build/fonda_scheduler', '@EXTRA_ARGS@',  '1', 'yes', './' ] #'@INSTANCE@',
+    #stdout: out
+   # num_threads: 24
+   # slurm_args: ['--partition', 'core8a', 'priority', '1']
 ##
 matrix:
   include:
-    - experiments: [ A1, A2, A3, BASE]
+    - experiments: [A1] #, A2, A3, BASE]
       axes: [penalties]
