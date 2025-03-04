@@ -467,7 +467,7 @@ struct CompareByTimestamp {
         }
 
 
-        if (isDeepSuccessor(a, b)) {
+     /*   if (isDeepSuccessor(a, b)) {
             return false;  // a is a deep successor of b, so b must come first
         }
 
@@ -478,7 +478,7 @@ struct CompareByTimestamp {
         if (isDeepSuccessor(a, b) && (a->type < b->type)) {
             cout << "Warning: Successor ordering conflicts with type sorting for "
                  << a->id << " and " << b->id << endl;
-        }
+        } */
 
         if (a->type != b->type) {
             return a->type < b->type;
