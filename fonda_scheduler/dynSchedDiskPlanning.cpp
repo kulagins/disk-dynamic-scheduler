@@ -352,6 +352,13 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
 
     eventFinishTask->setBothTimesFire(finishTime);
 
+    if(eventStartTask->getExpectedTimeFire() > eventFinishTask->getExpectedTimeFire()){
+        cout<<" BAD START/FINSH TIME TASK "<< eventStartTask->getExpectedTimeFire()<<" "<< eventFinishTask->getExpectedTimeFire()
+                                                                                        <<"FOR TASK "<<vertex->name<<
+                                                                                        " vertex time  "<< vertex->time<<
+        endl;
+
+    }
     assert(vertex->time < 0.01 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
     assert(eventStartTask->getExpectedTimeFire()== eventStartTask->getActualTimeFire());
 
@@ -361,7 +368,13 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
     ourModifiedProc->addEvent(eventStartTask);
     ourModifiedProc->addEvent(eventFinishTask);
 
+    if(eventStartTask->getExpectedTimeFire() > eventFinishTask->getExpectedTimeFire()){
+        cout<<" BAD START/FINSH TIME TASK "<< eventStartTask->getExpectedTimeFire()<<" "<< eventFinishTask->getExpectedTimeFire()
+            <<"FOR TASK "<<vertex->name<<
+            " vertex time  "<< vertex->time<<
+            endl;
 
+    }
     assert(vertex->time < 0.01 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
 
     eventFinishTask->addPredecessor(eventStartTask);

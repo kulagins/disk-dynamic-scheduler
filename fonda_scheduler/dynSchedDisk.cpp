@@ -382,7 +382,7 @@ void Cluster::printProcessorsEvents() {
 
 
 void Processor::addEvent(std::shared_ptr<Event> event) {
-    auto foundIterator = this->eventsOnProc.find(event.get()->id);
+    /*auto foundIterator = this->eventsOnProc.find(event.get()->id);
     if (foundIterator != eventsOnProc.end() && !foundIterator->second.expired()) {
         //  cout << "event already exists on Processor " << this->id << endl;
         if (event->getActualTimeFire() != foundIterator->second.lock()->getActualTimeFire()) {
@@ -391,7 +391,7 @@ void Processor::addEvent(std::shared_ptr<Event> event) {
         }
     } else {
         this->eventsOnProc[event->id] = event;
-    }
+    } */
 }
 
 bool dealWithPredecessors(shared_ptr<Event> us) {
