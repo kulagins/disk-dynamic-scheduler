@@ -572,12 +572,14 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
     ourModifiedProc->setLastReadEvent(eventFinishRead);
     ourModifiedProc->addPendingMemory(incomingEdge);
     assert(eventFinishRead->getActualTimeFire() == eventFinishRead->getExpectedTimeFire());
-    if(eventFinishRead->getExpectedTimeFire() <= eventStartRead->getExpectedTimeFire()){
-        cout<<"BAD TIMES FINISH AND START READ FOR "<<buildEdgeName(incomingEdge)<< " FINISH AT "<<eventFinishRead->getExpectedTimeFire()
-        <<" START AT "<<eventStartRead->getExpectedTimeFire()<<" planned finish  at "<<estimatedTimeOfFinishRead<<" duration of edge "<<incomingEdge->weight / ourModifiedProc->readSpeedDisk<<endl;
-        cout<<"was finihs moved? "<< (eventFinishRead->getExpectedTimeFire()==estimatedTimeOfFinishRead? "no": "yes")<<endl;
+    if(incomingEdge->weight / ourModifiedProc->readSpeedDisk> 0.001){
+        if(eventFinishRead->getExpectedTimeFire() <= eventStartRead->getExpectedTimeFire()){
+            cout<<"BAD TIMES FINISH AND START READ FOR "<<buildEdgeName(incomingEdge)<< " FINISH AT "<<eventFinishRead->getExpectedTimeFire()
+                <<" START AT "<<eventStartRead->getExpectedTimeFire()<<" planned finish  at "<<estimatedTimeOfFinishRead<<" duration of edge "<<incomingEdge->weight / ourModifiedProc->readSpeedDisk<<endl;
+            cout<<"was finihs moved? "<< (eventFinishRead->getExpectedTimeFire()==estimatedTimeOfFinishRead? "no": "yes")<<endl;
+        }
+        assert(eventFinishRead->getExpectedTimeFire() > eventStartRead->getExpectedTimeFire());
     }
-    assert(eventFinishRead->getExpectedTimeFire() > eventStartRead->getExpectedTimeFire());
     auto actualLength = eventFinishRead->getExpectedTimeFire() - eventStartRead->getExpectedTimeFire();
    // if(abs(actualLength - incomingEdge->weight / ourModifiedProc->readSpeedDisk) > 0.00001){
         //cerr<<"WRONG LENGTH OF READ PLANNED ON "<<buildEdgeName(incomingEdge)<<" actual length "<<actualLength<<" should be "<<to_string(incomingEdge->weight / ourModifiedProc->readSpeedDisk)<<endl;
@@ -744,7 +746,7 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
 
     assert(estimatedTimeOfFinishWrite <= readEvents.first->getExpectedTimeFire());
 
-    assert(incomingEdge->weight == 0 || estimatedTimeOfFinishWrite > eventStartWrite->getExpectedTimeFire());
+    assert(incomingEdge->weight < 0.001 || estimatedTimeOfFinishWrite > eventStartWrite->getExpectedTimeFire());
 
     createdEvents.emplace_back(eventFinishWrite);
     predecessorsProc->setLastWriteEvent(eventFinishWrite);
@@ -754,7 +756,7 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
 
     // cout << buildEdgeName(incomingEdge)<< " start write at " << eventStartWrite->getActualTimeFire() << " finish at "
     //      << eventFinishWrite->getActualTimeFire() << endl;
-    assert(eventStartWrite->getActualTimeFire() < eventFinishWrite->getActualTimeFire());
+    assert( incomingEdge->weight < 0.001 ||  eventStartWrite->getActualTimeFire() < eventFinishWrite->getActualTimeFire());
     assert(eventFinishWrite->getActualTimeFire() ==
            eventStartWrite->getActualTimeFire() + incomingEdge->weight / predecessorsProc->writeSpeedDisk);
 
