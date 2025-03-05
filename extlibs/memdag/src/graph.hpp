@@ -84,6 +84,7 @@ struct vertex_t {
   Status status = Status::Unscheduled;
 
   double actuallyUsedMemory=-1;
+  double factorActually=1;
 
 } ;
 
