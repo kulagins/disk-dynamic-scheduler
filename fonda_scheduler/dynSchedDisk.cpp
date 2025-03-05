@@ -434,10 +434,10 @@ void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc) {
 
 
 double deviation(double &in) {
-    in = in * 2;
-    return 2;
+   // in = in * 2;
+   // return 2;
     // return 1;
-    /* static std::random_device rd;
+     static std::random_device rd;
      static std::mt19937 gen(rd());  // Mersenne Twister PRNG
 
      double stddev = in * 0.1;  // 10% of the input value
@@ -446,7 +446,7 @@ double deviation(double &in) {
      double result = dist(gen);
      double factor = result/in;
      in= result;
-     return factor;*/
+     return factor;
 
 }
 
