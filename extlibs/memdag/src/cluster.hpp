@@ -307,6 +307,12 @@ public:
     double getReadyTimeWrite() ;
     double getReadyTimeRead() ;
     double getReadyTimeCompute();
+
+    double getExpectedOrActualReadyTimeWrite() ;
+    double getExpectedOrActualReadyTimeRead() ;
+    double getExpectedOrActualReadyTimeCompute();
+
+
     void setReadyTimeWrite(double rtw){
         this->readyTimeWrite= rtw;
     }

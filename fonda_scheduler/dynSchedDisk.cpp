@@ -6,6 +6,7 @@
 
 Cluster *cluster;
 EventManager events;
+ReadyQueue readyQueue;
 
 string lastEventName;
 
@@ -16,6 +17,18 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
     enforce_single_source_and_target_with_minimal_weights(graph);
     compute_bottom_and_top_levels(graph);
     vertex_t *vertex = graph->first_vertex;
+    static thread_local std::mt19937 gen(std::random_device{}());
+    static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
+
+    while(vertex!= nullptr){
+        double rank = calculateSimpleBottomUpRank(vertex);
+        rank = rank +  dist(gen);
+        vertex->rank= rank;
+        vertex = vertex->next;
+    }
+
+
+    vertex = graph->first_vertex;
     while (vertex != nullptr) {
         if (vertex->in_degree == 0) {
             //  cout << "starting task " << vertex->name << endl;
@@ -34,7 +47,6 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
     }
     int cntr = 0;
     while (!events.empty()) {
-        //  cout << "NEXT "; //events.printAll();
         cntr++;
         shared_ptr<Event> firstEvent = events.getEarliest();
         bool removed = events.remove(firstEvent->id);
@@ -53,7 +65,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
             removed = events.remove(firstEvent->id);
             assert(removed == true);
         }
-        cout << "event " << firstEvent->id << " at " << firstEvent->getActualTimeFire();
+        cout << "\nevent " << firstEvent->id << " at " << firstEvent->getActualTimeFire();
         cout << " num fired " << firstEvent->timesFired << endl;
         if (firstEvent->timesFired > 0 && !firstEvent->predecessors.empty()) {
             bool hasCycle = firstEvent->checkCycleFromEvent();
@@ -130,6 +142,9 @@ void Event::fireTaskStart() {
 void Event::fireTaskFinish() {
     vertex_t *thisTask = this->task;
     cout << "firing task Finish for " << this->id;
+    if(this->id=="bismark_report_00000008-f"){
+        cout<<endl;
+    }
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
@@ -147,47 +162,61 @@ void Event::fireTaskFinish() {
 
 
         string thisId = this->id;
-        //   cout << "EVENTS on our processor" << endl;
-        //    for (const auto &item: this->processor->getEvents()) {
-        //      cout << item.first << "\t";
-        //  }
-        // cout << endl;
 
         for (int i = 0; i < thisTask->out_degree; i++) {
             locateToThisProcessorFromNowhere(thisTask->out_edges[i], this->processor->id);
         }
 
-        //Then task goes over its successor tasks in the workflow and schedules ready ones.
         for (int i = 0; i < thisTask->out_degree; i++) {
             vertex_t *childTask = thisTask->out_edges[i]->head;
-            // cout << "deal with child " << childTask->name << endl;
+            //cout << "deal with child " << childTask->name << endl;
+            if(childTask->name=="preseq_00000007"){
+                cout<<endl;
+            }
             bool isReady = true;
             for (int j = 0; j < childTask->in_degree; j++) {
                 if (childTask->in_edges[j]->tail->status == Status::Unscheduled) {
                     isReady = false;
                 }
             }
-            if (childTask->status == Status::Scheduled) {
-                //      cout << "child already scheduled " << childTask->name << endl;
-            }
+           
 
             std::vector<shared_ptr<Event> > pred, succ;
-            //TODO Can be two times in queue?
+           
             if (isReady && childTask->status != Status::Scheduled) {
-                vector<shared_ptr<Processor>> bestModifiedProcs;
-                shared_ptr<Processor> bestProcessorToAssign;
-                vector<shared_ptr<Event>> newEvents =
-                        bestTentativeAssignment(childTask, bestModifiedProcs, bestProcessorToAssign,
-                                                this->actualTimeFire);
-
-                for (const auto &item: newEvents) {
-                    events.insert(item);
-                    item->processor->addEvent(item);
-                }
-                childTask->status = Status::Scheduled;
+               // cout<<"inserting into ready "<<childTask->name<<endl;
+                readyQueue.readyTasks.insert(childTask);
+              
             }
         }
+
         this->isDone = true;
+
+        bool foundSomeTaskForOurProcessor = false;
+
+        while(!foundSomeTaskForOurProcessor && !readyQueue.readyTasks.empty()){
+            vertex_t *mostReadyVertex = *readyQueue.readyTasks.begin();
+
+
+            vector<shared_ptr<Processor>> bestModifiedProcs;
+            shared_ptr<Processor> bestProcessorToAssign;
+            vector<shared_ptr<Event>> newEvents =
+                    bestTentativeAssignment(mostReadyVertex, bestModifiedProcs, bestProcessorToAssign,
+                                            this->actualTimeFire);
+
+            for (const auto &item: newEvents) {
+                events.insert(item);
+                item->processor->addEvent(item);
+            }
+            mostReadyVertex->status = Status::Scheduled;
+            readyQueue.readyTasks.erase(mostReadyVertex);
+
+            if(bestProcessorToAssign->id == this->processor->id){
+                foundSomeTaskForOurProcessor= true;
+            }
+        }
+        
+
 
     }
 }
@@ -434,19 +463,19 @@ void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc) {
 
 
 double deviation(double &in) {
-   // in = in * 2;
-   // return 2;
+    // in = in * 2;
+    // return 2;
     // return 1;
-     static std::random_device rd;
-     static std::mt19937 gen(rd());  // Mersenne Twister PRNG
+    static std::random_device rd;
+    static std::mt19937 gen(rd());  // Mersenne Twister PRNG
 
-     double stddev = in * 0.1;  // 10% of the input value
-     std::normal_distribution<double> dist(in, stddev);
+    double stddev = in * 0.1;  // 10% of the input value
+    std::normal_distribution<double> dist(in, stddev);
 
-     double result = dist(gen);
-     double factor = result/in;
-     in= result;
-     return factor;
+    double result = dist(gen);
+    double factor = result / in;
+    in = result;
+    return factor;
 
 }
 
@@ -486,4 +515,42 @@ double Processor::getReadyTimeRead() {
         this->readyTimeRead = lastReadEvent.lock()->getActualTimeFire();
     }
     return this->readyTimeRead;
+}
+
+
+double Processor::getExpectedOrActualReadyTimeCompute() {
+    if (!this->lastComputeEvent.expired() ) {
+        if(this->lastComputeEvent.lock()->isDone){
+            return this->lastComputeEvent.lock()->getActualTimeFire();
+        }
+        else{
+            return lastComputeEvent.lock()->getExpectedTimeFire();
+        }
+    }
+    else return this->readyTimeCompute;
+
+}
+
+double Processor::getExpectedOrActualReadyTimeWrite() {
+    if (!this->lastWriteEvent.expired() ) {
+        if(this->lastWriteEvent.lock()->isDone){
+            return this->lastWriteEvent.lock()->getActualTimeFire();
+        }
+        else{
+            return lastWriteEvent.lock()->getExpectedTimeFire();
+        }
+    }
+    else return  this->readyTimeWrite;
+}
+
+double Processor::getExpectedOrActualReadyTimeRead() {
+    if (!this->lastReadEvent.expired() ) {
+        if(this->lastReadEvent.lock()->isDone){
+            return this->lastReadEvent.lock()->getActualTimeFire();
+        }
+        else{
+            return lastReadEvent.lock()->getExpectedTimeFire();
+        }
+    }
+    else return this->readyTimeRead;
 }

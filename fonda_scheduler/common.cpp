@@ -60,7 +60,7 @@ void Cluster::printAssignment(){
             if(assignedVertex==NULL)
                 cout<<"No assignment."<<endl;
             else{
-                cout<<"Assigned subtree, id "<<assignedVertex->id<< ", leader "<<assignedVertex->leader<<", memReq "<< assignedVertex->memoryRequirement<<endl;
+                cout<<"Assigned subtree, id "<<assignedVertex->id<< ", leader "<<-1<<", memReq "<< assignedVertex->memoryRequirement<<endl;
                 for (vertex_t *u = assignedVertex->subgraph->source; u; u = next_vertex_in_topological_order(assignedVertex->subgraph, u)) {
                     cout<<u->name<<", ";
                 }

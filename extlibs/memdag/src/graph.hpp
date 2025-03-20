@@ -76,7 +76,6 @@ struct vertex_t {
   /* user data */
   void *data;
   graph_t * subgraph;
-  int leader=-1;
  int assignedProcessorId=-1;
   double makespan=-1;
 
@@ -85,6 +84,9 @@ struct vertex_t {
 
   double actuallyUsedMemory=-1;
   double factorActually=1;
+
+  double rank=-1;
+
 
 } ;
 

@@ -259,10 +259,11 @@ void print_graph_to_dot_file(graph_t *graph, FILE *output) {
 }
 
 void print_graph_to_cout(graph_t *graph) {
+    printf("No leaders anymore \n");
     printf("DiGraph G {\n");
     //  for(vertex_t *v=first_vertex(graph); is_last_vertex(v); v=next_vertex(v)) {
     for(vertex_t *v=graph->first_vertex; v; v=v->next) {
-        printf(" %d [label=%s (%d), leader=%d time= %f memory= %f];\n", v->id, v->name.c_str(), v->id, v->leader, v->time, v->memoryRequirement);
+        printf(" %d [label=%s (%d), leader=%d time= %f memory= %f];\n", v->id, v->name.c_str(), v->id, -1, v->time, v->memoryRequirement);
     }
     for(edge_t *e=graph->first_edge; e; e=e->next) {
         printf(" %d -> %d [weight=\"%f\" path=\"%s -> %s\"%s];\n", e->tail->id, e->head->id, e->weight, e->tail->name.c_str(), e->head->name.c_str(), (e->status==IN_CUT)?" color=\"red\"":(e->status==ADDED)?" color=\"blue\"":"");
@@ -274,10 +275,10 @@ void print_graph_to_cout_full(graph_t *graph) {
     printf("DiGraph G, full {\n");
     //  for(vertex_t *v=first_vertex(graph); is_last_vertex(v); v=next_vertex(v)) {
     for(vertex_t *v=graph->first_vertex; v; v=v->next) {
-        printf(" %d, leader %d [label=%s (%d) time= %f memory= %f];\n", v->id, v->leader, v->name.c_str(), v->id, v->time, v->memoryRequirement);
+        printf(" %d, leader %d [label=%s (%d) time= %f memory= %f];\n", v->id, -1, v->name.c_str(), v->id, v->time, v->memoryRequirement);
         if(v->subgraph!=NULL){
             for(vertex_t *v1=v->subgraph->first_vertex; v1; v1=v1->next) {
-                printf("\t %d [label=%s (%d) leader= %d time= %f memory= %f];\n", v1->id, v1->name.c_str(), v1->id, v->leader, v1->time, v1->memoryRequirement);
+                printf("\t %d [label=%s (%d) leader= %d time= %f memory= %f];\n", v1->id, v1->name.c_str(), v1->id, -1, v1->time, v1->memoryRequirement);
             }
         }
 
@@ -300,7 +301,7 @@ graph_t *copy_graph(graph_t *graph, int reverse_edges) {
   for(vertex_t *v=graph->first_vertex; v; v=v->next) {
     new_vertex_with_id(new_g, v->id, v->name, v->time, v->data);
     new_g->vertices_by_id[v->id]->memoryRequirement = v->memoryRequirement;
-    new_g->vertices_by_id[v->id]->leader = v->leader;
+    //new_g->vertices_by_id[v->id]->leader = v->leader;
     new_g->vertices_by_id[v->id]->makespan = v->makespan;
     if(v->subgraph!=NULL)
         new_g->vertices_by_id[v->id]->subgraph = copy_graph(v->subgraph,0);

@@ -117,10 +117,10 @@ private:
     void initialize(const std::vector<std::shared_ptr<Event>> &predecessors,
                     const std::vector<std::shared_ptr<Event>> &successors) {
         for (const auto &pred: predecessors) {
-            this->addPredecessor(pred);
+            this->addPredecessorInPlanning(pred);
         }
         for (const auto &succ: successors) {
-            this->addSuccessor(succ);
+            this->addSuccessorInPlanning(succ);
         }
     }
 
@@ -153,88 +153,60 @@ public:
 
     void removeOurselfFromSuccessors(Event *us);
 
-    void addPredecessor(shared_ptr<Event> pred) {
+    void addPredecessorInPlanning(shared_ptr<Event> pred) {
         if (pred->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS PREDECESSOR!");
         }
         //cout<<" ADDING pred "<<pred->id<<" -> "<<this->id<<endl;
         this->predecessors.insert(pred);
-        if (pred->actualTimeFire > this->actualTimeFire) {
-            double diff = pred->actualTimeFire - this->actualTimeFire;
-            this->setActualTimeFire(pred->actualTimeFire);
-            this->setExpectedTimeFire(pred->actualTimeFire);
+        double predsVisibleTime = pred->getVisibleTimeFireForPlanning();
+        if (predsVisibleTime > this->actualTimeFire) {
+            double diff = predsVisibleTime - this->actualTimeFire;
+            this->setActualTimeFire(predsVisibleTime);
+            this->setExpectedTimeFire(predsVisibleTime);
 
-            propagateChain(shared_from_this(), diff);
+            propagateChainInPlanning(shared_from_this(), diff);
         }
 
-        pred->addSuccessor(shared_from_this());
+        pred->addSuccessorInPlanning(shared_from_this());
     }
 
-    void propagateChain(shared_ptr<Event> event, double add) {
+    void propagateChainInPlanning(shared_ptr<Event> event, double add) {
         for (auto &successor: event->successors) {
-            double newTime = successor->getActualTimeFire() + add;
+            if(successor->getExpectedTimeFire()!= successor->getActualTimeFire()){
+                cout<<"!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!!"<<endl;
+            }
+           
+            
+            double newTime = successor->getVisibleTimeFireForPlanning() + add;
             successor->setActualTimeFire(newTime);
             successor->setExpectedTimeFire(newTime);
 
-            propagateChain(successor, add);
+            propagateChainInPlanning(successor, add);
         }
     }
 
-    /*void propagateChainActualTimeIfSmaller(shared_ptr<Event> event) {
-        for (auto &successor: event->successors) {
-            cout<<"propagate to successor "<<successor->id<<endl;
-            if(successor->getActualTimeFire()<event->getActualTimeFire()){
-                successor->setActualTimeFire(max(event->getActualTimeFire(), successor->getActualTimeFire()));
-            }
-            propagateChainActualTimeIfSmaller(successor);
-        }
-    } */
-
-    void propagateChainActualTimeIfSmaller(shared_ptr<Event> event, unordered_set<string> &visited) {
-        if (visited.find(event->id) != visited.end()) {
-            return; // Already processed, avoid redundant updates
-        }
-
-        visited.insert(event->id); // Mark as visited
-
-        for (auto &successor: event->successors) {
-            // cout << "propagate to successor " << successor->id << endl;
-            if (successor->getActualTimeFire() < event->getActualTimeFire()) {
-                successor->setActualTimeFire(max(event->getActualTimeFire() +
-                                                 std::numeric_limits<double>::epsilon() * event->getActualTimeFire(),
-                                                 successor->getActualTimeFire()));
-                propagateChainActualTimeIfSmaller(successor, visited);
-            }
-            //TODO move r-f etc in constant gap from r-s etc
-        }
-    }
-
-    // Wrapper function to avoid requiring a set in the initial call
-    void propagateChainActualTimeIfSmaller(shared_ptr<Event> event) {
-        // unordered_set<string> visited;
-        //propagateChainActualTimeIfSmaller(event, visited);
-    }
-
-    void addSuccessor(shared_ptr<Event> succ) {
+    void addSuccessorInPlanning(shared_ptr<Event> succ) {
         assert(succ != nullptr);
         if (succ->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS SUCCESSOR!");
         }
         // cout<<"add successor "<<succ->id<<" to event "<<this->id<<endl;
         this->successors.insert(succ);
-        if (succ->actualTimeFire < this->actualTimeFire) {
-            double diff = abs(succ->actualTimeFire - this->actualTimeFire);
-            succ->setActualTimeFire(this->actualTimeFire);
-            succ->setExpectedTimeFire(this->actualTimeFire);
+        double succsVisibleTime = succ->getVisibleTimeFireForPlanning();
+        if (succsVisibleTime < this->expectedTimeFire) {
+            double diff = abs(succsVisibleTime - this->expectedTimeFire);
+            succ->setActualTimeFire(this->expectedTimeFire);
+            succ->setExpectedTimeFire(this->expectedTimeFire);
 
-            propagateChain(succ, diff);
+            propagateChainInPlanning(succ, diff);
         }
         string thisId = this->id;
         auto it = find_if(succ->predecessors.begin(), succ->predecessors.end(),
                           [&thisId](const shared_ptr<Event> obj) { return obj->id == thisId; });
 
         if (it == succ->predecessors.end()) {
-            succ->addPredecessor(shared_from_this());
+            succ->addPredecessorInPlanning(shared_from_this());
         }
     }
 
@@ -260,6 +232,10 @@ public:
 
     double getActualTimeFire() {
         return this->actualTimeFire;
+    }
+    
+    double getVisibleTimeFireForPlanning(){
+        return this->isDone? this->getActualTimeFire() : this->getExpectedTimeFire();
     }
 
     void setBothTimesFire(double d) {
@@ -789,133 +765,18 @@ public:
 };
 
 
-class EventManager2 {
-private:
-    std::vector<std::shared_ptr<Event>> eventVector;
-    std::unordered_map<string, std::vector<std::shared_ptr<Event>>::iterator> eventMap; // Fast lookup by ID
+
+struct CompareByRank {
+    bool operator()(vertex_t * a,vertex_t * b) const {
+        assert(a->rank!=-1);
+        assert(b->rank!=-1);
+        return a->rank > b->rank;
+    }
+};
+
+class ReadyQueue{
 public:
-    // Insert a new event
-    void insert(const shared_ptr<Event> &event) {
-        auto foundIterator = eventMap.find(event->id);
-        if (foundIterator != eventMap.end()) {
-            remove(event->id);
-        }
-        //printAll();
-        auto it = std::lower_bound(eventVector.begin(), eventVector.end(), event, CompareByTimestamp());
-        eventVector.insert(it, event);
-        //printAll();
-        eventMap[event->id] = it;
-    }
-
-    shared_ptr<Event> find(string id) {
-        if (eventMap.find(id) != eventMap.end()) {
-            auto it = eventMap[id];
-            return *it;
-        }
-        return nullptr;
-    }
-
-
-    // Update an event's timestamp
-    bool update(const string &id, double newTimestamp) {
-        auto it = eventMap.find(id);
-        if (it != eventMap.end() && (*it->second)->getActualTimeFire() != newTimestamp) {
-            shared_ptr<Event> updatedEvent = *(it->second);
-            eventVector.erase(it->second);
-
-            // Update the timestamp and reinsert
-            updatedEvent->setActualTimeFire(newTimestamp);
-            auto it = std::lower_bound(eventVector.begin(), eventVector.end(), updatedEvent, CompareByTimestamp());
-            eventVector.insert(it, updatedEvent);
-
-            // Update map entry
-            eventMap[id] = it;
-            // checkAllEvents();
-            return true;
-        }
-        //checkAllEvents();
-        return false; // Event not found
-    }
-
-    // Remove an event by ID
-    bool remove(string id) {
-        //  cout<<"removing "<<id<<endl;
-        auto it = eventMap.find(id);
-        if (it != eventMap.end()) {
-            // Remove from multiset and map
-            auto it1 = std::find_if(eventVector.begin(), eventVector.end(),
-                                    [&id](const std::shared_ptr<Event> &e) { return e->id == id; });
-
-            if (it1 != eventVector.end()) {
-                eventVector.erase(it1);
-            } else {
-                std::cerr << "Warning: Event with ID '" << id << "' not found." << std::endl;
-
-            }
-
-
-            eventMap.erase(it);
-            return true;
-        }
-        return false; // Event not found
-    }
-
-    // Get the earliest event (smallest timestamp)
-    shared_ptr<Event> getEarliest() const {
-        if (!eventVector.empty()) {
-            return *eventVector.begin();
-        }
-        return nullptr; // Empty set
-    }
-
-    // Print all events (for debugging)
-    void printAll() const {
-        cout << endl;
-        for (const auto &event: eventVector) {
-            std::cout << "\tID: " << event->id << " at " << event->getActualTimeFire() << endl;// ",\t";
-        }
-        cout << endl << "-------";
-        cout << endl;
-    }
-
-
-    bool empty() {
-        return eventVector.empty();
-    }
-
-    void reinsertAll() {
-        std::vector<std::shared_ptr<Event>> tempEvents(eventVector.begin(), eventVector.end());
-        eventVector.clear();
-        eventMap.clear();
-
-        for (const auto &event: tempEvents) {
-            auto it = std::lower_bound(eventVector.begin(), eventVector.end(), event, CompareByTimestamp());
-            eventVector.insert(it, event);
-            eventMap[event->id] = it;
-        }
-    }
-
-    static void
-    printHelper(std::set<shared_ptr<Event>>::const_iterator begin, _Rb_tree_const_iterator<shared_ptr<Event>> end,
-                int depth) {
-        if (begin == end) return;
-
-        auto middle = begin;
-        std::advance(middle, std::distance(begin, end) / 2);
-
-        // Print the current middle node
-        for (int i = 0; i < depth; ++i) std::cout << "  "; // Indentation
-        std::cout << (*middle)->id << std::endl;
-
-        // Print left subtree
-        printHelper(begin, middle, depth + 1);
-        // Print right subtree
-        printHelper(std::next(middle), end, depth + 1);
-    }
-
-    void resort() {
-        std::sort(eventVector.begin(), eventVector.end(), CompareByTimestamp());
-    }
+    std::set<vertex_t*, CompareByRank> readyTasks;
 };
 
 

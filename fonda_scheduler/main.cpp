@@ -23,6 +23,7 @@ int currentAlgoNum = 0;
  *
  */
 
+//100000000 100 1 1 methylseq_2000 110641579976 1 yes ../ machines.csv
 //1000000 100 1 1 bacass 3637252230 1 yes ../
 //100000000 100 1 1 chipseq 3793245764 1 yes ../ machines.csv
 //1 1 1 1 debug 10 1 yes ../ machines_debug.csv
