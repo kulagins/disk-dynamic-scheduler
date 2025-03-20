@@ -1,0 +1,17 @@
+digraph DebugDAG {
+    A -> B;
+    A -> C;
+    A -> D;
+    A -> E;  // 4-fork from A
+    B -> F;
+    C -> F;
+    D -> G;
+    E -> G;
+    F -> H;
+    G -> H;
+    G -> I;
+    H -> J;
+    I -> K;
+    J -> K;
+}
+

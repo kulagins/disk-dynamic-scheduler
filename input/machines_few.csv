@@ -1,0 +1,4 @@
+machine,amount,cpu,memory,storage,cpu_events,linpack,ram_score,read_iops,write_iops
+local,1,4,16,hdd,458,3959800,18700,414,415
+n1,1,12,16,hdd,369,3620426,13400,481,483
+c2,1,32,192,hdd,523,4602096,18900,481,483

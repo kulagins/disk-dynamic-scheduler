@@ -1,0 +1,27 @@
+digraph DebugDAG {
+    A [label="A"];
+    B [label="B"];
+    C [label="C"];
+    D [label="D"];
+    E [label="E"];
+    F [label="F"];
+    G [label="G"];
+    H [label="H"];
+    I [label="I"];
+    J [label="J"];
+    K [label="K"];
+    A -> B;
+    A -> C;
+    A -> D;
+    A -> E;  
+    B -> F;
+    C -> F;
+    D -> G;
+    E -> G;
+    F -> H;
+    G -> H;
+    G -> I;
+    H -> J;
+    I -> K;
+    J -> K;
+}
