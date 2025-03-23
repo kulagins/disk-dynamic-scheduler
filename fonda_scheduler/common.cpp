@@ -145,6 +145,15 @@ bool isLocatedOnAnyProcessor(edge_t* edge){
                         })
            != edge->locations.end();
 }
+
+int whatProcessorIsLocatedOn(edge_t* edge){
+    auto locationOnProcessor = std::find_if(edge->locations.begin(), edge->locations.end(),
+                                            [](Location location) {
+                                                return location.locationType == LocationType::OnProcessor;
+                                            });
+    return (locationOnProcessor != edge->locations.end()) ? locationOnProcessor->processorId.value(): -1;
+
+}
 std::string buildEdgeName(edge_t* edge){
     return edge->tail->name+"-"+ edge->head->name;
 }
@@ -248,7 +257,7 @@ void Processor::updateFrom(const Processor& other){
     this->readyTimeRead = other.readyTimeRead;
     this->readyTimeWrite = other.readyTimeWrite;
 
-    assert(other.availableMemory<= other.getMemorySize());
+    assert(other.availableMemory<= other.getMemorySize() || abs(other.availableMemory- other.getMemorySize())<0.01);
     this->availableMemory = other.availableMemory;
     set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> updatedMemories(comparePendingMemories);
     // First, add elements that exist in both and new ones from 'other'

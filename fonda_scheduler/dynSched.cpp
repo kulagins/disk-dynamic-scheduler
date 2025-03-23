@@ -3,6 +3,8 @@
 #include <iterator>
 
 
+void evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &bestSchedulingResult);
+
 double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v, const shared_ptr<Processor> &pj) {
     assert(pj->getAvailableMemory() >= 0);
     double Res = pj->getAvailableMemory() - peakMemoryRequirementOfVertex(v);
@@ -29,7 +31,7 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
     int numberWithEvictedCases = 0;
     for (auto &pair: ranks) {
         auto vertex = pair.first;
-        // cout<<"processing "<< vertex->name<<endl;
+         cout<<"processing "<< vertex->name<<endl;
         SchedulingResult bestSchedulingResult = SchedulingResult(nullptr);
         bestTentativeAssignment(cluster, isHeft, vertex, bestSchedulingResult);
 
@@ -43,37 +45,28 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
         }
 
 
-        switch (bestSchedulingResult.resultingVar) {
-            case 1:
-                break;
-            case 2:
-                //cout<<"best with 1 kick"<<endl;
-                assert(bestSchedulingResult.edgeToKick != nullptr);
-                bestSchedulingResult.processorOfAssignment->delocateToDisk(bestSchedulingResult.edgeToKick);
-                numberWithEvictedCases++;
-                checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
-                break;
-            case 3:
-                //cout<<"best with all kick"<<endl;
-                for (auto it = bestSchedulingResult.processorOfAssignment->getPendingMemories().begin();
-                     it != bestSchedulingResult.processorOfAssignment->getPendingMemories().end();) {
-                    it = bestSchedulingResult.processorOfAssignment->delocateToDisk(*it);
-                    //cout<<"end deloc"<<endl;
-                }
-                assert(bestSchedulingResult.processorOfAssignment->getPendingMemories().empty());
-                numberWithEvictedCases++;
-                checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
-                break;
-            default:
-                throw runtime_error("");
-        }
+        evictAccordingToBestDecision(numberWithEvictedCases, bestSchedulingResult);
         // checkIfPendingMemoryCorrect(bestProcessorToAssign);
 
-        //  cout<<"delocating from other procs according to tentative "<<endl;
-        // bestProcessorToAssign->assignment+="started at "+ to_string(bestStartTime)+"; ";
+        if(vertex->name=="bismark_align_00001479" || vertex->name=="trim_galore_00001440"|| vertex->name=="bismark_align_00001947"){
+            cout<<endl;
+        }
+
         for (auto &modifiedProc: bestSchedulingResult.modifiedProcs) {
             // cout<<" from "<<modifiedProc->id<<endl;
             auto procInClusterWithId = cluster->getProcessorById(modifiedProc->id);
+
+            //if ((procInClusterWithId->id != bestSchedulingResult.processorOfAssignment->id || isHeft) &&
+           //     procInClusterWithId->getPendingMemories().size() != modifiedProc->getPendingMemories().size()) {
+           procInClusterWithId->updateFrom(*modifiedProc);
+            //}
+        }
+        //  cout<<"delocating from other procs according to tentative "<<endl;
+        // bestProcessorToAssign->assignment+="started at "+ to_string(bestStartTime)+"; ";
+      /*  for (auto &modifiedProc: bestSchedulingResult.modifiedProcs) {
+            // cout<<" from "<<modifiedProc->id<<endl;
+            auto procInClusterWithId = cluster->getProcessorById(modifiedProc->id);
+
             if ((procInClusterWithId->id != bestSchedulingResult.processorOfAssignment->id || isHeft) &&
                 procInClusterWithId->getPendingMemories().size() != modifiedProc->getPendingMemories().size()) {
 
@@ -105,14 +98,30 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
             cluster->replaceProcessor(modifiedProc);
 
 
-        }
+        } */
         assert(bestSchedulingResult.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
         vertex->assignedProcessorId = bestSchedulingResult.processorOfAssignment->id;
 
         //checkIfPendingMemoryCorrect(bestProcessorToAssign);
+        for (int j = 0; j < vertex->in_degree; j++) {
+            edge *ine = vertex->in_edges[j];
+           // int processorId = whatProcessorIsLocatedOn(ine);
+            //if(processorId!=-1){
+             //  cluster->getProcessorById( processorId)->delocateToDisk(ine);
+           // }
+
+            assert(whatProcessorIsLocatedOn(ine) ==-1 ||whatProcessorIsLocatedOn(ine) == bestSchedulingResult.processorOfAssignment->id ||
+                    cluster->getProcessorById( whatProcessorIsLocatedOn(ine))->getPendingMemories().find(ine)
+            == cluster->getProcessorById( whatProcessorIsLocatedOn(ine))->getPendingMemories().end());
+
+            if(whatProcessorIsLocatedOn(ine) == bestSchedulingResult.processorOfAssignment->id){
+                bestSchedulingResult.processorOfAssignment->delocateToDisk(ine);
+            }
+            ine->locations.clear();
+        }
 
         //  cout<<"kicking in edges"<<endl;
-        for (int j = 0; j < vertex->in_degree; j++) {
+       /* for (int j = 0; j < vertex->in_degree; j++) {
             edge *ine = vertex->in_edges[j];
             //    cout<<"ine ";print_edge(ine);
             for (auto location: ine->locations) {
@@ -142,16 +151,8 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
                 }
             }
             ine->locations.clear();//.emplace_back(LocationType::OnProcessor, bestProcessorToAssign->id);
-        }
+        } */
         checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
-
-        //  cout<<"actually remain pending: "<<bestProcessorToAssign->pendingMemories.size()<<" pieces, avail mem "<<bestProcessorToAssign->availableMemory<<" ";
-        for (auto it = bestSchedulingResult.processorOfAssignment->getPendingMemories().begin();
-             it != bestSchedulingResult.processorOfAssignment->getPendingMemories().end();) {
-            //    print_edge(*it);
-            it++;
-        }
-
 
         //cout<<"emplacing out edges , starting with "<<bestProcessorToAssign->availableMemory<<endl;
         for (int i = 0; i < vertex->out_degree; i++) {
@@ -162,6 +163,7 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
             checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
 
         }
+        cluster->getProcessorById(bestSchedulingResult.processorOfAssignment->id)->updateFrom(*bestSchedulingResult.processorOfAssignment);
         for (const auto &item: cluster->getProcessors()) {
             checkIfPendingMemoryCorrect(item.second);
         }
@@ -175,6 +177,33 @@ double new_heuristic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft)
     }
     cout << " #eviction " << numberWithEvictedCases << " ";
     return makespan;
+}
+
+void evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &bestSchedulingResult) {
+    switch (bestSchedulingResult.resultingVar) {
+        case 1:
+            break;
+        case 2:
+            //cout<<"best with 1 kick"<<endl;
+            assert(bestSchedulingResult.edgeToKick != nullptr);
+            bestSchedulingResult.processorOfAssignment->delocateToDisk(bestSchedulingResult.edgeToKick);
+            numberWithEvictedCases++;
+            checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
+            break;
+        case 3:
+            //cout<<"best with all kick"<<endl;
+            for (auto it = bestSchedulingResult.processorOfAssignment->getPendingMemories().begin();
+                 it != bestSchedulingResult.processorOfAssignment->getPendingMemories().end();) {
+                it = bestSchedulingResult.processorOfAssignment->delocateToDisk(*it);
+                //cout<<"end deloc"<<endl;
+            }
+            assert(bestSchedulingResult.processorOfAssignment->getPendingMemories().empty());
+            numberWithEvictedCases++;
+            checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
+            break;
+        default:
+            throw runtime_error("");
+    }    
 }
 
 void bestTentativeAssignment(Cluster *cluster, bool isHeft, vertex_t *vertex, SchedulingResult &result) {

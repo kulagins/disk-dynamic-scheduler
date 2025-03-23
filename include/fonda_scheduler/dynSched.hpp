@@ -21,6 +21,7 @@ public:
     int resultingVar;
     edge_t *edgeToKick;
     double peakMem;
+    vector<edge_t*> edgesToDelocateFromOtherProcessors;
 
     explicit SchedulingResult(const shared_ptr<Processor> &proc)
             : processorOfAssignment(proc ? make_shared<Processor>(*proc) : nullptr),
