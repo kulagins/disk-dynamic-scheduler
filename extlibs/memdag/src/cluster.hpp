@@ -174,9 +174,10 @@ public:
 
     void assignSubgraph(vertex_t *taskToBeAssigned);
 
-    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge);
+    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge, bool real=false);
     void loadFromDisk(edge_t* edge);
     void loadFromNowhere(edge_t* edge);
+    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator delocateToDiskOptionally(edge_t* edge, bool real=false);
 
     std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator
     //bool

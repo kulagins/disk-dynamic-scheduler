@@ -165,7 +165,14 @@ void delocateFromThisProcessorToDisk(edge_t* edge, int id){
                                                            location.processorId == id;
                                                 });
    //cout<<"delocating "; print_edge(edge);
-    assert(locationOnThisProcessor  != edge->locations.end());
+    //assert(locationOnThisProcessor  != edge->locations.end());
+    if(locationOnThisProcessor  == edge->locations.end()){
+        edge->locations.erase(locationOnThisProcessor);
+        if(!isLocatedOnDisk(edge))
+            edge->locations.emplace_back(LocationType::OnDisk);
+
+        throw runtime_error("not located on proc");
+    }
     edge->locations.erase(locationOnThisProcessor);
     if(!isLocatedOnDisk(edge))
         edge->locations.emplace_back(LocationType::OnDisk);

@@ -23,6 +23,7 @@ int currentAlgoNum = 0;
  *
  */
 
+//1000000 100 1 0.001 methylseq_200 110641579976 1 yes ../ machines.csv
 //100000000 100 1 1 methylseq_2000 110641579976 1 yes ../ machines.csv
 //1000000 100 1 1 bacass 3637252230 1 yes ../
 //100000000 100 1 1 chipseq 3793245764 1 yes ../ machines.csv
@@ -86,8 +87,10 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    Cluster * cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
-    double biggestMem = cluster->getMemBiggestFreeProcessor()->getMemorySize();
+
+    imaginedCluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    actualCluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    double biggestMem = imaginedCluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     string filename;
     if(workflowName.rfind("/home", 0) == 0 || workflowName.rfind("/work", 0) == 0){
@@ -121,7 +124,7 @@ int main(int argc, char *argv[]) {
     workflowName = workflowName.substr(0, n4);
 
     //10, 100                                                               memShorteningDivision, ioShorteningCoef
-    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, cluster, 10, 100);
+    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, imaginedCluster, 10, 100);
 
 
     vertex_t *pv = graphMemTopology->first_vertex;
@@ -146,7 +149,8 @@ int main(int argc, char *argv[]) {
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
     //print_graph_to_cout(graphMemTopology);
-    double d = new_heuristic(graphMemTopology, cluster, currentAlgoNum, isBaseline);
+
+    double d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
     //delete cluster;
     //cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
     //cout<<"makespan 1 "<<d<<", ";

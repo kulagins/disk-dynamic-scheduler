@@ -88,6 +88,7 @@ namespace Fonda {
         mintt = std::numeric_limits<double>::max();
         for(vertex_t *v=graphMemTopology->first_vertex; v; v=v->next) {
             v->bottom_level=-1;
+            v->factorForRealExecution=2;
             string lowercase_name = v->name;
             std::regex pattern("_\\d+");
             lowercase_name = std::regex_replace(lowercase_name, pattern, "");
@@ -183,6 +184,7 @@ namespace Fonda {
                edge *incomingEdge = vertex->in_edges[j];
                vertex_t *predecessor = incomingEdge->tail;
                incomingEdge->weight =(predecessor->wchar/ totalOutput) * vertex->taskinputsize;
+               incomingEdge->factorForRealExecution=2;
            }
            vertex = vertex->next;
        }

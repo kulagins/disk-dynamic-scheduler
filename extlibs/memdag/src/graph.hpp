@@ -78,12 +78,14 @@ struct vertex_t {
   graph_t * subgraph;
  int assignedProcessorId=-1;
   double makespan=-1;
+  double makespanPerceived=-1;
+  double makespanPerceivedHeft=-1;
 
   bool visited;
   Status status = Status::Unscheduled;
 
   double actuallyUsedMemory=-1;
-  double factorActually=1;
+  double factorForRealExecution=1;
 
   double rank=-1;
 
@@ -135,7 +137,7 @@ typedef struct edge {
   edge_status_t status;
   /* user data */
   void          *data;
-  
+  double factorForRealExecution=1;
   ///\cond HIDDEN_SYMBOLS
   /* other data used for graph algorithms */
   void *generic_pointer;
