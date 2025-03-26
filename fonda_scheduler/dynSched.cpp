@@ -110,7 +110,7 @@ void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &re
         } else {
             tentativeAssignment(vertex, false, tentativeResult);
         }
-        cout<<"tentative ft on "<<processor->id<<" is "<<tentativeResult.finishTime<<endl;
+       // cout<<"tentative ft on "<<processor->id<<" is "<<tentativeResult.finishTime<<endl;
 
         if (!isHeft)
             checkIfPendingMemoryCorrect(tentativeResult.processorOfAssignment);
@@ -131,8 +131,9 @@ void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &re
                     //throw runtime_error("numberWithEvictedCases++;");
                     cout << "increase numWithEvictged in HEFT" << endl;
                 }
+                result.resultingVar = 1;
             }
-            result.resultingVar = 1;
+
         }
     }
 }

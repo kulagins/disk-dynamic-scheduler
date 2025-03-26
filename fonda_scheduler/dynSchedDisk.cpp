@@ -117,7 +117,9 @@ void Event::fireTaskStart() {
         );
 
 
-        double factor = deviation(durationTask);
+        double factor = applyDeviationTo(durationTask);
+        this->task->factorForRealExecution = factor;
+        assert(factor >0);
         for (auto successor = successors.begin(); successor != successors.end();) {
             // cout << " from " << (*successor)->id << "'s predecessors" << endl;
             if ((*successor)->task == nullptr) {
@@ -248,7 +250,6 @@ shared_ptr<Processor> findPredecessorsProcessor(edge_t *incomingEdge, vector<sha
 
 void Event::fireReadStart() {
     cout << "firing read start for " << this->id << " ";
-    shared_ptr<Event> finishRead = events.find(buildEdgeName(this->edge) + "-r-f");
     // assert(finishRead->getActualTimeFire()> this->getActualTimeFire());
     auto canRun = dealWithPredecessors(shared_from_this());
 
@@ -259,7 +260,9 @@ void Event::fireReadStart() {
         cout << "DONE";
         removeOurselfFromSuccessors(this);
         double durationOfRead = this->edge->weight / this->processor->readSpeedDisk;
-        double factor = deviation(durationOfRead);
+        double factor = applyDeviationTo(durationOfRead);
+        assert(factor>0);
+        this->edge->factorForRealExecution= factor;
         double expectedTimeFireFinish = this->actualTimeFire + durationOfRead;
 
         this->isDone = true;
@@ -313,7 +316,9 @@ void Event::fireWriteStart() {
         removeOurselfFromSuccessors(this);
 
         double durationOfWrite = this->edge->weight / this->processor->writeSpeedDisk;
-        double factor = deviation(durationOfWrite);
+        double factor = applyDeviationTo(durationOfWrite);
+        this->edge->factorForRealExecution = factor;
+        assert(factor>0);
         double actualTimeFireFinish = this->actualTimeFire + durationOfWrite;
         this->isDone = true;
         shared_ptr<Event> finishWrite =
@@ -462,7 +467,7 @@ void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc) {
 }
 
 
-double deviation(double &in) {
+double applyDeviationTo(double &in) {
     // in = in * 2;
     // return 2;
     // return 1;

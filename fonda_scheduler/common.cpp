@@ -290,3 +290,21 @@ void Processor::updateFrom(const Processor& other){
 
 
 }
+
+void clearGraph(graph_t* graphMemTopology){
+    vertex_t *vertex = graphMemTopology->first_vertex;
+    while (vertex != nullptr) {
+        vertex->makespan= vertex->makespanPerceived=-1;
+        vertex->visited= false;
+        vertex->status= Status::Unscheduled;
+        vertex->actuallyUsedMemory=-1;
+        vertex->rank=-1;
+        vertex = vertex->next;
+    }
+
+    edge_t * edge = graphMemTopology->first_edge;
+    while(edge!= nullptr){
+        edge->locations.clear();
+        edge = edge->next;
+    }
+}

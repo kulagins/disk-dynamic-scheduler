@@ -58,6 +58,7 @@ std::string trimQuotes(const std::string &str);
 
 ////void completeRecomputationOfSchedule(Http::ResponseWriter &resp, const json &bodyjson, double timestamp, vertex_t * vertexThatHasAProblem);
 void removeSourceAndTarget(graph_t *graph, vector<pair<vertex_t *, double>> &ranks);
+void clearGraph(graph_t* graphMemTopology);
 
 Cluster *
 prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vector<Assignment *> &tempAssignments);

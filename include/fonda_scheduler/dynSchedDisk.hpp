@@ -19,7 +19,7 @@ extern ReadyQueue readyQueue;
 
 double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft);
 
-double deviation(double &in);
+double applyDeviationTo(double &in);
 vector<shared_ptr<Processor>>
 tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
 double &finTime, double &startTime, int &resultingVar,  vector<shared_ptr<Event>>  &newEvents,

@@ -18,7 +18,7 @@ int currentAlgoNum = 0;
 
 /*
  *
- *  Call: workflow, inputSIze, memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty, isBaseline
+ *  Call: memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty,workflow, inputSize, algorithmNumber, isBaseline, root directory, machines file, number of deviation function
  *  1000000, 100, 1, 0.001, true ../
  *
  */
@@ -150,20 +150,25 @@ int main(int argc, char *argv[]) {
     cout<<std::setprecision(15);
     //print_graph_to_cout(graphMemTopology);
 
-    double d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
-    //delete cluster;
-    //cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
-    //cout<<"makespan 1 "<<d<<", ";
-   // double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline);
+    cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+   double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline);
 
+
+    std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
+    cout<<"makespan_1 "<<d<<"\t\n";
+
+
+    delete cluster;
+    cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+
+    clearGraph(graphMemTopology);
+    start = std::chrono::system_clock::now();
+    d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
      end = std::chrono::system_clock::now();
      elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
-    cout<<"makespan 2 "<<d<<endl;
+    cout<<"makespan_2 "<<d<<endl;
 
-    //for (const auto &item: cluster->getProcessors()){
-   //     cout<< item.second->id<<": "<<item.second->assignment<<endl;
-   // }
 
     delete graphMemTopology;
     delete cluster;
