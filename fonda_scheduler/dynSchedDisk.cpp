@@ -16,15 +16,45 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
     algoNum = isHeft ? 1 : algoNum;
     enforce_single_source_and_target_with_minimal_weights(graph);
     compute_bottom_and_top_levels(graph);
-    vertex_t *vertex = graph->first_vertex;
+
     static thread_local std::mt19937 gen(std::random_device{}());
     static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
 
-    while(vertex!= nullptr){
-        double rank = calculateSimpleBottomUpRank(vertex);
-        rank = rank +  dist(gen);
-        vertex->rank= rank;
-        vertex = vertex->next;
+    vertex_t *vertex = graph->first_vertex;
+    switch (algoNum) {
+        case 1: {
+            vertex = graph->first_vertex;
+
+            while(vertex!= nullptr){
+                double rank = calculateSimpleBottomUpRank(vertex);
+                rank = rank +  dist(gen);
+                vertex->rank= rank;
+                vertex = vertex->next;
+            }
+            break;
+        }
+        case 2: {
+            vertex_t *vertex = graph->first_vertex;
+            static thread_local std::mt19937 gen(std::random_device{}());
+            static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
+
+            while(vertex!= nullptr){
+                double rank = calculateBLCBottomUpRank(vertex);
+                rank = rank +  dist(gen);
+                vertex->rank= rank;
+                vertex = vertex->next;
+            }
+            break;
+        }
+        case 3: {
+            vector<std::pair<vertex_t *, double>> ranks = calculateMMBottomUpRank(graph);
+            std::for_each(ranks.begin(), ranks.end(),[](std::pair<vertex_t *, double> pair){
+                pair.first->rank= pair.second+  dist(gen);
+            });
+        }
+            break;
+        default:
+            throw runtime_error("unknon algorithm");
     }
 
 
