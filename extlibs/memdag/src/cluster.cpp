@@ -71,13 +71,13 @@ void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
 //std::set<edge_t *, decltype(comparePendingMemories)*>::iterator
 //unsigned long
 std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Processor::delocateToDisk(edge_t* edge, bool real) {
-  // cout<<"delocate  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
+   //cout<<"delocate  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
         cout<<"not fnd1"<<endl;
     }
-    if(!real){
+    if(real){
         delocateFromThisProcessorToDisk(edge, this->id);
     }
 
@@ -86,7 +86,7 @@ std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Proce
 }
 
 std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Processor::delocateToDiskOptionally(edge_t* edge, bool real) {
-   // cout<<"delocate optionally  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
+    //cout<<"delocate optionally  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {

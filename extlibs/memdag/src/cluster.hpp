@@ -317,8 +317,8 @@ public:
     void setReadyTimeWrite(double rtw){
         this->readyTimeWrite= rtw;
     }
-    void setReadyTimeRead(double rtw){
-        this->readyTimeWrite= rtw;
+    void setReadyTimeRead(double rtr){
+        this->readyTimeRead= rtr;
     }
 
 

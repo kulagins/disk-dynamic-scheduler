@@ -33,6 +33,11 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
     for (auto &pair: ranks) {
         auto vertex = pair.first;
         cout << "processing " << vertex->name << endl;
+        if(//vertex->name=="TRIMGALORE_00000540" //|| vertex->name=="TRIMGALORE_00000002" ||
+       vertex->name=="MERGED_LIB_BAM_FILTER_00000205"
+        ){
+            cout<<endl;
+        }
 
         SchedulingResult bestSchedulingResult = SchedulingResult(nullptr);
         SchedulingResult bestSchedulingResultCorrectForHeftOnly = SchedulingResult(nullptr);
@@ -76,6 +81,10 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
         //    cout<<"some error"<<endl;
         //   }
 
+        for (const auto &item: imaginedCluster->getProcessors()){
+            assert(item.second->getPendingMemories().size()==
+            actualCluster->getProcessorById(item.second->id)->getPendingMemories().size());
+        }
 
         vertex->makespanPerceived = bestSchedulingResult.finishTime;
         assert(bestSchedulingResult.startTime < bestSchedulingResult.finishTime);
@@ -190,18 +199,18 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
         startTimeFor1Evicted = startTimeForAllEvicted =
                 result.processorOfAssignment->getReadyTimeWrite() > result.startTime ?
                 result.processorOfAssignment->getReadyTimeWrite() : result.startTime;
-        if (!result.processorOfAssignment->getPendingMemories().empty()) {
+        auto biggestPendingEdge = result.processorOfAssignment->getBiggestPendingEdgeThatIsNotIncomingOf(v);
+        if (!result.processorOfAssignment->getPendingMemories().empty() && biggestPendingEdge!=nullptr) {
             assert((*result.processorOfAssignment->getPendingMemories().begin())->weight >=
                    (*result.processorOfAssignment->getPendingMemories().rbegin())->weight);
-            auto biggestFileWeight = (*result.processorOfAssignment->getPendingMemories().begin())->weight;
+
+            auto biggestFileWeight = biggestPendingEdge->weight;
             double amountToOffloadWithoutBiggestFile = (amountToOffload - biggestFileWeight) > 0 ? (amountToOffload -
                                                                                                     biggestFileWeight)
                                                                                                  : 0;
 
-            double biggestWeightToWrite = real ? (*result.processorOfAssignment->getPendingMemories().begin())->weight *
-                                                 (*result.processorOfAssignment->getPendingMemories().begin())->factorForRealExecution
-                                               :
-                                          (*result.processorOfAssignment->getPendingMemories().begin())->weight;
+            double biggestWeightToWrite = real ? biggestPendingEdge->weight * biggestPendingEdge->factorForRealExecution
+                                               : biggestPendingEdge->weight;
             double finishTimeToWrite = result.processorOfAssignment->getReadyTimeWrite() +
                                        biggestWeightToWrite / result.processorOfAssignment->writeSpeedDisk;
             startTimeFor1Evicted = max(result.startTime, finishTimeToWrite);
@@ -251,13 +260,11 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
         assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
 
         if (timeToFinishBiggestEvicted == minTTF) {
-            result.edgeToKick = (*result.processorOfAssignment->getPendingMemories().begin());
+            result.edgeToKick = biggestPendingEdge;
             //cout<<"best tentative with biggest Evicted "; print_edge(toKick);
             result.resultingVar = 2;
-            double biggestWeightToWrite = real ? (*result.processorOfAssignment->getPendingMemories().begin())->weight *
-                                                 (*result.processorOfAssignment->getPendingMemories().begin())->factorForRealExecution
-                                               :
-                                          (*result.processorOfAssignment->getPendingMemories().begin())->weight;
+            double biggestWeightToWrite = real ? biggestPendingEdge->weight * biggestPendingEdge->factorForRealExecution
+                                               :  biggestPendingEdge->weight;
             result.processorOfAssignment->setReadyTimeWrite(result.processorOfAssignment->getReadyTimeWrite() +
                                                             biggestWeightToWrite /
                                                             result.processorOfAssignment->writeSpeedDisk);
@@ -459,8 +466,14 @@ evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &best
                 if ((*it)->head->name != pVertex->name) {
                     it = bestSchedulingResult.processorOfAssignment->delocateToDisk(*it, real);
                 }
+                else{
+                    it++;
+                }
             }
-            assert(bestSchedulingResult.processorOfAssignment->getPendingMemories().empty());
+            assert(bestSchedulingResult.processorOfAssignment->getPendingMemories().empty()
+            ||
+                           (*bestSchedulingResult.processorOfAssignment->getPendingMemories().begin())->head->name==pVertex->name
+            );
             numberWithEvictedCases++;
             checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
             break;
@@ -496,10 +509,20 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
 
         if (onWhichProcessor == schedulingResult.processorOfAssignment->id) {
             schedulingResult.processorOfAssignment->delocateToDisk(ine);
+            if(!real){
+                //put edge back, because this is not the true delocation
+                locateToThisProcessorFromNowhere(ine,onWhichProcessor);
+            }
         }
         else{
             if(onWhichProcessor!=-1){
                 cluster->getProcessorById(onWhichProcessor)->delocateToDiskOptionally(ine, real);
+            }
+            else{
+                //edge has been read
+                //cout<<"bla"<<endl;
+                auto proc = findProcessorThatHoldsEdge(ine, cluster);
+                assert(proc==nullptr);
             }
             //if(isHeft && onWhichProcessor!=-1){
              //   if(!real)
@@ -508,7 +531,8 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
              //       cluster->getProcessorById(onWhichProcessor)->removePendingMemory(ine);
            // }
         }
-        ine->locations.clear();
+        if(real)
+            ine->locations.clear();
     }
 
 
@@ -832,3 +856,18 @@ vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int botto
     }
     return false; */ return false;
 }
+
+shared_ptr<Processor> findProcessorThatHoldsEdge(edge_t *incomingEdge, Cluster* clusterToLookIn) {
+
+    for ( auto &pair: clusterToLookIn->getProcessors()){
+        auto iterator = std::find_if(pair.second->getPendingMemories().begin(), pair.second->getPendingMemories().end(),
+                                     [incomingEdge](edge_t *edge) {
+                                         return incomingEdge == edge;
+                                     });
+        if(iterator!=pair.second->getPendingMemories().end()){
+            return pair.second;
+        }
+    }
+    return nullptr;
+}
+

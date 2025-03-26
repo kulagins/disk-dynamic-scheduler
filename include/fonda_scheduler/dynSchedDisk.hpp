@@ -29,6 +29,7 @@ vector<shared_ptr<Event>>  bestTentativeAssignment( vertex_t *vertex, vector<sha
 std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask,
                                                               shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge,  double atThisTime=-1);
 shared_ptr<Processor> findPredecessorsProcessor(edge_t * incomingEdge, vector<shared_ptr<Processor>> &modifiedProcs);
+
 vector< shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc, double  weightToFit);
 void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event>ourEvent, vector<shared_ptr<Event>> &createdEvents, double startTimeOfTask,
                           shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, vector<std::shared_ptr<Processor>> &modifiedProcs);

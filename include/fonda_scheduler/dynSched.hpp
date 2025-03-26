@@ -75,4 +75,6 @@ evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &best
 
 void putChangeOnCluster(vertex_t * vertex,SchedulingResult &schedulingResult, Cluster * cluster, int &numberWithEvictedCases, bool real, bool isHeft=false);
 
+shared_ptr<Processor> findProcessorThatHoldsEdge(edge_t *incomingEdge, Cluster* clusterToLookIn);
+
 #endif //RESHI_TXT_DYNSCHED_HPP
