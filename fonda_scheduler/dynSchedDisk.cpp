@@ -128,12 +128,12 @@ void Event::fireTaskStart() {
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        cout << "BAD";
+       // cout << "BAD";
         //this->setActualTimeFire(
         //       this->getActualTimeFire()  +std::numeric_limits<double>::epsilon() * this->getActualTimeFire());
         events.insert(shared_from_this());
     } else {
-        cout << "DONE";
+      //  cout << "DONE";
         removeOurselfFromSuccessors(this);
         this->task->status = Status::Running;
         auto ourFinishEvent = events.find(this->task->name + "-f");
@@ -180,10 +180,10 @@ void Event::fireTaskFinish() {
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        cout << "BAD " << endl;
+      //  cout << "BAD " << endl;
         events.insert(shared_from_this());
     } else {
-        cout << "DONE ";
+      //  cout << "DONE ";
         removeOurselfFromSuccessors(this);
         //set its status to finished
         this->task->status = Status::Finished;
@@ -285,10 +285,10 @@ void Event::fireReadStart() {
     auto canRun = dealWithPredecessors(shared_from_this());
 
     if (!canRun) {
-        cout << "BAD " << (*this->predecessors.begin())->id << endl;
+      //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-        cout << "DONE";
+        //cout << "DONE";
         removeOurselfFromSuccessors(this);
         double durationOfRead = this->edge->weight / this->processor->readSpeedDisk;
         double factor = applyDeviationTo(durationOfRead);
@@ -316,10 +316,10 @@ void Event::fireReadFinish() {
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        cout << "BAD because " << (*this->predecessors.begin())->id << endl;
+     //   cout << "BAD because " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-        cout << "DONE";
+    //    cout << "DONE";
         removeOurselfFromSuccessors(this);
         if (!isLocatedOnDisk(this->edge)) {
             auto ptr = events.find(buildEdgeName(this->edge) + "-w-f");
@@ -340,10 +340,10 @@ void Event::fireWriteStart() {
     }
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        cout << "BAD" << (*this->predecessors.begin())->id << endl;
+     //   cout << "BAD" << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-        cout << "DONE" << endl;
+      //  cout << "DONE" << endl;
         removeOurselfFromSuccessors(this);
 
         double durationOfWrite = this->edge->weight / this->processor->writeSpeedDisk;
@@ -369,10 +369,10 @@ void Event::fireWriteFinish() {
     cout << "firing write finish for " << this->id << endl;
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        cout << "BAD " << (*this->predecessors.begin())->id << endl;
+      //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-        cout << "DONE";
+       // cout << "DONE";
         removeOurselfFromSuccessors(this);
         delocateFromThisProcessorToDisk(this->edge, this->processor->id);
         this->isDone = true;
