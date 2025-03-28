@@ -39,10 +39,10 @@ int currentAlgoNum = 0;
 //1000000 100 1 0.001 eager_2000 25705994498 1 no ../ machines.csv
 int main(int argc, char *argv[]) {
 
-   /* for (int i = 0; i < argc; ++i) {
+    for (int i = 0; i < argc; ++i) {
         std::cout << argv[i] << " ";
     }
-    cout<<endl; */
+    cout<<endl;
 
     auto start = std::chrono::system_clock::now();
     string workflowName = argv[5];
