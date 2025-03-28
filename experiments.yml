@@ -889,10 +889,10 @@ variants:
     items:
       - name: 'nrm'
         extra_args: ['1000000', '10', '1', '0.001']
-      - name: 'mrm'
-        extra_args: [ '10000000', '100', '1', '0.001' ]
-      - name: 'mrp'
-        extra_args: [ '1000000', '100', '1', '0.0001' ]
+      #- name: 'mrm'
+      #  extra_args: [ '10000000', '100', '1', '0.001' ]
+      #- name: 'mrp'
+      #  extra_args: [ '1000000', '100', '1', '0.0001' ]
 
 
 
