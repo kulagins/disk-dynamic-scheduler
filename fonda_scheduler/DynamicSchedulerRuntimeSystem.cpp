@@ -7,17 +7,19 @@
 Cluster *cluster;
 EventManager events;
 ReadyQueue readyQueue;
+int devationVariant;
 
 string lastEventName;
 
-double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, bool isHeft) {
+double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, bool isHeft, int deviationNumber) {
     double resMakespan = -1;
     cluster = cluster1;
     algoNum = isHeft ? 1 : algoNum;
     enforce_single_source_and_target_with_minimal_weights(graph);
     compute_bottom_and_top_levels(graph);
+    devationVariant = deviationNumber;
 
-    static thread_local std::mt19937 gen(std::random_device{}());
+       static thread_local std::mt19937 gen(std::random_device{}());
     static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
 
     vertex_t *vertex = graph->first_vertex;
@@ -25,10 +27,10 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
         case 1: {
             vertex = graph->first_vertex;
 
-            while(vertex!= nullptr){
+            while (vertex != nullptr) {
                 double rank = calculateSimpleBottomUpRank(vertex);
-                rank = rank +  dist(gen);
-                vertex->rank= rank;
+                rank = rank + dist(gen);
+                vertex->rank = rank;
                 vertex = vertex->next;
             }
             break;
@@ -38,18 +40,18 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
             static thread_local std::mt19937 gen(std::random_device{}());
             static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
 
-            while(vertex!= nullptr){
+            while (vertex != nullptr) {
                 double rank = calculateBLCBottomUpRank(vertex);
-                rank = rank +  dist(gen);
-                vertex->rank= rank;
+                rank = rank + dist(gen);
+                vertex->rank = rank;
                 vertex = vertex->next;
             }
             break;
         }
         case 3: {
             vector<std::pair<vertex_t *, double>> ranks = calculateMMBottomUpRank(graph);
-            std::for_each(ranks.begin(), ranks.end(),[](std::pair<vertex_t *, double> pair){
-                pair.first->rank= pair.second+  dist(gen);
+            std::for_each(ranks.begin(), ranks.end(), [](std::pair<vertex_t *, double> pair) {
+                pair.first->rank = pair.second + dist(gen);
             });
         }
             break;
@@ -128,12 +130,12 @@ void Event::fireTaskStart() {
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-       // cout << "BAD";
+        // cout << "BAD";
         //this->setActualTimeFire(
         //       this->getActualTimeFire()  +std::numeric_limits<double>::epsilon() * this->getActualTimeFire());
         events.insert(shared_from_this());
     } else {
-      //  cout << "DONE";
+        //  cout << "DONE";
         removeOurselfFromSuccessors(this);
         this->task->status = Status::Running;
         auto ourFinishEvent = events.find(this->task->name + "-f");
@@ -149,7 +151,7 @@ void Event::fireTaskStart() {
 
         double factor = applyDeviationTo(durationTask);
         this->task->factorForRealExecution = factor;
-        assert(factor >0);
+        assert(factor > 0);
         for (auto successor = successors.begin(); successor != successors.end();) {
             // cout << " from " << (*successor)->id << "'s predecessors" << endl;
             if ((*successor)->task == nullptr) {
@@ -174,16 +176,16 @@ void Event::fireTaskStart() {
 void Event::fireTaskFinish() {
     vertex_t *thisTask = this->task;
     cout << "firing task Finish for " << this->id;
-    if(this->id=="bismark_report_00000008-f"){
-        cout<<endl;
+    if (this->id == "bismark_report_00000008-f") {
+        cout << endl;
     }
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-      //  cout << "BAD " << endl;
+        //  cout << "BAD " << endl;
         events.insert(shared_from_this());
     } else {
-      //  cout << "DONE ";
+        //  cout << "DONE ";
         removeOurselfFromSuccessors(this);
         //set its status to finished
         this->task->status = Status::Finished;
@@ -202,8 +204,8 @@ void Event::fireTaskFinish() {
         for (int i = 0; i < thisTask->out_degree; i++) {
             vertex_t *childTask = thisTask->out_edges[i]->head;
             //cout << "deal with child " << childTask->name << endl;
-            if(childTask->name=="preseq_00000007"){
-                cout<<endl;
+            if (childTask->name == "preseq_00000007") {
+                cout << endl;
             }
             bool isReady = true;
             for (int j = 0; j < childTask->in_degree; j++) {
@@ -211,14 +213,14 @@ void Event::fireTaskFinish() {
                     isReady = false;
                 }
             }
-           
+
 
             std::vector<shared_ptr<Event> > pred, succ;
-           
+
             if (isReady && childTask->status != Status::Scheduled) {
-               // cout<<"inserting into ready "<<childTask->name<<endl;
+                // cout<<"inserting into ready "<<childTask->name<<endl;
                 readyQueue.readyTasks.insert(childTask);
-              
+
             }
         }
 
@@ -226,7 +228,7 @@ void Event::fireTaskFinish() {
 
         bool foundSomeTaskForOurProcessor = false;
 
-        while(!foundSomeTaskForOurProcessor && !readyQueue.readyTasks.empty()){
+        while (!foundSomeTaskForOurProcessor && !readyQueue.readyTasks.empty()) {
             vertex_t *mostReadyVertex = *readyQueue.readyTasks.begin();
 
 
@@ -243,11 +245,10 @@ void Event::fireTaskFinish() {
             mostReadyVertex->status = Status::Scheduled;
             readyQueue.readyTasks.erase(mostReadyVertex);
 
-            if(bestProcessorToAssign->id == this->processor->id){
-                foundSomeTaskForOurProcessor= true;
+            if (bestProcessorToAssign->id == this->processor->id) {
+                foundSomeTaskForOurProcessor = true;
             }
         }
-        
 
 
     }
@@ -278,22 +279,21 @@ shared_ptr<Processor> findPredecessorsProcessor(edge_t *incomingEdge, vector<sha
 }
 
 
-
 void Event::fireReadStart() {
     cout << "firing read start for " << this->id << " ";
     // assert(finishRead->getActualTimeFire()> this->getActualTimeFire());
     auto canRun = dealWithPredecessors(shared_from_this());
 
     if (!canRun) {
-      //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
+        //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
         //cout << "DONE";
         removeOurselfFromSuccessors(this);
         double durationOfRead = this->edge->weight / this->processor->readSpeedDisk;
         double factor = applyDeviationTo(durationOfRead);
-        assert(factor>0);
-        this->edge->factorForRealExecution= factor;
+        assert(factor > 0);
+        this->edge->factorForRealExecution = factor;
         double expectedTimeFireFinish = this->actualTimeFire + durationOfRead;
 
         this->isDone = true;
@@ -316,10 +316,10 @@ void Event::fireReadFinish() {
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-     //   cout << "BAD because " << (*this->predecessors.begin())->id << endl;
+        //   cout << "BAD because " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-    //    cout << "DONE";
+        //    cout << "DONE";
         removeOurselfFromSuccessors(this);
         if (!isLocatedOnDisk(this->edge)) {
             auto ptr = events.find(buildEdgeName(this->edge) + "-w-f");
@@ -340,16 +340,16 @@ void Event::fireWriteStart() {
     }
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-     //   cout << "BAD" << (*this->predecessors.begin())->id << endl;
+        //   cout << "BAD" << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-      //  cout << "DONE" << endl;
+        //  cout << "DONE" << endl;
         removeOurselfFromSuccessors(this);
 
         double durationOfWrite = this->edge->weight / this->processor->writeSpeedDisk;
         double factor = applyDeviationTo(durationOfWrite);
         this->edge->factorForRealExecution = factor;
-        assert(factor>0);
+        assert(factor > 0);
         double actualTimeFireFinish = this->actualTimeFire + durationOfWrite;
         this->isDone = true;
         shared_ptr<Event> finishWrite =
@@ -369,10 +369,10 @@ void Event::fireWriteFinish() {
     cout << "firing write finish for " << this->id << endl;
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-      //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
+        //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-       // cout << "DONE";
+        // cout << "DONE";
         removeOurselfFromSuccessors(this);
         delocateFromThisProcessorToDisk(this->edge, this->processor->id);
         this->isDone = true;
@@ -499,20 +499,28 @@ void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc) {
 
 
 double applyDeviationTo(double &in) {
-    // in = in * 2;
-    // return 2;
-    // return 1;
     static std::random_device rd;
     static std::mt19937 gen(rd());  // Mersenne Twister PRNG
+    double result, factor, stddev;
+    switch (devationVariant) {
+        case 1:
+            stddev = in * 0.1;
+            break;
+        case 2:
+            stddev = in * 0.5;
+            break;
+        case 3:
+            stddev = 0;
+            break;
+        default:
+            throw runtime_error("unknown deviation variant");
+    }
 
-    double stddev = in * 0.1;  // 10% of the input value
     std::normal_distribution<double> dist(in, stddev);
-
-    double result = dist(gen);
-    double factor = result / in;
+    result = dist(gen);
+    factor = result / in;
     in = result;
     return factor;
-
 }
 
 
@@ -555,38 +563,32 @@ double Processor::getReadyTimeRead() {
 
 
 double Processor::getExpectedOrActualReadyTimeCompute() {
-    if (!this->lastComputeEvent.expired() ) {
-        if(this->lastComputeEvent.lock()->isDone){
+    if (!this->lastComputeEvent.expired()) {
+        if (this->lastComputeEvent.lock()->isDone) {
             return this->lastComputeEvent.lock()->getActualTimeFire();
-        }
-        else{
+        } else {
             return lastComputeEvent.lock()->getExpectedTimeFire();
         }
-    }
-    else return this->readyTimeCompute;
+    } else return this->readyTimeCompute;
 
 }
 
 double Processor::getExpectedOrActualReadyTimeWrite() {
-    if (!this->lastWriteEvent.expired() ) {
-        if(this->lastWriteEvent.lock()->isDone){
+    if (!this->lastWriteEvent.expired()) {
+        if (this->lastWriteEvent.lock()->isDone) {
             return this->lastWriteEvent.lock()->getActualTimeFire();
-        }
-        else{
+        } else {
             return lastWriteEvent.lock()->getExpectedTimeFire();
         }
-    }
-    else return  this->readyTimeWrite;
+    } else return this->readyTimeWrite;
 }
 
 double Processor::getExpectedOrActualReadyTimeRead() {
-    if (!this->lastReadEvent.expired() ) {
-        if(this->lastReadEvent.lock()->isDone){
+    if (!this->lastReadEvent.expired()) {
+        if (this->lastReadEvent.lock()->isDone) {
             return this->lastReadEvent.lock()->getActualTimeFire();
-        }
-        else{
+        } else {
             return lastReadEvent.lock()->getExpectedTimeFire();
         }
-    }
-    else return this->readyTimeRead;
+    } else return this->readyTimeRead;
 }

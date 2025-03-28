@@ -19,7 +19,13 @@ int currentAlgoNum = 0;
 /*
  *
  *  Call: memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty,workflow, inputSize, algorithmNumber, isBaseline, root directory, machines file, number of deviation function
- *  1000000, 100, 1, 0.001, true ../
+ *  1000000, 100, 1, 0.001, true ../ machines.csv 1
+ *
+ * algos with  memory awareness: 1 - HEFT-BL, 2- HEFT-BL, 3- HEFT-MM
+ * HEFT (no memory awareness) : yes at isBaseline, algoNum is irrelevant then
+ *  deviations :  1 - normal deviation function around historical value with 10% deviation
+ *  2 - normal deviation function around historical value with 50% deviation
+ *  3 - no deviation
  *
  */
 
@@ -50,6 +56,7 @@ int main(int argc, char *argv[]) {
     bool isBaseline = (std::string(argv[8]) == "yes");
     string dotPrefix= argv[9];
     string machinesFile = (argc<10)?"input/machines.csv" : std::string("input/") + argv[10];
+    int deviationVariant = stoi(argv[11]);
     //1000000, 100, 1, 0.001
     csv2::Reader<csv2::delimiter<','>,
             csv2::quote_character<'"'>,
@@ -151,7 +158,7 @@ int main(int argc, char *argv[]) {
     //print_graph_to_cout(graphMemTopology);
 
     cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
-   double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline);
+   double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant);
 
 
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
