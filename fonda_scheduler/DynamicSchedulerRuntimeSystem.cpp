@@ -1,7 +1,7 @@
 
 #include <queue>
-#include "fonda_scheduler/dynSchedDisk.hpp"
-#include "fonda_scheduler/dynSched.hpp"
+#include "fonda_scheduler/DynamicSchedulerHeader.hpp"
+#include "fonda_scheduler/SchedulerHeader.hpp"
 #include <random>
 
 Cluster *cluster;

@@ -3,10 +3,10 @@
 #include <vector>
 #include <filesystem>
 #include "../extlibs/memdag/src/graph.hpp"
-#include "../include/fonda_scheduler/dynSched.hpp"
+#include "../include/fonda_scheduler/SchedulerHeader.hpp"
 #include "../include/fonda_scheduler/io/graphWeightsBuilder.hpp"
 #include "../extlibs/csv2/single_include/csv2/csv2.hpp"
-#include "fonda_scheduler/dynSchedDisk.hpp"
+#include "fonda_scheduler/DynamicSchedulerHeader.hpp"
 #include <iomanip>
 
 #include <chrono>

@@ -70,9 +70,9 @@ add_executable(fonda_scheduler "${PROJECT_SOURCE_DIR}/fonda_scheduler/main.cpp"
 target_include_directories(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/include")
 target_sources(fonda_scheduler PRIVATE "${PROJECT_SOURCE_DIR}/fonda_scheduler/io/graphWeightsBuilder.cpp"
         "${PROJECT_SOURCE_DIR}/fonda_scheduler/common.cpp"
-        "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSched.cpp"
-        "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSchedDisk.cpp"
-        "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSchedDiskPlanning.cpp"
+        "${PROJECT_SOURCE_DIR}/fonda_scheduler/StaticScheduler.cpp"
+        "${PROJECT_SOURCE_DIR}/fonda_scheduler/DynamicSchedulerRuntimeSystem.cpp"
+        "${PROJECT_SOURCE_DIR}/fonda_scheduler/DynamicSchedulerScheduler.cpp"
 
 )
 
@@ -98,8 +98,9 @@ IF (FONDA_UNIT_TESTS)
     target_include_directories(dagp-tests PRIVATE "${PROJECT_SOURCE_DIR}/include")
     target_sources(dagp-tests PRIVATE
             "${PROJECT_SOURCE_DIR}/fonda_scheduler/common.cpp"
-            "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSched.cpp"
-            "${PROJECT_SOURCE_DIR}/fonda_scheduler/dynSchedDisk.cpp"
+            "${PROJECT_SOURCE_DIR}/fonda_scheduler/StaticScheduler.cpp"
+            "${PROJECT_SOURCE_DIR}/fonda_scheduler/DynamicSchedulerRuntimeSystem.cpp"
+            "${PROJECT_SOURCE_DIR}/fonda_scheduler/DynamicSchedulerScheduler.cpp"
             "${PROJECT_SOURCE_DIR}/fonda_scheduler/cluster.cpp")
     target_link_libraries(dagp-tests
             PRIVATE

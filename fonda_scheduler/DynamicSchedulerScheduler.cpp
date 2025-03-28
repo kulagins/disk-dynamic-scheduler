@@ -1,5 +1,5 @@
-#include "fonda_scheduler/dynSchedDisk.hpp"
-#include "fonda_scheduler/dynSched.hpp"
+#include "fonda_scheduler/DynamicSchedulerHeader.hpp"
+#include "fonda_scheduler/SchedulerHeader.hpp"
 
 vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<shared_ptr<Processor>> &bestModifiedProcs,
                                                   shared_ptr<Processor> &bestProcessorToAssign, double notEarlierThan) {

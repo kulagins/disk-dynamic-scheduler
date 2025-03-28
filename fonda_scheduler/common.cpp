@@ -5,7 +5,7 @@
 #include "../include/fonda_scheduler/common.hpp"
 
 #include "graph.hpp"
-#include "fonda_scheduler/dynSched.hpp"
+#include "fonda_scheduler/SchedulerHeader.hpp"
 
 bool Debug;
 
