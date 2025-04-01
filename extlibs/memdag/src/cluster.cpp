@@ -77,9 +77,8 @@ std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Proce
     if (it == this->pendingMemories.end()) {
         cout<<"not fnd1"<<endl;
     }
-    if(real){
-        delocateFromThisProcessorToDisk(edge, this->id);
-    }
+
+     delocateFromThisProcessorToDisk(edge, this->id, !real);
 
     return removePendingMemory(edge);
 
@@ -92,9 +91,9 @@ std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Proce
     if (it == this->pendingMemories.end()) {
         return this->pendingMemories.end();
     }
-    if(!real){
-        delocateFromThisProcessorToDisk(edge, this->id);
-    }
+
+    delocateFromThisProcessorToDisk(edge, this->id, !real);
+
     return removePendingMemory(edge);
 
 }
@@ -183,7 +182,8 @@ Processor::Processor(const Processor& copy)
           assignment(copy.assignment),
           lastReadEvent(copy.lastReadEvent),
           lastWriteEvent(copy.lastWriteEvent),
-          lastComputeEvent(copy.lastComputeEvent)
+          lastComputeEvent(copy.lastComputeEvent),
+          isKeptValid(copy.isKeptValid)
 {
     // Copy elements manually to preserve set integrity
     for (auto* mem : copy.pendingMemories) {

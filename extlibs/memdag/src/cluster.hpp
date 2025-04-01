@@ -30,6 +30,7 @@ protected:
     double processorSpeed;
     vertex_t *assignedTask;
     std::unordered_map<string, std::weak_ptr<Event>> eventsOnProc;
+    bool isKeptValid= true;
 
 public:
     static auto comparePendingMemories(edge_t* a, edge_t*b) -> bool {
@@ -151,13 +152,13 @@ public:
         if(abs(availableMemory - memorySize) <0.01){
             availableMemory= memorySize;
         }
-        assert(availableMemory>=0 && availableMemory<= memorySize);
+        assert(!isKeptValid || (availableMemory>=0 && availableMemory<= memorySize));
         return this->availableMemory;
     }
     void setAvailableMemory(double mem){
        // cout<<"set available memory of proc "<<this->id<<" to "<<mem<<endl;
         assert(mem>=0);
-        if(mem>memorySize){
+        if(mem>memorySize && isKeptValid){
             assert(abs(mem - memorySize)< 0.1);
         }
 
@@ -169,6 +170,10 @@ public:
         this->readyTimeCompute = newTime;
     }
     int getAssignedTaskId() const;
+
+    void setIsKeptValid(bool is){
+        this->isKeptValid= is;
+    }
 
       vertex_t *getAssignedTask() const;
 
@@ -182,39 +187,45 @@ public:
     std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator
     //bool
     removePendingMemory(edge_t * edgeToRemove){
-       // cout<<"removing pending memory "<<buildEdgeName(edgeToRemove)<<endl;
+        cout<<"removing pending memory "<<buildEdgeName(edgeToRemove)<<endl;
 
         auto it = pendingMemories.find(edgeToRemove);
-        if (it == pendingMemories.end()) {
-            throw std::runtime_error("not found edge in pending");
+        if (it == pendingMemories.end() ) {
+            if(isKeptValid){
+                throw std::runtime_error("not found edge in pending");
+            }
+            else{
+                return pendingMemories.end();
+            }
+
         }
 
         auto nextIt = std::next(it);  // Get the next iterator before erasing
         pendingMemories.erase(it);  // Now erase safely
 
         availableMemory += edgeToRemove->weight;
-        assert(availableMemory < memorySize || std::abs(availableMemory - memorySize) < 0.1);
+        assert(!isKeptValid ||availableMemory < memorySize || std::abs(availableMemory - memorySize) < 0.1);
 
         return nextIt;  // Return the next iterator, which is safe
      }
 
     void addPendingMemory(edge_t * edge){
-        //cout<<"Add pending memory "<<buildEdgeName(edge)<<endl;
-        if (!edge) {
-            throw std::runtime_error("Edge is null!");
+        cout<<"Add pending memory "<<buildEdgeName(edge)<<endl;
+        if(isKeptValid) {
+            if (!edge) {
+                throw std::runtime_error("Edge is null!");
+            }
+            if (!edge->head || !edge->tail) {
+                throw std::runtime_error("Edge has uninitialized fields!");
+            }
+            auto it = pendingMemories.find(edge);
+            if (it != pendingMemories.end()) {
+                throw runtime_error(" found edge in pending");
+            }
         }
-        if (!edge->head || !edge->tail) {
-            throw std::runtime_error("Edge has uninitialized fields!");
-        }
-        auto it = pendingMemories.find(edge);
-        if (it != pendingMemories.end()) {
-            throw runtime_error(" found edge in pending");
-        }
-        else{
-            pendingMemories.emplace(edge);
-        }
+        pendingMemories.emplace(edge);
         availableMemory-= edge->weight;
-        assert(availableMemory>= 0);
+        assert(!isKeptValid || availableMemory>= 0);
     }
 
     void addPendingMemoryAfter(edge_t * edge){
@@ -329,6 +340,7 @@ class Cluster {
 protected:
     vector<edge_t *> filesOnDisk;
     int maxSpeed = -1;
+    bool isKeptValid= true;
 public:
     std::unordered_map<int, std::shared_ptr<Processor>> processors;
 
@@ -400,7 +412,12 @@ public:
 
     void printProcessorsEvents() ;
 
-
+    void mayBecomeInvalid(){
+        this->isKeptValid=false;
+        for (auto &item: processors){
+            item.second->setIsKeptValid(false);
+        }
+    }
 
 
     shared_ptr<Processor>getMemBiggestFreeProcessor();

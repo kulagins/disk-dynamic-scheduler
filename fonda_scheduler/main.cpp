@@ -26,6 +26,7 @@ int currentAlgoNum = 0;
  *  deviations :  1 - normal deviation function around historical value with 10% deviation
  *  2 - normal deviation function around historical value with 50% deviation
  *  3 - no deviation
+ *  4 - everything x2
  *
  */
 

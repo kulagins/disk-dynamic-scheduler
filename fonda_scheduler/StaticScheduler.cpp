@@ -21,6 +21,9 @@ double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v
 
 double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
     algoNum = isHeft ? 1 : algoNum;
+    if (isHeft){
+        imaginedCluster->mayBecomeInvalid();
+    }
     vector<pair<vertex_t *, double>> ranks = calculateBottomLevels(graph, algoNum);
     removeSourceAndTarget(graph, ranks);
     sort(ranks.begin(), ranks.end(),
@@ -72,18 +75,24 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
                  << endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
         }
 
-
+if(vertex->name=="TRIMGALORE_00000055") {
+    cout<<"";
+}
+cout<<"imagine"<<endl;
         putChangeOnCluster(vertex, bestSchedulingResult, imaginedCluster, numberWithEvictedCases, false, isHeft);
         //try {
+        cout<<"real"<<endl;
         putChangeOnCluster(vertex, bestSchedulingResultOnReal, actualCluster, numberWithEvictedCases2, true, isHeft);
         //}
         // catch(...){
         //    cout<<"some error"<<endl;
         //   }
 
-        for (const auto &item: imaginedCluster->getProcessors()){
-            assert(item.second->getPendingMemories().size()==
-            actualCluster->getProcessorById(item.second->id)->getPendingMemories().size());
+        if(!isHeft){
+            for (const auto &item: imaginedCluster->getProcessors()){
+                assert(item.second->getPendingMemories().size()==
+                       actualCluster->getProcessorById(item.second->id)->getPendingMemories().size());
+            }
         }
 
         vertex->makespanPerceived = bestSchedulingResult.finishTime;
@@ -408,11 +417,11 @@ tentativeAssignmentHEFT(vertex_t *v, bool real, SchedulingResult &result, Schedu
         assert(resultCorrect.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
     }
 
-    double Res = howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(v, result.processorOfAssignment);
+    double Res = howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(v, resultCorrect.processorOfAssignment);
     result.peakMem = (Res < 0) ? 1 : (result.processorOfAssignment->getMemorySize() - Res) /
                                      result.processorOfAssignment->getMemorySize();
 
-    result.finishTime = result.startTime + v->time / resultCorrect.processorOfAssignment->getProcessorSpeed();
+    result.finishTime = result.startTime + v->time / result.processorOfAssignment->getProcessorSpeed();
     result.processorOfAssignment->setReadyTimeCompute(result.finishTime);
 
     if (Res < 0) {
@@ -500,7 +509,7 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
     for (int j = 0; j < vertex->in_degree; j++) {
         edge *ine = vertex->in_edges[j];
 
-        int onWhichProcessor = whatProcessorIsLocatedOn(ine);
+        int onWhichProcessor = whatProcessorIsLocatedOn(ine, !real);
         assert(onWhichProcessor == -1 ||
                onWhichProcessor == schedulingResult.processorOfAssignment->id ||
                cluster->getProcessorById(onWhichProcessor)->getPendingMemories().find(ine)
@@ -508,7 +517,7 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
 
 
         if (onWhichProcessor == schedulingResult.processorOfAssignment->id) {
-            schedulingResult.processorOfAssignment->delocateToDisk(ine);
+            schedulingResult.processorOfAssignment->delocateToDisk(ine, !real);
             if(!real){
                 //put edge back, because this is not the true delocation
                 locateToThisProcessorFromNowhere(ine,onWhichProcessor);
@@ -543,6 +552,9 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
         auto v1 = vertex->out_edges[i];
         schedulingResult.processorOfAssignment->loadFromNowhere(v1);
         checkIfPendingMemoryCorrect(schedulingResult.processorOfAssignment);
+        if(schedulingResult.processorOfAssignment->getAvailableMemory()<0){
+            cout<<"";
+        }
 
     }
     cluster->getProcessorById(schedulingResult.processorOfAssignment->id)->updateFrom(
@@ -587,8 +599,8 @@ processIncomingEdges(const vertex_t *v, bool real, shared_ptr<Processor> &ourMod
                                       : incomingEdge->weight;
 
         if (predecessor->assignedProcessorId == ourModifiedProc->id) {
-            if (!isLocatedOnThisProcessor(incomingEdge, ourModifiedProc->id)) {
-                assert(isLocatedOnDisk(incomingEdge));
+            if (!isLocatedOnThisProcessor(incomingEdge, ourModifiedProc->id, !real)) {
+                assert(isLocatedOnDisk(incomingEdge,!real));
                 ourModifiedProc->setReadyTimeRead(
                         ourModifiedProc->getReadyTimeRead() + edgeWeightToUse / ourModifiedProc->readSpeedDisk);
                 earliestStartingTimeToComputeVertex =
@@ -597,7 +609,7 @@ processIncomingEdges(const vertex_t *v, bool real, shared_ptr<Processor> &ourMod
             }
 
         } else {
-            if (isLocatedOnDisk(incomingEdge)) {
+            if (isLocatedOnDisk(incomingEdge,!real)) {
                 //we need to schedule read
                 ourModifiedProc->setReadyTimeRead(
                         ourModifiedProc->getReadyTimeRead() + edgeWeightToUse / ourModifiedProc->readSpeedDisk);
@@ -607,7 +619,7 @@ processIncomingEdges(const vertex_t *v, bool real, shared_ptr<Processor> &ourMod
                 //TODO evict??
             } else {
                 auto predecessorsProcessorsId = predecessor->assignedProcessorId;
-                assert(isLocatedOnThisProcessor(incomingEdge, predecessorsProcessorsId));
+                assert(isLocatedOnThisProcessor(incomingEdge, predecessorsProcessorsId,!real));
                 shared_ptr<Processor> addedProc;
                 auto it = //modifiedProcs.size()==1?
                         //  modifiedProcs.begin():

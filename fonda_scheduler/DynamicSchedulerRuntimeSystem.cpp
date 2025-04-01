@@ -512,12 +512,18 @@ double applyDeviationTo(double &in) {
         case 3:
             stddev = 0;
             break;
+        case 4:
+            stddev = 0;
+            break;
         default:
             throw runtime_error("unknown deviation variant");
     }
 
     std::normal_distribution<double> dist(in, stddev);
     result = dist(gen);
+    if(devationVariant==4){
+        result*=2;
+    }
     factor = result / in;
     in = result;
     return factor;
