@@ -29,7 +29,8 @@ int currentAlgoNum = 0;
  *  4 - everything x2
  *
  */
-
+//1 1 0.1 0.01 debug 10 1 no ../ machines_debug.csv 3 -> gives evictions
+//1000000 100 100 0.1 chipseq_200 41366257414 1 yes ../ machines.csv 3
 //1000000 100 1 0.001 methylseq_200 110641579976 1 yes ../ machines.csv
 //100000000 100 1 1 methylseq_2000 110641579976 1 yes ../ machines.csv
 //1000000 100 1 1 bacass 3637252230 1 yes ../
@@ -132,8 +133,8 @@ int main(int argc, char *argv[]) {
     workflowName = workflowName.substr(0, n4);
 
     //10, 100                                                               memShorteningDivision, ioShorteningCoef
-    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, imaginedCluster, 10, 100);
-
+    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, imaginedCluster, 1, 10);
+    //print_graph_to_cout(graphMemTopology);
 
     vertex_t *pv = graphMemTopology->first_vertex;
     while(pv!= nullptr){
@@ -142,11 +143,21 @@ int main(int argc, char *argv[]) {
             //cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
         }
         if(outMemoryRequirement(pv)> biggestMem){
-            cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< endl;
-            return 0;
+            cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+            for (int i = 0; i < pv->out_degree; i++) {
+                pv->out_edges[i]->weight /= 4;
+            }
+            double d = inMemoryRequirement(pv);
+            double requirement = outMemoryRequirement(pv);
+            if(outMemoryRequirement(pv)> biggestMem){
+                return 0;
+            }
+
+
         }
         pv= pv->next;
     }
+    cout<<endl;
     // cluster->printProcessors();
 
     auto end = std::chrono::system_clock::now();
@@ -156,10 +167,15 @@ int main(int argc, char *argv[]) {
     start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
-    //print_graph_to_cout(graphMemTopology);
+
 
     cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
-   double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant);
+    assert(cluster->getProcessors().at(0)->getMemorySize()== actualCluster->getProcessors().at(0)->getMemorySize());
+    assert(cluster->getProcessors().at(1)->getMemorySize()== actualCluster->getProcessors().at(1)->getMemorySize());
+    assert(cluster->getProcessors().at(2)->getMemorySize()== actualCluster->getProcessors().at(2)->getMemorySize());
+    assert(cluster->getProcessors().at(3)->getMemorySize()== actualCluster->getProcessors().at(3)->getMemorySize());
+
+    double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant);
 
 
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;

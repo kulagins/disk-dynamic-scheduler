@@ -179,20 +179,20 @@ public:
 
     void assignSubgraph(vertex_t *taskToBeAssigned);
 
-    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge, bool real=false);
-    void loadFromDisk(edge_t* edge);
-    void loadFromNowhere(edge_t* edge);
-    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator delocateToDiskOptionally(edge_t* edge, bool real=false);
+    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge, bool shouldUseImaginary);
+    void loadFromDisk(edge_t* edge, bool shouldUseImaginary);
+    void loadFromNowhere(edge_t* edge, bool shouldUseImaginary, double afterWhen);
+    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator delocateToDiskOptionally(edge_t* edge, bool shouldUseImaginary);
 
     std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator
     //bool
     removePendingMemory(edge_t * edgeToRemove){
-        cout<<"removing pending memory "<<buildEdgeName(edgeToRemove)<<endl;
+     //   cout<<"removing pending memory "<<buildEdgeName(edgeToRemove)<<" from proc "<<this->id<<endl;
 
         auto it = pendingMemories.find(edgeToRemove);
         if (it == pendingMemories.end() ) {
             if(isKeptValid){
-                throw std::runtime_error("not found edge in pending");
+                throw std::runtime_error("not found edge in pending "+ buildEdgeName(edgeToRemove));
             }
             else{
                 return pendingMemories.end();
@@ -210,7 +210,7 @@ public:
      }
 
     void addPendingMemory(edge_t * edge){
-        cout<<"Add pending memory "<<buildEdgeName(edge)<<endl;
+      //  cout<<"Add pending memory "<<buildEdgeName(edge)<<endl;
         if(isKeptValid) {
             if (!edge) {
                 throw std::runtime_error("Edge is null!");

@@ -123,9 +123,10 @@ enum class LocationType {
 struct Location {
     LocationType locationType;
     std::optional<int> processorId; // Holds processor ID if location is OnProcessor
+    std::optional<double> afterWhen;
 
-    explicit Location(LocationType type, std::optional<int> procId = std::nullopt)
-            : locationType(type), processorId(procId) {}
+    explicit Location(LocationType type, std::optional<int> procId = std::nullopt,  std::optional<double> aftW = std::nullopt)
+            : locationType(type), processorId(procId) , afterWhen(aftW){}
 };
 typedef struct edge {
   /* basic edge information */
@@ -151,6 +152,8 @@ typedef struct edge {
                head->name == other.head->name &&
                weight == other.weight;
     }
+
+
 } edge_t;
 
 /**
@@ -217,23 +220,17 @@ int sort_by_increasing_top_level(const void *v1, const void *v2);
 int sort_by_increasing_avg_level(const void *v1, const void *v2);
 vertex_t *next_vertex_in_sorted_topological_order(graph_t *graph, vertex_t *vertex, int (*compar)(const void *, const void *));
 
-bool isLocatedNowhere(edge_t* edge, bool imaginary=false);
-bool isLocatedOnDisk(edge_t* edge, bool imaginary = false);
-bool isLocatedOnThisProcessor(edge_t* edge, int id, bool imaginary=false);
-bool isLocatedOnAnyProcessor(edge_t* edge, bool imaginary=false);
-int whatProcessorIsLocatedOn(edge_t* edge, bool imaginary=false);
-void delocateFromThisProcessorToDisk(edge_t* edge, int id, bool imaginary=false);
-void locateToThisProcessorFromDisk(edge_t* edge, int id, bool imaginary=false);
-void locateToThisProcessorFromNowhere(edge_t* edge, int id, bool imaginary=false);
+bool isLocatedNowhere(edge_t* edge, bool imaginary);
+bool isLocatedOnDisk(edge_t* edge, bool imaginary);
+bool isLocatedOnThisProcessor(edge_t* edge, int id, bool imaginary);
+bool isLocatedOnAnyProcessor(edge_t* edge, bool imaginary);
+int whatProcessorIsLocatedOn(edge_t* edge, bool imaginary);
+void delocateFromThisProcessorToDisk(edge_t* edge, int id, bool imaginary);
+void locateToThisProcessorFromDisk(edge_t* edge, int id, bool imaginary);
+void locateToThisProcessorFromNowhere(edge_t* edge, int id, bool imaginary, double afterWhen);
 
-bool isImgLocatedNowhere(edge_t* edge);
-bool isIngLocatedOnDisk(edge_t* edge);
-bool isImgLocatedOnThisProcessor(edge_t* edge, int id);
-bool isImgLocatedOnAnyProcessor(edge_t* edge);
-int whatProcessorIsImgLocatedOn(edge_t* edge);
-void imgDelocateFromThisProcessorToDisk(edge_t* edge, int id);
-void imgLocateToThisProcessorFromDisk(edge_t* edge, int id);
-void imgLocateToThisProcessorFromNowhere(edge_t* edge, int id);
+Location &getLocationOnProcessor(edge_t* edge, int id, bool imaginary);
+Location &getLocationOnDisk(edge_t* edge, bool imaginary);
 
 std::string buildEdgeName(edge_t* edge);
 

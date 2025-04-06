@@ -15,6 +15,16 @@
 extern Cluster * imaginedCluster;
 extern Cluster * actualCluster;
 
+struct EdgeChange{
+
+     edge_t * edge;
+    Location newLocation;
+
+    EdgeChange(edge_t * e,  Location nl):
+    edge(e), newLocation(nl) {}
+
+} ;
+
 class SchedulingResult {
 public:
     shared_ptr<Processor> processorOfAssignment;
@@ -24,7 +34,7 @@ public:
     int resultingVar;
     edge_t *edgeToKick;
     double peakMem;
-    vector<edge_t*> edgesToDelocateFromOtherProcessors;
+    vector<EdgeChange> edgesToChangeStatus;
 
     explicit SchedulingResult(const shared_ptr<Processor> &proc)
             : processorOfAssignment(proc ? make_shared<Processor>(*proc) : nullptr),
@@ -58,7 +68,7 @@ tentativeAssignmentHEFT(vertex_t *v, bool real,  SchedulingResult &result, Sched
 graph_t *convertToNonMemRepresentation(graph_t *withMemories, map<int, int> &noMemToWithMem);
 
 void
-processIncomingEdges(const vertex_t *v, bool real, shared_ptr<Processor> &ourDesiredProc,
+processIncomingEdges(const vertex_t *v, bool realAsNotImaginary, bool realAsRealRuntimes, bool isHeft, shared_ptr<Processor> &ourDesiredProc,
                      vector<std::shared_ptr<Processor>> &modifiedProcs,
                      double &earliestStartingTimeToComputeVertex);
 
@@ -71,7 +81,7 @@ void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &re
 void realSurplusOfOutgoingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, double &sumOut);
 
 void
-evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &bestSchedulingResult, vertex_t *pVertex, bool real=false);
+evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &bestSchedulingResult, vertex_t *pVertex, bool isHeft, bool real);
 
 void putChangeOnCluster(vertex_t * vertex,SchedulingResult &schedulingResult, Cluster * cluster, int &numberWithEvictedCases, bool real, bool isHeft=false);
 

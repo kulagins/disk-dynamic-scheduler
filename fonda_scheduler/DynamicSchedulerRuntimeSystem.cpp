@@ -97,8 +97,8 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
             removed = events.remove(firstEvent->id);
             assert(removed == true);
         }
-        cout << "\nevent " << firstEvent->id << " at " << firstEvent->getActualTimeFire();
-        cout << " num fired " << firstEvent->timesFired << endl;
+       // cout << "\nevent " << firstEvent->id << " at " << firstEvent->getActualTimeFire();
+     //   cout << " num fired " << firstEvent->timesFired << endl;
         if (firstEvent->timesFired > 0 && !firstEvent->predecessors.empty()) {
             bool hasCycle = firstEvent->checkCycleFromEvent();
             assert(!hasCycle);
@@ -175,10 +175,7 @@ void Event::fireTaskStart() {
 
 void Event::fireTaskFinish() {
     vertex_t *thisTask = this->task;
-    cout << "firing task Finish for " << this->id;
-    if (this->id == "bismark_report_00000008-f") {
-        cout << endl;
-    }
+    cout << "firing task Finish for " << this->id<<" at "<<this->getActualTimeFire()<<endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
@@ -198,7 +195,7 @@ void Event::fireTaskFinish() {
         string thisId = this->id;
 
         for (int i = 0; i < thisTask->out_degree; i++) {
-            locateToThisProcessorFromNowhere(thisTask->out_edges[i], this->processor->id);
+            locateToThisProcessorFromNowhere(thisTask->out_edges[i], this->processor->id, false, -1);
         }
 
         for (int i = 0; i < thisTask->out_degree; i++) {
@@ -228,15 +225,27 @@ void Event::fireTaskFinish() {
 
         bool foundSomeTaskForOurProcessor = false;
 
-        while (!foundSomeTaskForOurProcessor && !readyQueue.readyTasks.empty()) {
+        bool existsIdleProcessor = false;
+
+        for (const auto &item: cluster->getProcessors()){
+            if(item.second->getReadyTimeCompute()<this->getActualTimeFire()){
+                existsIdleProcessor= true;
+                break;
+            }
+        }
+
+        while ((!foundSomeTaskForOurProcessor || existsIdleProcessor ) && !readyQueue.readyTasks.empty() ) {
             vertex_t *mostReadyVertex = *readyQueue.readyTasks.begin();
 
 
             vector<shared_ptr<Processor>> bestModifiedProcs;
             shared_ptr<Processor> bestProcessorToAssign;
-            vector<shared_ptr<Event>> newEvents =
+            cout<<"assigning vertex "<<mostReadyVertex->name<<" ";
+                vector<shared_ptr<Event>> newEvents =
                     bestTentativeAssignment(mostReadyVertex, bestModifiedProcs, bestProcessorToAssign,
                                             this->actualTimeFire);
+
+
 
             for (const auto &item: newEvents) {
                 events.insert(item);
@@ -247,6 +256,14 @@ void Event::fireTaskFinish() {
 
             if (bestProcessorToAssign->id == this->processor->id) {
                 foundSomeTaskForOurProcessor = true;
+            }
+
+            existsIdleProcessor = false;
+            for (const auto &item: cluster->getProcessors()){
+                if(item.second->getReadyTimeCompute()<this->getActualTimeFire()){
+                    existsIdleProcessor= true;
+                    break;
+                }
             }
         }
 
@@ -280,7 +297,7 @@ shared_ptr<Processor> findPredecessorsProcessor(edge_t *incomingEdge, vector<sha
 
 
 void Event::fireReadStart() {
-    cout << "firing read start for " << this->id << " ";
+    cout << "firing read start for " << this->id << " at "<<this->actualTimeFire<<endl;
     // assert(finishRead->getActualTimeFire()> this->getActualTimeFire());
     auto canRun = dealWithPredecessors(shared_from_this());
 
@@ -310,7 +327,7 @@ void Event::fireReadStart() {
 }
 
 void Event::fireReadFinish() {
-    cout << "firing read finish for " << this->id << endl;
+    cout << "firing read finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<<endl;
 
     shared_ptr<Event> startRead = events.find(buildEdgeName(this->edge) + "-r-s");
 
@@ -321,23 +338,20 @@ void Event::fireReadFinish() {
     } else {
         //    cout << "DONE";
         removeOurselfFromSuccessors(this);
-        if (!isLocatedOnDisk(this->edge)) {
+        if (!isLocatedOnDisk(this->edge, false)) {
             auto ptr = events.find(buildEdgeName(this->edge) + "-w-f");
             assert(ptr != nullptr);
             auto ptr1 = events.find(buildEdgeName(this->edge) + "-r-s");
             assert(ptr->getActualTimeFire() < this->getActualTimeFire());
         }
-        locateToThisProcessorFromDisk(this->edge, this->processor->id);
+        locateToThisProcessorFromDisk(this->edge, this->processor->id, false);
         this->isDone = true;
     }
 }
 
 void Event::fireWriteStart() {
-    cout << "firing write start for " << this->id << endl;
-    if (buildEdgeName(this->edge) == "GRAPH_SOURCE-CHECK_DESIGN" ||
-        buildEdgeName(this->edge) == "GRAPH_SOURCE-MAKE_GENOME_FILTER") {
-        cout << endl;
-    }
+    cout << "firing write start for " << this->id <<" at "<<this->getActualTimeFire()<< endl;
+
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         //   cout << "BAD" << (*this->predecessors.begin())->id << endl;
@@ -366,7 +380,7 @@ void Event::fireWriteStart() {
 }
 
 void Event::fireWriteFinish() {
-    cout << "firing write finish for " << this->id << endl;
+    cout << "firing write finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<< endl;
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
@@ -374,7 +388,7 @@ void Event::fireWriteFinish() {
     } else {
         // cout << "DONE";
         removeOurselfFromSuccessors(this);
-        delocateFromThisProcessorToDisk(this->edge, this->processor->id);
+        delocateFromThisProcessorToDisk(this->edge, this->processor->id, false);
         this->isDone = true;
     }
 }
