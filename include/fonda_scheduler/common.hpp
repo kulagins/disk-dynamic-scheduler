@@ -343,23 +343,6 @@ struct CompareByTimestamp {
     }
 
 
-   /* bool isDeepSuccessor(const shared_ptr<Event> &a, const shared_ptr<Event> &b) const {
-        // cout << "isDeepSuccessor " << a->id << " of " << b->id << endl;
-        if (std::any_of(a->predecessors.begin(), a->predecessors.end(),
-                        [&b](const shared_ptr<Event> &pred) { return pred->id == b->id; })) {
-            //   cout << "true" << endl;
-            return true;
-        }
-        for (const auto &pred: a->predecessors) {
-            if (isDeepSuccessor(pred, b)) {
-                //        cout << "true" << endl;
-                return true;
-            }
-        }
-        // cout << "false" << endl;
-        return false;
-    } */
-
    bool isDeepSuccessor(const shared_ptr<Event> &a, const shared_ptr<Event> &b, unordered_set<string> &visited) const {
        if (a->id == b->id) {
            return true; // Direct match
@@ -379,46 +362,9 @@ struct CompareByTimestamp {
 
        return false;
    }
-    bool isDeepSuccessor(const shared_ptr<Event> &a, const shared_ptr<Event> &b) const {
-        unordered_set<string> visited;
-        return isDeepSuccessor(a, b, visited);
-    }
-
-
-    int compareByTopAndBottomLevels(const shared_ptr<Event> &a, const shared_ptr<Event> &b) const {
-
-    }
 
 
     bool operator()(const shared_ptr<Event> a, const shared_ptr<Event> b) const {
-        // cout << "compare " << a->id << " and " << b->id << endl;
-
-        // if (a->getActualTimeFire() != b->getActualTimeFire()) {
-        //    cout<<"a time "<<a->getActualTimeFire()<<" b time "<<b->getActualTimeFire()<<endl;
-        //   double diff = a->getActualTimeFire() - b->getActualTimeFire();
-        //  cout << "Time difference: " << diff << endl;
-        // return a->getActualTimeFire() < b->getActualTimeFire();
-        // }
-        if (a->id == "MERGED_BAM_FILTER_00000037-MACS2_00000028-r-f" ||
-            b->id == "MERGED_BAM_FILTER_00000037-MACS2_00000028-r-f") {
-            cout << "";
-        }
-        if (a->id == "MACS2_ANNOTATE_00000134-MACS2_QC_00000135-w-f" ||
-            b->id == "MACS2_ANNOTATE_00000134-MACS2_QC_00000135-w-f") {
-            cout << "";
-        }
-        if (a->id == "MACS2_ANNOTATE_00000134-f" || b->id == "MACS2_ANNOTATE_00000134-f") {
-            cout << "";
-        }
-
-
-        if (a->id == "CHECK_DESIGN_00000049-MACS2_00000028-r-s" ||
-            b->id == "CHECK_DESIGN_00000049-MACS2_00000028-r-s") {
-            cout << "Comparing " << a->id << " and " << b->id << endl;
-            cout << "Deep Successor (a -> b): " << isDeepSuccessor(a, b) << endl;
-            cout << "Deep Successor (b -> a): " << isDeepSuccessor(b, a) << endl;
-        }
-
 
         const double EPSILON = 1e-9;  // Adjust this if needed
         if (fabs(a->getActualTimeFire() - b->getActualTimeFire()) > EPSILON) {

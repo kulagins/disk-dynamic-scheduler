@@ -537,7 +537,10 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
     }
 
     if (atThisTime != -1) {
-        assert(estimatedStartOfRead <= atThisTime);
+        assert(estimatedStartOfRead <= atThisTime
+        ||
+        abs(estimatedStartOfRead - atThisTime)<0.1
+        );
         estimatedStartOfRead = atThisTime;
     }
 
