@@ -7,7 +7,7 @@ Cluster *actualCluster;
 
 
 double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v, const shared_ptr<Processor> &pj) {
-    assert(pj->getAvailableMemory() >= 0);
+    assert(!pj->getIsKeptValid() || pj->getAvailableMemory() >= 0);
     double Res = pj->getAvailableMemory() - peakMemoryRequirementOfVertex(v);
     for (int i = 0; i < v->in_degree; i++) {
         auto inEdge = v->in_edges[i];
@@ -35,15 +35,18 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
     int numberWithEvictedCases = 0, numberWithEvictedCases2 = 0;
     for (auto &pair: ranks) {
         auto vertex = pair.first;
+        //cout<<"deal w "<<vertex->name<<endl;
 
         SchedulingResult bestSchedulingResult = SchedulingResult(nullptr);
         SchedulingResult bestSchedulingResultCorrectForHeftOnly = SchedulingResult(nullptr);
+      //  cout << "imagine" << endl;
         bestTentativeAssignment(isHeft, vertex, bestSchedulingResult, bestSchedulingResultCorrectForHeftOnly);
 
         SchedulingResult bestSchedulingResultOnReal = SchedulingResult(
                 actualCluster->getProcessorById(bestSchedulingResult.processorOfAssignment->id));
         SchedulingResult bestCorrectSchedulingResultOnReal = SchedulingResult(
                 actualCluster->getProcessorById(bestSchedulingResult.processorOfAssignment->id));
+       // cout << "real" << endl;
         if (isHeft) {
             tentativeAssignmentHEFT(vertex, true, bestSchedulingResultOnReal, bestCorrectSchedulingResultOnReal);
             bestSchedulingResultOnReal = bestCorrectSchedulingResultOnReal;
@@ -56,14 +59,14 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
             cout << "Invalid assignment of " << vertex->name;
             return -1;
         } else {
-          //  cout  << vertex->name << //" best " <<
-          // " "<< bestSchedulingResult.startTime << " "
-           //      << bestSchedulingResult.finishTime << " on "
-            //     << bestSchedulingResult.processorOfAssignment->id
-                 //<< " variant " << bestSchedulingResult.resultingVar
-              //   << endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
+       /*     cout  << vertex->name << " best " <<
+           " "<< bestSchedulingResult.startTime << " "
+                << bestSchedulingResult.finishTime << " on "
+                 << bestSchedulingResult.processorOfAssignment->id
+                 << " variant " << bestSchedulingResult.resultingVar
+                 << endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
 
-           /* cout << " for " << vertex->name << " best real " << bestSchedulingResultOnReal.startTime << " "
+            cout << " for " << vertex->name << " best real " << bestSchedulingResultOnReal.startTime << " "
                  << bestSchedulingResultOnReal.finishTime << " on proc "
                  << bestSchedulingResultOnReal.processorOfAssignment->id
                  << " variant " << bestSchedulingResultOnReal.resultingVar
@@ -71,7 +74,7 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
         }
 
 
-        //cout << "imagine" << endl;
+      //  cout << "imagine" << endl;
         putChangeOnCluster(vertex, bestSchedulingResult, imaginedCluster, numberWithEvictedCases, false, isHeft);
         //try {
        // cout << "real" << endl;
@@ -80,6 +83,11 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
         // catch(...){
         //    cout<<"some error"<<endl;
         //   }
+
+      /*  for (const auto &item: actualCluster->getProcessorById(5)->getPendingMemories()){
+            cout<<buildEdgeName(item)<<endl;
+        }
+        cout<<"<<<<<<<<<"<<endl; */
 
         if (!isHeft) {
             for (const auto &item: imaginedCluster->getProcessors()) {
@@ -113,7 +121,7 @@ void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &re
       //  cout << "try proc " << processor->id << endl;
         double actualStartTime = 0, actualFinishTime = 0;
         SchedulingResult tentativeResult = SchedulingResult(processor);
-        SchedulingResult correctTentativeResultForHeftOnly = SchedulingResult(processor);
+        SchedulingResult correctTentativeResultForHeftOnly = SchedulingResult(actualCluster->getProcessorById(processor->id));
 
         checkIfPendingMemoryCorrect(processor);
         if (isHeft) {
@@ -140,7 +148,7 @@ void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &re
                 if (result.startTime != correctTentativeResultForHeftOnly.startTime) {
                     //resultnumberWithEvictedCases++;
                     //throw runtime_error("numberWithEvictedCases++;");
-                    cout << "increase numWithEvictged in HEFT" << endl;
+                  //  cout << "increase numWithEvictged in HEFT" << endl;
                 }
                 result.resultingVar = 1;
             }
@@ -327,7 +335,9 @@ tentativeAssignmentHEFT(vertex_t *v, bool real, SchedulingResult &result, Schedu
     assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
 
     double timeToRun = real ? v->time * v->factorForRealExecution : v->time;
-
+    if(v->name=="TRIMGALORE_00000080"|| v->name=="CHECK_DESIGN_00000174"){
+        cout<<"";
+    }
     double sumOut = getSumOut(v);
     assert(sumOut == outMemoryRequirement(v));
    if (result.processorOfAssignment->getMemorySize() < outMemoryRequirement(v) ||
@@ -382,11 +392,15 @@ tentativeAssignmentHEFT(vertex_t *v, bool real, SchedulingResult &result, Schedu
                 double startWriteTime = max( writeTime,   real ? (*it)->tail->makespan
                                                                : (*it)->tail->makespanPerceived);
                 writeTime = startWriteTime +  weightForTime / resultCorrect.processorOfAssignment->writeSpeedDisk;
+            //   cout<<"tent on proc "<<resultCorrect.processorOfAssignment->id<<" ";
+                resultCorrect.edgesToChangeStatus.emplace_back((*it), Location(LocationType::OnDisk, nullopt, writeTime));
                 it = resultCorrect.processorOfAssignment->removePendingMemory(*it);
+
             } else { ++it; }
 
         }
         if (stillNeedsToBeEvictedToRun > 0) {
+            cout<<buildEdgeName(*resultCorrect.processorOfAssignment->getPendingMemories().begin())<<endl;
             throw runtime_error("stillNeedsToBeEvictedToRun > 0");
         }
         assert(stillNeedsToBeEvictedToRun <= 0);
@@ -514,6 +528,15 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
         procInClusterWithId->updateFrom(*modifiedProc);
     }
 
+    for(auto e: schedulingResult.edgesToChangeStatus){
+      //  cout<<"change status "<<buildEdgeName(e.edge)<<endl;
+        assert(!shouldUseImaginary);
+        if(isLocatedOnThisProcessor(e.edge,schedulingResult.processorOfAssignment->id, shouldUseImaginary )){
+            delocateFromThisProcessorToDisk(e.edge,schedulingResult.processorOfAssignment->id, shouldUseImaginary);
+            getLocationOnDisk(e.edge,shouldUseImaginary).afterWhen= e.newLocation.afterWhen;
+        }
+    }
+
     assert(schedulingResult.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
     vertex->assignedProcessorId = schedulingResult.processorOfAssignment->id;
 
@@ -529,7 +552,8 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
 
 
         if (onWhichProcessor == schedulingResult.processorOfAssignment->id) {
-            schedulingResult.processorOfAssignment->delocateToDisk(ine, shouldUseImaginary);
+            //optionally, because edge could have been force removed during calculation of caorrect result in HEFT
+            schedulingResult.processorOfAssignment->delocateToDiskOptionally(ine, shouldUseImaginary);
         } else {
             if (onWhichProcessor != -1) {
                 cluster->getProcessorById(onWhichProcessor)->delocateToDiskOptionally(ine, shouldUseImaginary);

@@ -22,6 +22,8 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
     static thread_local std::mt19937 gen(std::random_device{}());
     static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
 
+    remove_vertex(graph, findVertexByName(graph,"GRAPH_SOURCE"));
+    remove_vertex(graph, findVertexByName(graph,"GRAPH_TARGET"));
     vertex_t *vertex = graph->first_vertex;
     switch (algoNum) {
         case 1: {
@@ -118,7 +120,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
         firstEvent->fire();
         resMakespan = max(resMakespan, firstEvent->getActualTimeFire());
         lastEventName = firstEvent->id;
-        firstEvent.reset();
+        //firstEvent.reset();
         //cout<<"events now "; events.printAll();
     }
     return resMakespan;
@@ -177,7 +179,7 @@ void Event::fireTaskStart() {
 
 void Event::fireTaskFinish() {
     vertex_t *thisTask = this->task;
-    // cout << "firing task Finish for " << this->id<<" at "<<this->getActualTimeFire()<<endl;
+  //   cout << "firing task Finish for " << this->id<<" at "<<this->getActualTimeFire()<<endl;
     //  cout<<this->actualTimeFire<<" on "<<this->processor->id<<endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
@@ -298,7 +300,7 @@ shared_ptr<Processor> findPredecessorsProcessor(edge_t *incomingEdge, vector<sha
 
 
 void Event::fireReadStart() {
-    //cout << "firing read start for " << this->id << " at "<<this->actualTimeFire<<endl;
+   // cout << "firing read start for " << this->id << " at "<<this->actualTimeFire<<endl;
     // assert(finishRead->getActualTimeFire()> this->getActualTimeFire());
     auto canRun = dealWithPredecessors(shared_from_this());
 
@@ -328,7 +330,7 @@ void Event::fireReadStart() {
 }
 
 void Event::fireReadFinish() {
-    //cout << "firing read finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<<endl;
+//    cout << "firing read finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<<endl;
 
     shared_ptr<Event> startRead = events.find(buildEdgeName(this->edge) + "-r-s");
 
@@ -351,7 +353,7 @@ void Event::fireReadFinish() {
 }
 
 void Event::fireWriteStart() {
-    // cout << "firing write start for " << this->id <<" at "<<this->getActualTimeFire()<< endl;
+   //  cout << "firing write start for " << this->id <<" at "<<this->getActualTimeFire()<< endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
@@ -381,13 +383,13 @@ void Event::fireWriteStart() {
 }
 
 void Event::fireWriteFinish() {
-    //  cout << "firing write finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<< endl;
+ //     cout << "firing write finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<< endl;
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-        // cout << "DONE";
+   //      cout << "DONE"<<endl;
         removeOurselfFromSuccessors(this);
         delocateFromThisProcessorToDisk(this->edge, this->processor->id, false);
         this->isDone = true;
@@ -424,7 +426,7 @@ void Event::removeOurselfFromSuccessors(Event *us) {
         }
         successor++;
     }
-    successors.clear();
+   // successors.clear();
 }
 
 

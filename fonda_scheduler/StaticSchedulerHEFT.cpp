@@ -147,7 +147,7 @@ void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &re
                 if (result.startTime != correctTentativeResultForHeftOnly.startTime) {
                     //resultnumberWithEvictedCases++;
                     //throw runtime_error("numberWithEvictedCases++;");
-                    cout << "increase numWithEvictged in HEFT" << endl;
+                //    cout << "increase numWithEvictged in HEFT" << endl;
                 }
                 result.resultingVar = 1;
             }

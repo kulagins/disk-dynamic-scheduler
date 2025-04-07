@@ -297,7 +297,7 @@ void Event::fire(){
     }
     this->timesFired++;
 
-    removeOurselfFromSuccessors(this);
+   // removeOurselfFromSuccessors(this);
 
   /*
 

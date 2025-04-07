@@ -164,6 +164,25 @@ int main(int argc, char *argv[]) {
 
 
         }
+
+        if(inMemoryRequirement(pv)> biggestMem){
+            //  cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+            for (int i = 0; i < pv->in_degree; i++) {
+                pv->in_edges[i]->weight /= 4;
+            }
+
+            if(inMemoryRequirement(pv)> biggestMem){
+                // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                for (int i = 0; i < pv->in_degree; i++) {
+                    pv->in_edges[i]->weight /= 4;
+                }
+                if(inMemoryRequirement(pv)> biggestMem) {
+                    return 0;
+                }
+            }
+
+
+        }
         pv= pv->next;
     }
     cout<<endl;

@@ -72,7 +72,7 @@ void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
 //unsigned long
 std::set<edge_t *, decltype(Processor::comparePendingMemories) *>::iterator
 Processor::delocateToDisk(edge_t *edge, bool shouldUseImaginary) {
-    //  cout<<"delocate  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
+      //cout<<"delocate  from "<<this->id<<" "<<buildEdgeName(edge)<<" imagine? "<<(shouldUseImaginary? "yes":"no")<<endl;
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
@@ -87,16 +87,15 @@ Processor::delocateToDisk(edge_t *edge, bool shouldUseImaginary) {
 
 std::set<edge_t *, decltype(Processor::comparePendingMemories) *>::iterator
 Processor::delocateToDiskOptionally(edge_t *edge, bool shouldUseImaginary) {
-    //  cout<<"delocate optionally  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
+     // cout<<"delocate optionally  from "<<this->id<<" "<<buildEdgeName(edge)<<" imagine? "<<(shouldUseImaginary? "yes":"no")<<endl;
+
+    if (isLocatedOnThisProcessor(edge, this->id, false))
+        delocateFromThisProcessorToDisk(edge, this->id, shouldUseImaginary);
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
         return this->pendingMemories.end();
     }
-
-    if (isLocatedOnThisProcessor(edge, this->id, false))
-        delocateFromThisProcessorToDisk(edge, this->id, shouldUseImaginary);
-
     return removePendingMemory(edge);
 
 }
@@ -107,8 +106,8 @@ void Processor::loadFromDisk(edge_t *edge, bool shouldUseImaginary) {
 }
 
 void Processor::loadFromNowhere(edge_t *edge, bool shouldUseImaginary, double afterWhen) {
-    //  cout<<"load onto proc "<<this->id<<" ";
-    //  print_edge(edge);
+      //cout<<"load onto proc "<<this->id<<" ";
+     // print_edge(edge);
     addPendingMemory(edge);
     locateToThisProcessorFromNowhere(edge, this->id, shouldUseImaginary, afterWhen);
     //  cout<<"remains mem "<< this->availableMemory<<endl;

@@ -644,10 +644,10 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t *graph, std::
      * If several sources are detected, create new vertex and connect it to existing sources
      */
     if (several_sources) {
-        source = new_vertex(graph, "GRAPH_SOURCE"+suffix, 100, NULL);
+        source = new_vertex(graph, "GRAPH_SOURCE"+suffix, 1, NULL);
         for(vertex_t *v = graph->first_vertex; v; v=v->next) {
             if ((v->in_degree==0) && (v!= source)) {
-                new_edge(graph, source, v, 100, NULL);
+                new_edge(graph, source, v, 1, NULL);
             }
         }
     }

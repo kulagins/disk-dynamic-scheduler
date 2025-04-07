@@ -21,9 +21,9 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
                                                                           startTime, resultingEvictionVariant,
                                                                           newEvents, reallyUsedMem, notEarlierThan);
 
-      //  cout<<"on "<<processor->id<<" fin time "<<finTime<<endl;
+        //cout<<"on "<<processor->id<<" fin time "<<finTime<<endl;
         if (bestFinishTime > finTime) {
-            //cout << "best acutalize to " << ourModifiedProc->id << " act used mem " << reallyUsedMem << endl;
+           // cout << "best acutalize to " << ourModifiedProc->id << " act used mem " << reallyUsedMem << endl;
             assert(!modifiedProcs.empty());
             bestModifiedProcs.clear();
             bestModifiedProcs = modifiedProcs;
@@ -155,6 +155,8 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
         return {};
     }
     realSurplusOfOutgoingEdges(vertex, ourModifiedProc, sumOut);
+    double sumIn = getSumIn(vertex);
+    realSurplusOfOutgoingEdges(vertex, ourModifiedProc, sumIn);
     double biggestFileWeight = 0;
     double sumWeightsOfAllPending = 0;
     double amountToOffloadWithoutBiggestFile = 0;
@@ -172,7 +174,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
             //cout<<"cant"<<endl;
             timeToFinishNoEvicted = std::numeric_limits<double>::max();
         }
-        if (getSumIn(vertex) > ourModifiedProc->getAvailableMemory()) {
+        if (sumIn> ourModifiedProc->getAvailableMemory()) {
             timeToFinishNoEvicted = std::numeric_limits<double>::max();
         }
 
@@ -789,7 +791,7 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
 
     assert(estimatedTimeOfFinishWrite <= readEvents.first->getExpectedTimeFire());
 
-    assert(incomingEdge->weight < 0.001 || estimatedTimeOfFinishWrite > eventStartWrite->getExpectedTimeFire());
+    assert(incomingEdge->weight < 1 || estimatedTimeOfFinishWrite > eventStartWrite->getExpectedTimeFire());
 
     createdEvents.emplace_back(eventFinishWrite);
     predecessorsProc->setLastWriteEvent(eventFinishWrite);
@@ -799,7 +801,7 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
 
     // cout << buildEdgeName(incomingEdge)<< " start write at " << eventStartWrite->getActualTimeFire() << " finish at "
     //      << eventFinishWrite->getActualTimeFire() << endl;
-    assert(incomingEdge->weight < 0.001 ||
+    assert(incomingEdge->weight < 1 ||
            eventStartWrite->getActualTimeFire() < eventFinishWrite->getActualTimeFire());
     assert(eventFinishWrite->getActualTimeFire() ==
            eventStartWrite->getActualTimeFire() + incomingEdge->weight / predecessorsProc->writeSpeedDisk);

@@ -177,6 +177,10 @@ public:
         this->isKeptValid= is;
     }
 
+    bool getIsKeptValid(){
+       return this->isKeptValid;
+    }
+
       vertex_t *getAssignedTask() const;
 
     void assignSubgraph(vertex_t *taskToBeAssigned);
@@ -189,7 +193,7 @@ public:
     std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator
     //bool
     removePendingMemory(edge_t * edgeToRemove){
-     //   cout<<"removing pending memory "<<buildEdgeName(edgeToRemove)<<" from proc "<<this->id<<endl;
+       // cout<<"removing pending memory "<<buildEdgeName(edgeToRemove)<<" from proc "<<this->id<<endl;
 
         auto it = pendingMemories.find(edgeToRemove);
         if (it == pendingMemories.end() ) {
