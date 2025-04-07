@@ -13,6 +13,7 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
         double finTime = -1, startTime = -1, reallyUsedMem = 0;
         int resultingEvictionVariant = -1;
         auto ourModifiedProc = make_shared<Processor>(*processor);
+      //  cout<<"adding our proc "<<ourModifiedProc->id<<endl;
         vector<shared_ptr<Event>> newEvents = {};
         //checkIfPendingMemoryCorrect(ourModifiedProc);
         vector<shared_ptr<Processor>> modifiedProcs = tentativeAssignment(vertex, ourModifiedProc,
@@ -20,13 +21,15 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
                                                                           startTime, resultingEvictionVariant,
                                                                           newEvents, reallyUsedMem, notEarlierThan);
 
-        cout<<"on "<<processor->id<<" fin time "<<finTime<<endl;
+      //  cout<<"on "<<processor->id<<" fin time "<<finTime<<endl;
         if (bestFinishTime > finTime) {
             //cout << "best acutalize to " << ourModifiedProc->id << " act used mem " << reallyUsedMem << endl;
             assert(!modifiedProcs.empty());
+            bestModifiedProcs.clear();
             bestModifiedProcs = modifiedProcs;
             bestFinishTime = finTime;
             bestStartTime = startTime;
+            bestProcessorToAssign.reset();
             bestProcessorToAssign = ourModifiedProc;
             resultingVar = resultingEvictionVariant;
             bestEvents = newEvents;
@@ -39,6 +42,7 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
             for (auto &item: modifiedProcs) {
                 item.reset();
             }
+            ourModifiedProc.reset();
         }
     }
     //cout << "!!!END BEST"<<endl;
@@ -69,7 +73,7 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
                 bestFinishTime > vertex->in_edges[j]->tail->makespan);
     }
 
-    cout << "resulting var " << resultingVar<<" on "<<bestProcessorToAssign->id << endl;
+   // cout << "resulting var " << resultingVar<<" on "<<bestProcessorToAssign->id << endl;
     return bestEvents;
 }
 
@@ -157,7 +161,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
     double amountToOffloadWithoutAllFiles = 0;
     double Res = howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(vertex, ourModifiedProc);
     if (Res < 0) {
-        cout<<" overflow! ";
+       // cout<<" overflow! ";
         double amountToOffload = -Res;
         double shortestFT = std::numeric_limits<double>::max();
 
@@ -842,4 +846,8 @@ void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t 
         assert(ourModifiedProc->getAfterAvailableMemory() >= 0 &&
                ourModifiedProc->getAfterAvailableMemory() < ourModifiedProc->getMemorySize());
     }
+}
+
+double assessWritingOfEdge(edge_t* edge, shared_ptr<Processor> proc){
+    return edge->weight/ proc->writeSpeedDisk;
 }

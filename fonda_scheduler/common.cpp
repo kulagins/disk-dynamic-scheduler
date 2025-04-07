@@ -296,6 +296,21 @@ void Event::fire(){
             break;
     }
     this->timesFired++;
+
+    removeOurselfFromSuccessors(this);
+
+  /*
+
+    for ( auto &item: this->predecessors){
+        for (auto succspred = item->successors.begin(); succspred != item->successors.end();) {
+            if ((*succspred)->id == this->id) {
+                succspred = item->successors.erase(succspred);
+            } else {
+                // Move to the next element
+                ++succspred;
+            }
+        }
+    } */
 }
 
 
@@ -307,14 +322,14 @@ void Processor::updateFrom(const Processor& other){
 
     std::unordered_map<std::string, std::weak_ptr<Event>> updatedEvents;
     // Keep valid old events and add new ones from 'other'
-    for (const auto& [key, weak_event] : other.eventsOnProc) {
+   /* for (const auto& [key, weak_event] : other.eventsOnProc) {
         if (auto shared_event = weak_event.lock()) {  // Ensure the weak_ptr is still valid
             updatedEvents[key] = weak_event;  // Insert or update
             shared_event->processor = shared_from_this();
         }
     }
     // Swap the updated map into place
-    eventsOnProc.swap(updatedEvents);
+    eventsOnProc.swap(updatedEvents); */
 
     this->readyTimeCompute= other.readyTimeCompute;
     this->readyTimeRead = other.readyTimeRead;

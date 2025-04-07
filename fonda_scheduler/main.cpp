@@ -98,7 +98,10 @@ int main(int argc, char *argv[]) {
 
 
     imaginedCluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+
     actualCluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+
+
     double biggestMem = imaginedCluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     string filename;
@@ -143,14 +146,20 @@ int main(int argc, char *argv[]) {
             //cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
         }
         if(outMemoryRequirement(pv)> biggestMem){
-            cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+          //  cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
             for (int i = 0; i < pv->out_degree; i++) {
                 pv->out_edges[i]->weight /= 4;
             }
             double d = inMemoryRequirement(pv);
             double requirement = outMemoryRequirement(pv);
             if(outMemoryRequirement(pv)> biggestMem){
-                return 0;
+               // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                for (int i = 0; i < pv->out_degree; i++) {
+                    pv->out_edges[i]->weight /= 4;
+                }
+                if(outMemoryRequirement(pv)> biggestMem) {
+                    return 0;
+                }
             }
 
 
@@ -177,6 +186,7 @@ int main(int argc, char *argv[]) {
 
     double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant);
 
+    events.deleteAll();
 
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
     cout<<"makespan_1 "<<d<<"\t\n";

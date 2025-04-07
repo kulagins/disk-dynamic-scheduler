@@ -29,8 +29,9 @@ protected:
     double memorySize;
     double processorSpeed;
     vertex_t *assignedTask;
-    std::unordered_map<string, std::weak_ptr<Event>> eventsOnProc;
+    //std::unordered_map<string, std::weak_ptr<Event>> eventsOnProc;
     bool isKeptValid= true;
+
 
 public:
     static auto comparePendingMemories(edge_t* a, edge_t*b) -> bool {
@@ -54,6 +55,7 @@ public:
     double softReadyTimeWrite;
 
     double memoryOffloadingPenalty;
+    vector<edge_t *> writingQueue;
 
 protected:
     double availableMemory;
@@ -262,9 +264,9 @@ public:
 
     void addEvent(std::shared_ptr<Event> event);
 
-    std::unordered_map<string, std::weak_ptr<Event>>  getEvents(){
-        return this->eventsOnProc;
-    }
+   // std::unordered_map<string, std::weak_ptr<Event>>  getEvents(){
+   //     return this->eventsOnProc;
+   // }
     void updateFrom(const Processor& other);
 
     std::set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> &getPendingMemories() {
@@ -351,16 +353,6 @@ public:
 
     }
 
-    Cluster(unsigned int clusterSize) {
-        processors.reserve(clusterSize);
-        //for (unsigned long i = 0; i < clusterSize; i++) {
-     //       processors.at(i) = make_shared<Processor>();
-      //  }
-
-
-
-    }
-
 
 
 public:
@@ -372,14 +364,7 @@ public:
         processors[p->id] = p;
 
     }
-    void replaceProcessor(const shared_ptr<Processor>& p){
-        processors[p->id] = p;
-    }
 
-
-    void removeProcessor(Processor * toErase){
-        this->processors.erase(toErase->id);
-    }
 
     std::unordered_map<int, std::shared_ptr<Processor>>& getProcessors() {
         return this->processors;

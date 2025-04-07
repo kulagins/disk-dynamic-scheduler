@@ -35,12 +35,6 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
     int numberWithEvictedCases = 0, numberWithEvictedCases2 = 0;
     for (auto &pair: ranks) {
         auto vertex = pair.first;
-        cout << "processing " << vertex->name << endl;
-        if (//vertex->name=="TRIMGALORE_00000540" //|| vertex->name=="TRIMGALORE_00000002" ||
-                vertex->name == "MERGED_LIB_BAM_FILTER_00000205"
-                ) {
-            cout << endl;
-        }
 
         SchedulingResult bestSchedulingResult = SchedulingResult(nullptr);
         SchedulingResult bestSchedulingResultCorrectForHeftOnly = SchedulingResult(nullptr);
@@ -62,11 +56,12 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
             cout << "Invalid assignment of " << vertex->name;
             return -1;
         } else {
-            cout << " for " << vertex->name << " best " << bestSchedulingResult.startTime << " "
-                 << bestSchedulingResult.finishTime << " on proc "
-                 << bestSchedulingResult.processorOfAssignment->id
-                 << " variant " << bestSchedulingResult.resultingVar
-                 << endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
+          //  cout  << vertex->name << //" best " <<
+          // " "<< bestSchedulingResult.startTime << " "
+           //      << bestSchedulingResult.finishTime << " on "
+            //     << bestSchedulingResult.processorOfAssignment->id
+                 //<< " variant " << bestSchedulingResult.resultingVar
+              //   << endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
 
            /* cout << " for " << vertex->name << " best real " << bestSchedulingResultOnReal.startTime << " "
                  << bestSchedulingResultOnReal.finishTime << " on proc "
@@ -75,13 +70,11 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
                  << endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl; */
         }
 
-        if (vertex->name == "TRIMGALORE_00000055") {
-            cout << "";
-        }
-        cout << "imagine" << endl;
+
+        //cout << "imagine" << endl;
         putChangeOnCluster(vertex, bestSchedulingResult, imaginedCluster, numberWithEvictedCases, false, isHeft);
         //try {
-        cout << "real" << endl;
+       // cout << "real" << endl;
         putChangeOnCluster(vertex, bestSchedulingResultOnReal, actualCluster, numberWithEvictedCases2, true, isHeft);
         //}
         // catch(...){
@@ -128,7 +121,7 @@ void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &re
         } else {
             tentativeAssignment(vertex, false, tentativeResult);
         }
-       cout<<"tentative ft on "<<processor->id<<" is "<<tentativeResult.finishTime <<(tentativeResult.resultingVar>1? "overflow!":"")<<endl;
+     //  cout<<"tentative ft on "<<processor->id<<" is "<<tentativeResult.finishTime <<(tentativeResult.resultingVar>1? "overflow!":"")<<endl;
 
         if (!isHeft)
             checkIfPendingMemoryCorrect(tentativeResult.processorOfAssignment);
@@ -452,7 +445,7 @@ evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &best
         case 1:
             break;
         case 2:
-            cout<<"best with 1 kick"<<endl;
+        //    cout<<"best with 1 kick"<<endl;
             assert(bestSchedulingResult.edgeToKick != nullptr);
 
             canAlreadyBeEvicted ?
@@ -470,12 +463,12 @@ evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &best
             checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
             break;
         case 3:
-            cout<<"best with all kick"<<endl;
+           // cout<<"best with all kick"<<endl;
             assert(bestSchedulingResult.edgesToChangeStatus.size()>1);
             for (auto it = bestSchedulingResult.processorOfAssignment->getPendingMemories().begin();
                  it != bestSchedulingResult.processorOfAssignment->getPendingMemories().end();) {
                 edge_t *nextEdge = *it;
-                cout << buildEdgeName(nextEdge) << endl;
+               // cout << buildEdgeName(nextEdge) << endl;
                 if (nextEdge->head->name != pVertex->name) {
                     it = canAlreadyBeEvicted ?
                          bestSchedulingResult.processorOfAssignment->delocateToDiskOptionally(nextEdge,
@@ -844,13 +837,8 @@ vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int botto
     switch (bottomLevelVariant) {
         case 1: {
             vertex_t *vertex = graph->first_vertex;
-            if(vertex->name=="lanemerge"){
-                cout<<"";
-            }
             while (vertex != nullptr) {
-                cout<<"rank for "<<vertex->name<<endl;
                 double rank = calculateSimpleBottomUpRank(vertex);
-                cout<<"rank for "<<vertex->name<<" is "<<rank<<endl;
                 ranks.emplace_back(vertex, rank);
                 vertex = vertex->next;
             }

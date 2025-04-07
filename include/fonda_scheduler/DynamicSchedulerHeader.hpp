@@ -45,4 +45,5 @@ void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t*
 void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc);
 bool dealWithPredecessors(shared_ptr<Event> us);
 void checkBestEvents(vector<shared_ptr<Event>> &bestEvents);
+double assessWritingOfEdge(edge_t* edge, shared_ptr<Processor> proc);
 #endif //RESHI_TXT_DYNSCHED_HPP

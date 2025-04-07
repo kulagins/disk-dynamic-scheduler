@@ -9,6 +9,7 @@
 #include <queue>
 #include <unordered_set>
 #include <regex>
+#include <utility>
 
 
 class Assignment {
@@ -104,13 +105,13 @@ private:
             task(task),
             edge(edge),
             type(type),
-            processor(processor),
+            processor(std::move(processor)),
             expectedTimeFire(expectedTimeFire),
             actualTimeFire(actualTimeFire),
             predecessors({}),
             successors({}),
             isEviction(isEviction),
-            id(idN) {
+            id(std::move(idN)) {
         // cout<<"creating event "<<id<<endl;
     }
 
@@ -133,7 +134,7 @@ public:
                                               const std::vector<std::shared_ptr<Event>> &successors,
                                               bool isEviction, const std::string &id) {
         auto event = std::shared_ptr<Event>(
-                new Event(task, edge, type, processor, expectedTimeFire, actualTimeFire, isEviction, id));
+                new Event(task, edge, type, std::move(processor), expectedTimeFire, actualTimeFire, isEviction, id));
         event->initialize(predecessors, successors);
         return event;
     }
@@ -154,7 +155,7 @@ public:
 
     void removeOurselfFromSuccessors(Event *us);
 
-    void addPredecessorInPlanning(shared_ptr<Event> pred) {
+    void addPredecessorInPlanning(const shared_ptr<Event>& pred) {
         if (pred->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS PREDECESSOR!");
         }
@@ -172,7 +173,7 @@ public:
         pred->addSuccessorInPlanning(shared_from_this());
     }
 
-    void propagateChainInPlanning(shared_ptr<Event> event, double add) {
+    void propagateChainInPlanning(const shared_ptr<Event>& event, double add) {
         for (auto &successor: event->successors) {
             if(successor->getExpectedTimeFire()!= successor->getActualTimeFire()){
                 cout<<"!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!!"<<endl;
@@ -187,7 +188,7 @@ public:
         }
     }
 
-    void addSuccessorInPlanning(shared_ptr<Event> succ) {
+    void addSuccessorInPlanning(const shared_ptr<Event>& succ) {
         assert(succ != nullptr);
         if (succ->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS SUCCESSOR!");
@@ -719,6 +720,10 @@ public:
             reinsertChainBackwardFrom(predecessor, visited);
 
         }
+    }
+    void deleteAll(){
+        eventSet.clear();
+        eventMap.clear();
     }
 
     void checkAllEvents() {

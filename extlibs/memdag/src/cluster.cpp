@@ -3,12 +3,12 @@
 
 using namespace std;
 
-shared_ptr<Processor>Cluster::getMemBiggestFreeProcessor() {
+shared_ptr<Processor> Cluster::getMemBiggestFreeProcessor() {
 
     shared_ptr<Processor> largestProcessor = nullptr;
     double largestMemory = 0;
 
-    for (auto& [id, processor] : processors) {
+    for (auto &[id, processor]: processors) {
         if (processor->getMemorySize() > largestMemory) {
             largestMemory = processor->getMemorySize();
             largestProcessor = processor;
@@ -25,8 +25,9 @@ shared_ptr<Processor> Cluster::getFastestProcessorFitting(double memReq) {
 
     size_t fastestSpeed = 0;
 
-    for (auto& [id, processor] : processors) {
-        if (processor->getMemorySize() > memReq && processor->getProcessorSpeed()> fastestSpeed && !processor->isBusy) {
+    for (auto &[id, processor]: processors) {
+        if (processor->getMemorySize() > memReq && processor->getProcessorSpeed() > fastestSpeed &&
+            !processor->isBusy) {
             fastestSpeed = processor->getProcessorSpeed();
             bestProcessor = processor;
         }
@@ -36,23 +37,22 @@ shared_ptr<Processor> Cluster::getFastestProcessorFitting(double memReq) {
 
 }
 
-shared_ptr<Processor>Cluster::getFastestFreeProcessor() {
+shared_ptr<Processor> Cluster::getFastestFreeProcessor() {
 
     shared_ptr<Processor> fastestProcessor = nullptr;
     size_t bestSpeed = 0;
 
-    for (auto& [id, processor] : processors) {
+    for (auto &[id, processor]: processors) {
         if (processor->getProcessorSpeed() > bestSpeed && !processor->isBusy) {
             bestSpeed = processor->getProcessorSpeed();
             fastestProcessor = processor;
         }
     }
-    if(fastestProcessor==nullptr){
+    if (fastestProcessor == nullptr) {
         throw;
     }
     return fastestProcessor;
 }
-
 
 
 void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
@@ -60,9 +60,9 @@ void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
         this->assignedTask = taskToBeAssigned;
         //TODO
         //taskToBeAssigned->assignedProcessor= this;
-       taskToBeAssigned->assignedProcessorId =  this->id;
+        taskToBeAssigned->assignedProcessorId = this->id;
         this->isBusy = true;
-    } else{
+    } else {
         this->assignedTask = NULL;
         this->isBusy = false;
     }
@@ -70,48 +70,49 @@ void Processor::assignSubgraph(vertex_t *taskToBeAssigned) {
 
 //std::set<edge_t *, decltype(comparePendingMemories)*>::iterator
 //unsigned long
-std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Processor::delocateToDisk(edge_t* edge, bool shouldUseImaginary) {
- //  cout<<"delocate  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
+std::set<edge_t *, decltype(Processor::comparePendingMemories) *>::iterator
+Processor::delocateToDisk(edge_t *edge, bool shouldUseImaginary) {
+    //  cout<<"delocate  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
-        cout<<"not fnd1 "<<buildEdgeName(edge)<<endl;
+        cout << "not fnd1 " << buildEdgeName(edge) << endl;
     }
 
-     delocateFromThisProcessorToDisk(edge, this->id, shouldUseImaginary);
+    delocateFromThisProcessorToDisk(edge, this->id, shouldUseImaginary);
 
     return removePendingMemory(edge);
 
 }
 
-std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator Processor::delocateToDiskOptionally(edge_t* edge, bool shouldUseImaginary) {
-  //  cout<<"delocate optionally  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
+std::set<edge_t *, decltype(Processor::comparePendingMemories) *>::iterator
+Processor::delocateToDiskOptionally(edge_t *edge, bool shouldUseImaginary) {
+    //  cout<<"delocate optionally  from "<<this->id<<" "<<buildEdgeName(edge)<<endl;
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
         return this->pendingMemories.end();
     }
 
-    if(isLocatedOnThisProcessor(edge, this->id, false))
+    if (isLocatedOnThisProcessor(edge, this->id, false))
         delocateFromThisProcessorToDisk(edge, this->id, shouldUseImaginary);
 
     return removePendingMemory(edge);
 
 }
 
-void Processor::loadFromDisk(edge_t* edge, bool shouldUseImaginary) {
+void Processor::loadFromDisk(edge_t *edge, bool shouldUseImaginary) {
     addPendingMemory(edge);
     locateToThisProcessorFromDisk(edge, this->id, shouldUseImaginary);
 }
 
 void Processor::loadFromNowhere(edge_t *edge, bool shouldUseImaginary, double afterWhen) {
-  //  cout<<"load onto proc "<<this->id<<" ";
-  //  print_edge(edge);
+    //  cout<<"load onto proc "<<this->id<<" ";
+    //  print_edge(edge);
     addPendingMemory(edge);
     locateToThisProcessorFromNowhere(edge, this->id, shouldUseImaginary, afterWhen);
-  //  cout<<"remains mem "<< this->availableMemory<<endl;
+    //  cout<<"remains mem "<< this->availableMemory<<endl;
 }
-
 
 
 vertex_t *Processor::getAssignedTask() const {
@@ -122,15 +123,15 @@ int Processor::getAssignedTaskId() const {
     return assignedTask->id;
 }
 
-void Processor::setPendingMemories( set<edge_t *, std::function<bool(edge_t*, edge_t*)>> &newSet) {
-  //  this->pendingMemories = pendingMemories;
+void Processor::setPendingMemories(set<edge_t *, std::function<bool(edge_t *, edge_t *)>> &newSet) {
+    //  this->pendingMemories = pendingMemories;
     this->pendingMemories.swap(newSet);
 }
 
 double Processor::getAfterAvailableMemory() const {
-    assert(afterAvailableMemory>=0);
-    if(afterAvailableMemory>memorySize){
-        assert(abs(afterAvailableMemory - memorySize)< 0.1);
+    assert(afterAvailableMemory >= 0);
+    if (afterAvailableMemory > memorySize) {
+        assert(abs(afterAvailableMemory - memorySize) < 0.1);
     }
 
     return afterAvailableMemory;
@@ -138,19 +139,18 @@ double Processor::getAfterAvailableMemory() const {
 
 void Processor::setAfterAvailableMemory(double d) {
     //cout<<"set after available memory of proc "<<this->id<<" to "<<d<<endl;
-    if(abs(d-memorySize)<0.0001){
-        d=memorySize;
+    if (abs(d - memorySize) < 0.0001) {
+        d = memorySize;
     }
 
-    assert(d>=0 && d<= (memorySize+0.001));
-     this->afterAvailableMemory = d;
+    assert(d >= 0 && d <= (memorySize + 0.001));
+    this->afterAvailableMemory = d;
 }
 
-void Processor::setAfterPendingMemories(set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> &memories) {
-   // this->afterPendingMemories = memories;
+void Processor::setAfterPendingMemories(set<edge_t *, std::function<bool(edge_t *, edge_t *)>> &memories) {
+    // this->afterPendingMemories = memories;
     this->afterPendingMemories.swap(memories);
 }
-
 
 
 void Cluster::clean() {
@@ -160,11 +160,11 @@ void Cluster::clean() {
 
 
 //Processor::Processor(const Processor & copy)= default;
-Processor::Processor(const Processor& copy)
+Processor::Processor(const Processor &copy)
         : memorySize(copy.memorySize),
           processorSpeed(copy.processorSpeed),
           assignedTask(copy.assignedTask),
-          eventsOnProc(copy.eventsOnProc),
+        //eventsOnProc(copy.eventsOnProc),
           id(copy.id),
           name(copy.name),
           isBusy(copy.isBusy),
@@ -184,14 +184,12 @@ Processor::Processor(const Processor& copy)
           lastReadEvent(copy.lastReadEvent),
           lastWriteEvent(copy.lastWriteEvent),
           lastComputeEvent(copy.lastComputeEvent),
-          isKeptValid(copy.isKeptValid)
-{
-    // Copy elements manually to preserve set integrity
-    for (auto* mem : copy.pendingMemories) {
+          isKeptValid(copy.isKeptValid) {
+    for (auto *mem: copy.pendingMemories) {
         pendingMemories.insert(mem);
     }
 
-    for (auto* mem : copy.afterPendingMemories) {
+    for (auto *mem: copy.afterPendingMemories) {
         afterPendingMemories.insert(mem);
     }
 }

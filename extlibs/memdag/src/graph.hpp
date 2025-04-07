@@ -44,7 +44,7 @@ enum Status {Unscheduled,
 
 
 extern bool Debug;
-class Processor;
+
 struct graph_t;
 struct vertex_t {
   /* basic vertex information */

@@ -19,7 +19,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
     compute_bottom_and_top_levels(graph);
     devationVariant = deviationNumber;
 
-       static thread_local std::mt19937 gen(std::random_device{}());
+    static thread_local std::mt19937 gen(std::random_device{}());
     static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
 
     vertex_t *vertex = graph->first_vertex;
@@ -93,12 +93,12 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
             while (!firstEvent->predecessors.empty()) {
                 firstEvent = *firstEvent->predecessors.begin();
             }
-            cout << "firing predecessor without predecessors " << firstEvent->id << endl;
+            // cout << "firing predecessor without predecessors " << firstEvent->id << endl;
             removed = events.remove(firstEvent->id);
             assert(removed == true);
         }
-       // cout << "\nevent " << firstEvent->id << " at " << firstEvent->getActualTimeFire();
-     //   cout << " num fired " << firstEvent->timesFired << endl;
+        // cout << "\nevent " << firstEvent->id << " at " << firstEvent->getActualTimeFire();
+        //   cout << " num fired " << firstEvent->timesFired << endl;
         if (firstEvent->timesFired > 0 && !firstEvent->predecessors.empty()) {
             bool hasCycle = firstEvent->checkCycleFromEvent();
             assert(!hasCycle);
@@ -106,7 +106,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
             while (!firstEvent->predecessors.empty()) {
                 firstEvent = *firstEvent->predecessors.begin();
             }
-            cout << "firing predecessor without predecessors " << firstEvent->id << endl;
+            //  cout << "firing predecessor without predecessors " << firstEvent->id << endl;
             removed = events.remove(firstEvent->id);
             assert(removed == true);
         }
@@ -118,6 +118,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
         firstEvent->fire();
         resMakespan = max(resMakespan, firstEvent->getActualTimeFire());
         lastEventName = firstEvent->id;
+        firstEvent.reset();
         //cout<<"events now "; events.printAll();
     }
     return resMakespan;
@@ -125,8 +126,9 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
 
 void Event::fireTaskStart() {
     string thisid = this->id;
-    cout << "task start for " << thisid << " at " << this->actualTimeFire << " on proc " << this->processor->id << " ";
-    double timeStart = 0;
+    // cout << "task start for " << thisid << " at " << this->actualTimeFire << " on proc " << this->processor->id << " ";
+
+    //   cout<<this->task->name<<" "<<this->actualTimeFire<<" "<<events.find(this->task->name+"-f")->getActualTimeFire()<<" on "<<this->processor->id<<endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
@@ -169,13 +171,14 @@ void Event::fireTaskStart() {
         //propagateChainActualTimeIfSmaller(ourFinishEvent);
 
     }
-    cout << endl;
+    //cout << endl;
 }
 
 
 void Event::fireTaskFinish() {
     vertex_t *thisTask = this->task;
-    cout << "firing task Finish for " << this->id<<" at "<<this->getActualTimeFire()<<endl;
+    // cout << "firing task Finish for " << this->id<<" at "<<this->getActualTimeFire()<<endl;
+    //  cout<<this->actualTimeFire<<" on "<<this->processor->id<<endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
@@ -201,9 +204,6 @@ void Event::fireTaskFinish() {
         for (int i = 0; i < thisTask->out_degree; i++) {
             vertex_t *childTask = thisTask->out_edges[i]->head;
             //cout << "deal with child " << childTask->name << endl;
-            if (childTask->name == "preseq_00000007") {
-                cout << endl;
-            }
             bool isReady = true;
             for (int j = 0; j < childTask->in_degree; j++) {
                 if (childTask->in_edges[j]->tail->status == Status::Unscheduled) {
@@ -219,6 +219,8 @@ void Event::fireTaskFinish() {
                 readyQueue.readyTasks.insert(childTask);
 
             }
+
+            this->processor->writingQueue.emplace_back(thisTask->out_edges[i]);
         }
 
         this->isDone = true;
@@ -227,24 +229,21 @@ void Event::fireTaskFinish() {
 
         bool existsIdleProcessor = false;
 
-        for (const auto &item: cluster->getProcessors()){
-            if(item.second->getReadyTimeCompute()<this->getActualTimeFire()){
-                existsIdleProcessor= true;
+        for (const auto &item: cluster->getProcessors()) {
+            if (item.second->getReadyTimeCompute() < this->getActualTimeFire()) {
+                existsIdleProcessor = true;
                 break;
             }
         }
 
-        while ((!foundSomeTaskForOurProcessor || existsIdleProcessor ) && !readyQueue.readyTasks.empty() ) {
+        while ((!foundSomeTaskForOurProcessor || existsIdleProcessor) && !readyQueue.readyTasks.empty()) {
             vertex_t *mostReadyVertex = *readyQueue.readyTasks.begin();
-
-
             vector<shared_ptr<Processor>> bestModifiedProcs;
             shared_ptr<Processor> bestProcessorToAssign;
-            cout<<"assigning vertex "<<mostReadyVertex->name<<" ";
-                vector<shared_ptr<Event>> newEvents =
+            // cout<<"assigning vertex "<<mostReadyVertex->name<<" ";
+            vector<shared_ptr<Event>> newEvents =
                     bestTentativeAssignment(mostReadyVertex, bestModifiedProcs, bestProcessorToAssign,
                                             this->actualTimeFire);
-
 
 
             for (const auto &item: newEvents) {
@@ -259,12 +258,14 @@ void Event::fireTaskFinish() {
             }
 
             existsIdleProcessor = false;
-            for (const auto &item: cluster->getProcessors()){
-                if(item.second->getReadyTimeCompute()<this->getActualTimeFire()){
-                    existsIdleProcessor= true;
+            for (const auto &item: cluster->getProcessors()) {
+                if (item.second->getReadyTimeCompute() < this->getActualTimeFire()) {
+                    existsIdleProcessor = true;
                     break;
                 }
             }
+
+
         }
 
 
@@ -286,7 +287,7 @@ shared_ptr<Processor> findPredecessorsProcessor(edge_t *incomingEdge, vector<sha
 
     if (it == modifiedProcs.end()) {
         addedProc = make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
-// cout<<"adding modified proc "<<addedProc->id<<endl;
+       // cout << "adding modified proc " << addedProc->id << endl;
         modifiedProcs.emplace_back(addedProc);
         //checkIfPendingMemoryCorrect(addedProc);
     } else {
@@ -297,7 +298,7 @@ shared_ptr<Processor> findPredecessorsProcessor(edge_t *incomingEdge, vector<sha
 
 
 void Event::fireReadStart() {
-    cout << "firing read start for " << this->id << " at "<<this->actualTimeFire<<endl;
+    //cout << "firing read start for " << this->id << " at "<<this->actualTimeFire<<endl;
     // assert(finishRead->getActualTimeFire()> this->getActualTimeFire());
     auto canRun = dealWithPredecessors(shared_from_this());
 
@@ -322,12 +323,12 @@ void Event::fireReadStart() {
             events.update(buildEdgeName(this->edge) + "-w-f", expectedTimeFireFinish);
         }
     }
-    cout << endl;
+    //  cout << endl;
 
 }
 
 void Event::fireReadFinish() {
-    cout << "firing read finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<<endl;
+    //cout << "firing read finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<<endl;
 
     shared_ptr<Event> startRead = events.find(buildEdgeName(this->edge) + "-r-s");
 
@@ -350,7 +351,7 @@ void Event::fireReadFinish() {
 }
 
 void Event::fireWriteStart() {
-    cout << "firing write start for " << this->id <<" at "<<this->getActualTimeFire()<< endl;
+    // cout << "firing write start for " << this->id <<" at "<<this->getActualTimeFire()<< endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
@@ -380,7 +381,7 @@ void Event::fireWriteStart() {
 }
 
 void Event::fireWriteFinish() {
-    cout << "firing write finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<< endl;
+    //  cout << "firing write finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<< endl;
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
@@ -390,6 +391,18 @@ void Event::fireWriteFinish() {
         removeOurselfFromSuccessors(this);
         delocateFromThisProcessorToDisk(this->edge, this->processor->id, false);
         this->isDone = true;
+
+        if (!this->processor->writingQueue.empty()) {
+            edge_t *edgeToWriteJustInCase = this->processor->writingQueue.at(0);
+
+            double presumedLength = assessWritingOfEdge(edgeToWriteJustInCase, this->processor);
+
+            for (auto succ: this->successors) {
+                if (succ->id.find(("-w-s")) != std::string::npos && succ->processor->id == this->processor->id) {
+                    // do smth
+                }
+            }
+        }
     }
 }
 
@@ -411,52 +424,53 @@ void Event::removeOurselfFromSuccessors(Event *us) {
         }
         successor++;
     }
+    successors.clear();
 }
 
 
 void Cluster::printProcessorsEvents() {
 
-    for (const auto &[key, value]: this->processors) {
-        if (!value->getEvents().empty()) {
-            cout << "Processor " << value->id << "with memory " << value->getMemorySize() << ", speed "
-                 << value->getProcessorSpeed() << endl;
-            cout << "Events: " << endl;
-            if (value->getLastComputeEvent().lock())
-                cout << "\t" << value->getLastComputeEvent().lock()->id << " ";
-            if (value->getLastReadEvent().lock())
-                cout << value->getLastReadEvent().lock()->id << " ";
-            if (value->getLastWriteEvent().lock())
-                cout << value->getLastWriteEvent().lock()->id;
-            cout << endl;
-            for (auto &item: value->getEvents()) {
-                auto eventPrt = item.second.lock();
-                if (eventPrt) {
-                    cout << "\t" << eventPrt->id << " " << eventPrt->getExpectedTimeFire() << " "
-                         << eventPrt->getActualTimeFire()
-                         << endl;
-                }
-            }
+    /* for (const auto &[key, value]: this->processors) {
+         if (!value->getEvents().empty()) {
+             cout << "Processor " << value->id << "with memory " << value->getMemorySize() << ", speed "
+                  << value->getProcessorSpeed() << endl;
+             cout << "Events: " << endl;
+             if (value->getLastComputeEvent().lock())
+                 cout << "\t" << value->getLastComputeEvent().lock()->id << " ";
+             if (value->getLastReadEvent().lock())
+                 cout << value->getLastReadEvent().lock()->id << " ";
+             if (value->getLastWriteEvent().lock())
+                 cout << value->getLastWriteEvent().lock()->id;
+             cout << endl;
+             for (auto &item: value->getEvents()) {
+                 auto eventPrt = item.second.lock();
+                 if (eventPrt) {
+                     cout << "\t" << eventPrt->id << " " << eventPrt->getExpectedTimeFire() << " "
+                          << eventPrt->getActualTimeFire()
+                          << endl;
+                 }
+             }
 
-            cout << "\t"
-                 << " ready time compute " << value->getReadyTimeCompute()
-                 << " ready time read " << value->getReadyTimeRead()
-                 << " ready time write " << value->getReadyTimeWrite()
-                 //<< " ready time write soft " << value->softReadyTimeWrite
-                 //<< " avail memory " << value->availableMemory
-                 << " pending in memory " << value->getPendingMemories().size() << " pcs: ";
+             cout << "\t"
+                  << " ready time compute " << value->getReadyTimeCompute()
+                  << " ready time read " << value->getReadyTimeRead()
+                  << " ready time write " << value->getReadyTimeWrite()
+                  //<< " ready time write soft " << value->softReadyTimeWrite
+                  //<< " avail memory " << value->availableMemory
+                  << " pending in memory " << value->getPendingMemories().size() << " pcs: ";
 
-            for (const auto &item: value->getPendingMemories()) {
-                print_edge(item);
-            }
-            cout << endl;
-            cout << "after pending in memory " << value->getAfterPendingMemories().size() << " pcs: ";
-            for (const auto &item: value->getAfterPendingMemories()) {
-                print_edge(item);
-            }
-            cout << endl;
-        }
+             for (const auto &item: value->getPendingMemories()) {
+                 print_edge(item);
+             }
+             cout << endl;
+             cout << "after pending in memory " << value->getAfterPendingMemories().size() << " pcs: ";
+             for (const auto &item: value->getAfterPendingMemories()) {
+                 print_edge(item);
+             }
+             cout << endl;
+         }
 
-    }
+     } */
 }
 
 
@@ -535,8 +549,8 @@ double applyDeviationTo(double &in) {
 
     std::normal_distribution<double> dist(in, stddev);
     result = dist(gen);
-    if(devationVariant==4){
-        result*=2;
+    if (devationVariant == 4) {
+        result *= 2;
     }
     factor = result / in;
     in = result;
