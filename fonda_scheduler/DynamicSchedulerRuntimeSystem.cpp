@@ -120,8 +120,8 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
         firstEvent->fire();
         resMakespan = max(resMakespan, firstEvent->getActualTimeFire());
         lastEventName = firstEvent->id;
-        //firstEvent.reset();
-        //cout<<"events now "; events.printAll();
+
+      //  cout<<"events now "; events.printAll();
     }
     return resMakespan;
 }

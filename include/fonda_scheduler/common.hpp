@@ -502,13 +502,19 @@ struct CompareByTimestamp {
                 // If tail numbers are the same, compare based on head task number
                 int headA = extractTaskNumber(a->edge->head->name);
                 int headB = extractTaskNumber(b->edge->head->name);
-                return headA < headB;  // Compare based on head task number
+                if(headA!=headB) {
+                    return headA < headB;  // Compare based on head task number
+                }
+                else
+                {
+                    return a->id<b->id;
+                }
             }
 
         }
 
         cout << "could NOT COMPARE!! " << a->id << " " << b->id << endl;
-        return false;
+        return a->id<b->id;
         // return customIDCompare(a->id, b->id);
     }
 };
@@ -530,10 +536,12 @@ public:
                 }
             }
         }
-        //printAll();
-        auto it = eventSet.insert(event);
-        //printAll();
-        eventMap[event->id] = it.first;
+        //auto it = eventSet.insert(event);
+        auto [it, inserted] = eventSet.insert(event);
+        if (!inserted) {
+            std::cout << "Event "<<event->id<<" was NOT inserted. Conflicted with: " << (*it)->id << std::endl;
+        }
+        eventMap[event->id] = it;
     }
 
     shared_ptr<Event> find(string id) {

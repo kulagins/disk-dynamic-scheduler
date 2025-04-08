@@ -297,20 +297,6 @@ void Event::fire(){
     }
     this->timesFired++;
 
-   // removeOurselfFromSuccessors(this);
-
-  /*
-
-    for ( auto &item: this->predecessors){
-        for (auto succspred = item->successors.begin(); succspred != item->successors.end();) {
-            if ((*succspred)->id == this->id) {
-                succspred = item->successors.erase(succspred);
-            } else {
-                // Move to the next element
-                ++succspred;
-            }
-        }
-    } */
 }
 
 
