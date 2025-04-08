@@ -497,7 +497,7 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
                     readEVents.first->addPredecessorInPlanning(plannedWriteFinishOfIncomingEdge);
                 }
                 assert(prev == plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning());
-                assert(readEVents.first->getActualTimeFire() < readEVents.second->getActualTimeFire());
+                assert(incomingEdge->weight<1 || readEVents.first->getActualTimeFire() < readEVents.second->getActualTimeFire());
             } else {
                 //schedule a write
                 scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,

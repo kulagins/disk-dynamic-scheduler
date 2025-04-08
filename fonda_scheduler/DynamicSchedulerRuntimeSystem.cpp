@@ -529,6 +529,20 @@ void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc) {
 
 
 double applyDeviationTo(double &in) {
+    if(in==0){
+        switch (devationVariant) {
+            case 1:
+                return 1.1;
+            case 2:
+                return 1.5;
+            case 3:
+                return 1;
+            case 4:
+              return 2;
+            default:
+                throw runtime_error("unknown deviation variant");
+        }
+    }
     static std::random_device rd;
     static std::mt19937 gen(rd());  // Mersenne Twister PRNG
     double result, factor, stddev;
