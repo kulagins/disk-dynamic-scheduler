@@ -95,7 +95,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
             while (!firstEvent->predecessors.empty()) {
                 firstEvent = *firstEvent->predecessors.begin();
             }
-            // cout << "firing predecessor without predecessors " << firstEvent->id << endl;
+             cout << "firing predecessor without predecessors " << firstEvent->id << endl;
             removed = events.remove(firstEvent->id);
             assert(removed == true);
         }
@@ -108,7 +108,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
             while (!firstEvent->predecessors.empty()) {
                 firstEvent = *firstEvent->predecessors.begin();
             }
-            //  cout << "firing predecessor without predecessors " << firstEvent->id << endl;
+              cout << "2-firing predecessor without predecessors " << firstEvent->id << endl;
             removed = events.remove(firstEvent->id);
             assert(removed == true);
         }
@@ -128,18 +128,18 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
 
 void Event::fireTaskStart() {
     string thisid = this->id;
-    // cout << "task start for " << thisid << " at " << this->actualTimeFire << " on proc " << this->processor->id << " ";
+    cout << "task start for " << thisid << " at " << this->actualTimeFire << " on proc " << this->processor->id << " ";
 
     //   cout<<this->task->name<<" "<<this->actualTimeFire<<" "<<events.find(this->task->name+"-f")->getActualTimeFire()<<" on "<<this->processor->id<<endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        // cout << "BAD";
+         cout << "BAD"<<endl;
         //this->setActualTimeFire(
         //       this->getActualTimeFire()  +std::numeric_limits<double>::epsilon() * this->getActualTimeFire());
         events.insert(shared_from_this());
     } else {
-        //  cout << "DONE";
+          cout << "DONE"<<endl;
         removeOurselfFromSuccessors(this);
         this->task->status = Status::Running;
         auto ourFinishEvent = events.find(this->task->name + "-f");
@@ -179,15 +179,15 @@ void Event::fireTaskStart() {
 
 void Event::fireTaskFinish() {
     vertex_t *thisTask = this->task;
-  //   cout << "firing task Finish for " << this->id<<" at "<<this->getActualTimeFire()<<endl;
+    cout << "firing task Finish for " << this->id<<" at "<<this->getActualTimeFire()<<endl;
     //  cout<<this->actualTimeFire<<" on "<<this->processor->id<<endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        //  cout << "BAD " << endl;
+          cout << "BAD " << endl;
         events.insert(shared_from_this());
     } else {
-        //  cout << "DONE ";
+          cout << "DONE "<<endl;
         removeOurselfFromSuccessors(this);
         //set its status to finished
         this->task->status = Status::Finished;
@@ -300,15 +300,15 @@ shared_ptr<Processor> findPredecessorsProcessor(edge_t *incomingEdge, vector<sha
 
 
 void Event::fireReadStart() {
-   // cout << "firing read start for " << this->id << " at "<<this->actualTimeFire<<endl;
+    cout << "firing read start for " << this->id << " at "<<this->actualTimeFire<<endl;
     // assert(finishRead->getActualTimeFire()> this->getActualTimeFire());
     auto canRun = dealWithPredecessors(shared_from_this());
 
     if (!canRun) {
-        //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
+          cout << "BAD " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-        //cout << "DONE";
+        cout << "DONE"<<endl;
         removeOurselfFromSuccessors(this);
         double durationOfRead = this->edge->weight / this->processor->readSpeedDisk;
         double factor = applyDeviationTo(durationOfRead);
@@ -330,16 +330,16 @@ void Event::fireReadStart() {
 }
 
 void Event::fireReadFinish() {
-//    cout << "firing read finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<<endl;
+    cout << "firing read finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<<endl;
 
     shared_ptr<Event> startRead = events.find(buildEdgeName(this->edge) + "-r-s");
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        //   cout << "BAD because " << (*this->predecessors.begin())->id << endl;
+           cout << "BAD because " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-        //    cout << "DONE";
+            cout << "DONE "<<endl;
         removeOurselfFromSuccessors(this);
         if (!isLocatedOnDisk(this->edge, false)) {
             auto ptr = events.find(buildEdgeName(this->edge) + "-w-f");
@@ -353,14 +353,14 @@ void Event::fireReadFinish() {
 }
 
 void Event::fireWriteStart() {
-   //  cout << "firing write start for " << this->id <<" at "<<this->getActualTimeFire()<< endl;
+     cout << "firing write start for " << this->id <<" at "<<this->getActualTimeFire()<< endl;
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        //   cout << "BAD" << (*this->predecessors.begin())->id << endl;
+           cout << "BAD" << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-        //  cout << "DONE" << endl;
+         cout << "DONE" << endl;
         removeOurselfFromSuccessors(this);
 
         double durationOfWrite = this->edge->weight / this->processor->writeSpeedDisk;
@@ -383,13 +383,13 @@ void Event::fireWriteStart() {
 }
 
 void Event::fireWriteFinish() {
- //     cout << "firing write finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<< endl;
+      cout << "firing write finish for " << this->id << " at "<<this->getActualTimeFire()<<" on "<<this->processor->id<< endl;
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
-        //  cout << "BAD " << (*this->predecessors.begin())->id << endl;
+          cout << "BAD " << (*this->predecessors.begin())->id << endl;
         events.insert(shared_from_this());
     } else {
-   //      cout << "DONE"<<endl;
+         cout << "DONE"<<endl;
         removeOurselfFromSuccessors(this);
         delocateFromThisProcessorToDisk(this->edge, this->processor->id, false);
         this->isDone = true;
