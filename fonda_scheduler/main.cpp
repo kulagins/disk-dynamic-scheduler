@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
 
     clearGraph(graphMemTopology);
     start = std::chrono::system_clock::now();
-   // d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
+    d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
      end = std::chrono::system_clock::now();
      elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
