@@ -90,7 +90,7 @@ public:
     eventType type;
     shared_ptr<Processor> processor;
 
-    set<shared_ptr<Event>> predecessors, successors;
+
     bool isEviction;
     bool isDone = false;
     int timesFired = 0;
@@ -98,30 +98,28 @@ private:
     double expectedTimeFire = -1;
     double actualTimeFire = -1;
 
+    set<shared_ptr<Event>> predecessors, successors;
+
     Event(vertex_t *task, edge_t *edge,
-          eventType type, shared_ptr<Processor> processor, double expectedTimeFire, double actualTimeFire,
-            // vector<shared_ptr<Event>>& predecessors,  vector<shared_ptr<Event>>& successors,
-          bool isEviction, string idN) :
-            task(task),
-            edge(edge),
-            type(type),
-            processor(std::move(processor)),
-            expectedTimeFire(expectedTimeFire),
-            actualTimeFire(actualTimeFire),
-            predecessors({}),
-            successors({}),
-            isEviction(isEviction),
-            id(std::move(idN)) {
-        // cout<<"creating event "<<id<<endl;
-    }
+          eventType type, const shared_ptr<Processor>& processor,
+          double expectedTimeFire, double actualTimeFire,
+          bool isEviction, string idN)
+            : task(task),
+              edge(edge),
+              type(type),
+              processor(processor),  // shared ownership
+              expectedTimeFire(expectedTimeFire),
+              actualTimeFire(actualTimeFire),
+              isEviction(isEviction),
+              id(std::move(idN)) {}
 
 
-    void initialize(const std::vector<std::shared_ptr<Event>> &predecessors,
-                    const std::vector<std::shared_ptr<Event>> &successors) {
-        for (const auto &pred: predecessors) {
+    void initialize(const std::vector<std::shared_ptr<Event>> &ppredecessors,
+                    const std::vector<std::shared_ptr<Event>> &ssuccessors) {
+        for (const auto &pred: ppredecessors) {
             this->addPredecessorInPlanning(pred);
         }
-        for (const auto &succ: successors) {
+        for (const auto &succ: ssuccessors) {
             this->addSuccessorInPlanning(succ);
         }
     }
@@ -137,6 +135,24 @@ public:
                 new Event(task, edge, type, std::move(processor), expectedTimeFire, actualTimeFire, isEviction, id));
         event->initialize(predecessors, successors);
         return event;
+    }
+
+    ~Event() {
+        task = nullptr;
+        edge = nullptr;
+
+        // Clear shared_ptr references to help break potential shared_ptr cycles (if any)
+        processor.reset();
+        predecessors.clear();
+        successors.clear();
+    }
+
+    std::set<std::shared_ptr<Event>>& getPredecessors() {
+        return predecessors;
+    }
+
+    std::set<std::shared_ptr<Event>>& getSuccessors() {
+        return successors;
     }
 
     void fire();
@@ -160,7 +176,17 @@ public:
             throw runtime_error("ADDING OURSELVES AS PREDECESSOR!");
         }
         //cout<<" ADDING pred "<<pred->id<<" -> "<<this->id<<endl;
-        this->predecessors.insert(pred);
+        if(this->predecessors.find(pred)== this->predecessors.end()){
+
+            auto it = find_if(this->predecessors.begin(), this->predecessors.end(), [pred](const shared_ptr<Event> &e) {
+                return e->id == pred->id;
+            });
+            if(it!= this->predecessors.end()){
+                cout<<"EVENT BY OTHER NAME"<<endl;
+            }
+            this->predecessors.insert(pred);
+        }
+
         double predsVisibleTime = pred->getVisibleTimeFireForPlanning();
         if (predsVisibleTime > this->actualTimeFire) {
             double diff = predsVisibleTime - this->actualTimeFire;
@@ -190,11 +216,23 @@ public:
 
     void addSuccessorInPlanning(const shared_ptr<Event>& succ) {
         assert(succ != nullptr);
+        //cout<<"add successor "<<succ->id <<" to " <<this->id<<endl;
         if (succ->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS SUCCESSOR!");
         }
-        // cout<<"add successor "<<succ->id<<" to event "<<this->id<<endl;
-        this->successors.insert(succ);
+        if(this->successors.find(succ)== this->successors.end()){
+
+            auto it = find_if(this->successors.begin(), this->successors.end(), [succ](const shared_ptr<Event> &e) {
+                return e->id == succ->id;
+            });
+            if(it!= this->successors.end()){
+             //   cout<<"succ EVENT BY OTHER NAME"<<endl;
+                //assert((*it)->predecessors.size()== succ->predecessors.size());
+                this->successors.erase(it);
+            }
+            this->successors.insert(succ);
+        }
+
         double succsVisibleTime = succ->getVisibleTimeFireForPlanning();
         if (succsVisibleTime < this->expectedTimeFire) {
             double diff = abs(succsVisibleTime - this->expectedTimeFire);
@@ -354,7 +392,7 @@ struct CompareByTimestamp {
 
        visited.insert(a->id); // Mark as visited
 
-       for (const auto &pred : a->predecessors) {
+       for (const auto &pred : a->getPredecessors()) {
            if (isDeepSuccessor(pred, b, visited)) {
                return true;
            }
@@ -373,20 +411,20 @@ struct CompareByTimestamp {
 
 
         // Direct predecessor/successor check
-        if (std::any_of(a->predecessors.begin(), a->predecessors.end(),
+        if (std::any_of(a->getPredecessors().begin(), a->getPredecessors().end(),
                         [&b](const shared_ptr<Event> &pred) { return pred->id == b->id; })) {
             return false;  // a is a successor of b => a should come later
         }
 
-        if (std::any_of(b->predecessors.begin(), b->predecessors.end(),
+        if (std::any_of(b->getPredecessors().begin(), b->getPredecessors().end(),
                         [&a](const shared_ptr<Event> &pred) { return pred->id == a->id; })) {
             return true;  // b is a successor of a => b should come later
         }
 
-        if(a->predecessors.empty() && !b->predecessors.empty()){
+        if(a->getPredecessors().empty() && !b->getPredecessors().empty()){
             return true;
         }
-        if(!a->predecessors.empty() && b->predecessors.empty()){
+        if(!a->getPredecessors().empty() && b->getPredecessors().empty()){
             return false;
         }
 
@@ -531,7 +569,7 @@ public:
         if (foundIterator != eventMap.end()) {
             remove(event->id);
         } else {
-            for (const auto &pred: event->predecessors) {
+            for (const auto &pred: event->getPredecessors()) {
                 if (eventMap.find(pred->id) == eventMap.end()) {
                 }
             }
@@ -652,7 +690,7 @@ public:
 
         visited.insert(event->id); // Mark as visited
 
-        for (auto &successor: event->successors) {
+        for (auto &successor: event->getSuccessors()) {
             successor->setActualTimeFire(max(event->getActualTimeFire() +
                                              std::numeric_limits<double>::epsilon() * event->getActualTimeFire(),
                                              successor->getActualTimeFire()));
@@ -668,7 +706,7 @@ public:
 
         visited.insert(event->id); // Mark as visited
 
-        for (auto &predecessor: event->predecessors) {
+        for (auto &predecessor: event->getPredecessors()) {
             remove(predecessor->id);
             insert(predecessor);
             reinsertChainBackwardFrom(predecessor, visited);
@@ -684,7 +722,7 @@ public:
         const double EPSILON = 1e-9;  // Adjust this as needed
         for (const auto &event: eventSet) {
             auto it_event = eventSet.find(event);
-            for (const auto &pred: event->predecessors) {
+            for (const auto &pred: event->getPredecessors()) {
                 auto it_pred = eventSet.find(pred);
                 // assert(it_pred != eventSet.end() && it_event != eventSet.end() &&
                 //       "ERROR: A predecessor is missing in eventSet!");

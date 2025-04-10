@@ -206,7 +206,6 @@ int main(int argc, char *argv[]) {
     double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant);
 
     events.deleteAll();
-
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
     cout<<"makespan_1 "<<d<<"\t\n";
 
@@ -216,7 +215,7 @@ int main(int argc, char *argv[]) {
 
     clearGraph(graphMemTopology);
     start = std::chrono::system_clock::now();
-    d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
+   // d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
      end = std::chrono::system_clock::now();
      elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
@@ -225,5 +224,7 @@ int main(int argc, char *argv[]) {
 
     delete graphMemTopology;
     delete cluster;
+    delete imaginedCluster;
+    delete actualCluster;
 }
 

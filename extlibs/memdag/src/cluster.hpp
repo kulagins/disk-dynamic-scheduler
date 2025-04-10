@@ -130,8 +130,10 @@ public:
 
     //TODO impelement
     ~Processor() {
-        //  if (assignedTask != nullptr) delete assignedTask;
+        writingQueue.clear();
         pendingMemories.clear();
+        afterPendingMemories.clear();
+        assignedTask = nullptr; // just nullify borrowed pointer
     }
 
     double getMemorySize() const {
@@ -350,7 +352,10 @@ protected:
 public:
     std::unordered_map<int, std::shared_ptr<Processor>> processors;
 
-
+    ~Cluster(){
+        filesOnDisk.resize(0);
+        processors.clear();
+    }
 
     Cluster() {
         processors.clear();

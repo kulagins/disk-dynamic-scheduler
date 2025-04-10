@@ -3,7 +3,7 @@
 
 vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<shared_ptr<Processor>> &bestModifiedProcs,
                                                   shared_ptr<Processor> &bestProcessorToAssign, double notEarlierThan) {
-    //cout << "!!!START BEST tent assign for " << vertex->name << endl;
+   // cout << "!!!START BEST tent assign for " << vertex->name << endl;
     double bestStartTime = numeric_limits<double>::max(), bestFinishTime = numeric_limits<double>::max(),
             bestReallyUsedMem;
     vector<shared_ptr<Event>> bestEvents;
@@ -29,20 +29,26 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
             bestModifiedProcs = modifiedProcs;
             bestFinishTime = finTime;
             bestStartTime = startTime;
+
             bestProcessorToAssign.reset();
             bestProcessorToAssign = ourModifiedProc;
             resultingVar = resultingEvictionVariant;
             bestEvents = newEvents;
             bestReallyUsedMem = reallyUsedMem;
         } else {
-            ourModifiedProc.reset();
+            if(ourModifiedProc!=nullptr){
+                ourModifiedProc->resetPendingMemories();
+                ourModifiedProc->resetAfterPendingMemories();
+                ourModifiedProc.reset();
+            }
             for (auto &item: newEvents) {
                 item.reset();
             }
             for (auto &item: modifiedProcs) {
                 item.reset();
             }
-            ourModifiedProc.reset();
+
+
         }
     }
     //cout << "!!!END BEST"<<endl;
@@ -68,7 +74,14 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
         assert(iterator->second->getPendingMemories().size() == item->getPendingMemories().size());
     }
 
-    for (int j = 0; j < vertex->in_degree; j++) {
+    for ( auto &item: bestEvents){
+        int procid = item->processor->id;
+        item->processor.reset();
+        item->processor = cluster->getProcessorById(procid);
+    }
+
+
+        for (int j = 0; j < vertex->in_degree; j++) {
         assert(//vertex->in_edges[j]->tail->makespan==-1 ||
                 bestFinishTime > vertex->in_edges[j]->tail->makespan);
     }
@@ -519,6 +532,8 @@ std::pair<shared_ptr<Event>, shared_ptr<Event>>
 scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<Event>> &createdEvents,
               double startTimeOfTask,
               shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, double atThisTime) {
+    assert(events.find(buildEdgeName(incomingEdge)+"-r-s")==nullptr);
+    assert(events.find(buildEdgeName(incomingEdge)+"-r-f")==nullptr);
 
     double estimatedStartOfRead = startTimeOfTask - incomingEdge->weight / ourModifiedProc->readSpeedDisk;
     estimatedStartOfRead = max(estimatedStartOfRead, ourModifiedProc->getExpectedOrActualReadyTimeRead());
@@ -546,7 +561,7 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
         estimatedStartOfRead = atThisTime;
     }
 
-    vector<shared_ptr<Event>> newEvents = evictFilesUntilThisFits(ourModifiedProc, incomingEdge->weight);
+    vector<shared_ptr<Event>> newEvents = evictFilesUntilThisFits(ourModifiedProc, incomingEdge);
     if (!newEvents.empty()) {
         // cout << "evicted" << newEvents.size() << endl;
 
@@ -580,7 +595,7 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
             if (eventStartRead->getExpectedTimeFire() < incomingEdge->tail->makespan) {
                 double diff = incomingEdge->tail->makespan - eventStartRead->getExpectedTimeFire();
                 eventStartRead->setBothTimesFire(incomingEdge->tail->makespan);
-                if (!eventStartRead->successors.empty()) {
+                if (!eventStartRead->getSuccessors().empty()) {
                     eventStartRead->propagateChainInPlanning(eventStartRead, diff);
                 }
             }
@@ -633,18 +648,30 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
 }
 
 
-vector<shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc, double weightToFit) {
+vector<shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc, edge_t* edgeToFit) {
+
+    assert(thisProc->getPendingMemories().find(edgeToFit)== thisProc->getPendingMemories().end());
+    double weightToFit= edgeToFit->weight;
     vector<shared_ptr<Event>> newEvents;
-    auto begin = thisProc->getPendingMemories().begin();
-    while (begin != thisProc->getPendingMemories().end()) {
-        begin++;
+    if(thisProc->getAvailableMemory() >= weightToFit){
+        return newEvents;
     }
-    while (thisProc->getAvailableMemory() < weightToFit && !thisProc->getPendingMemories().empty()) {
-        edge_t *edgeToEvict = *thisProc->getPendingMemories().begin();
-        std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
-        auto iterator = scheduleWriteForEdge(thisProc, edgeToEvict, writeEvents);
-        newEvents.emplace_back(writeEvents.first);
-        newEvents.emplace_back(writeEvents.second);
+  //  cout<<"evict for "<<buildEdgeName(edgeToFit)<<endl;
+      auto begin = thisProc->getPendingMemories().begin();
+    while (begin != thisProc->getPendingMemories().end()) {
+        edge_t *edgeToEvict = *begin;
+        if (thisProc->getAvailableMemory() < weightToFit &&edgeToEvict->head->name!= edgeToFit->head->name ) {
+           // cout<<"evict "<<buildEdgeName(edgeToEvict)<<endl;
+            std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
+            auto iterator = scheduleWriteForEdge(thisProc, edgeToEvict, writeEvents);
+            newEvents.emplace_back(writeEvents.first);
+            newEvents.emplace_back(writeEvents.second);
+            begin = iterator;
+           // cout<<"evicted, new candidate is "<<buildEdgeName(*begin)<<endl;
+        }else {
+         //   cout<<"not evict"<<endl;
+            begin++;
+        }
     }
     return newEvents;
 }
@@ -654,6 +681,9 @@ set<edge_t *, bool (*)(edge_t *, edge_t *)>::iterator
 scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict,
                      std::pair<shared_ptr<Event>, shared_ptr<Event>> &writeEvents) {
     //cout << "schedule write for edge evicting " << buildEdgeName(edgeToEvict) << endl;
+
+    assert(events.find(buildEdgeName(edgeToEvict)+"-w-s")==nullptr);
+    assert(events.find(buildEdgeName(edgeToEvict)+"-w-f")==nullptr);
 
     vector<shared_ptr<Event>> pred, succ = vector<shared_ptr<Event>>{};
     auto eventStartWrite = Event::createEvent(nullptr, edgeToEvict, OnWriteStart, thisProc,
@@ -752,6 +782,9 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
 
     vector<shared_ptr<Event>> predsOfWrite = vector<shared_ptr<Event>>{};
     vector<shared_ptr<Event>> succsOfWrite = vector<shared_ptr<Event>>{};
+
+    assert(events.find(buildEdgeName(incomingEdge)+"-w-s")==nullptr);
+    assert(events.find(buildEdgeName(incomingEdge)+"-w-f")==nullptr);
 
     auto eventStartWrite = Event::createEvent(nullptr, incomingEdge, OnWriteStart, predecessorsProc,
                                               estimatedStartOfWrite, estimatedStartOfWrite, predsOfWrite,
