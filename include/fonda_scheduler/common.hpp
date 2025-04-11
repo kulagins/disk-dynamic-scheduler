@@ -507,7 +507,13 @@ struct CompareByTimestamp {
             if (a->task && b->task) {
                 int taskA = extractTaskNumber(a->task->name);
                 int taskB = extractTaskNumber(b->task->name);
-                return taskA < taskB;  // Smaller task number comes first
+                if(taskA!=taskB) {
+                    return taskA < taskB;  // Smaller task number comes first
+                }
+                else
+                {
+                    return a->id<b->id;
+                }
             }
 
             if (a->task != NULL && b->edge != NULL) {
