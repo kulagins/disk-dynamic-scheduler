@@ -59,7 +59,8 @@ std::string trimQuotes(const std::string &str);
 
 ////void completeRecomputationOfSchedule(Http::ResponseWriter &resp, const json &bodyjson, double timestamp, vertex_t * vertexThatHasAProblem);
 void removeSourceAndTarget(graph_t *graph, vector<pair<vertex_t *, double>> &ranks);
-void clearGraph(graph_t* graphMemTopology);
+
+void clearGraph(graph_t *graphMemTopology);
 
 Cluster *
 prepareClusterWithChangesAtTimestamp(const json &bodyjson, double timestamp, vector<Assignment *> &tempAssignments);
@@ -101,7 +102,7 @@ private:
     set<shared_ptr<Event>> predecessors, successors;
 
     Event(vertex_t *task, edge_t *edge,
-          eventType type, const shared_ptr<Processor>& processor,
+          eventType type, const shared_ptr<Processor> &processor,
           double expectedTimeFire, double actualTimeFire,
           bool isEviction, string idN)
             : task(task),
@@ -131,6 +132,7 @@ public:
                                               const std::vector<std::shared_ptr<Event>> &predecessors,
                                               const std::vector<std::shared_ptr<Event>> &successors,
                                               bool isEviction, const std::string &id) {
+        //  cout<<"creating event "<<id<<endl;
         auto event = std::shared_ptr<Event>(
                 new Event(task, edge, type, std::move(processor), expectedTimeFire, actualTimeFire, isEviction, id));
         event->initialize(predecessors, successors);
@@ -147,11 +149,11 @@ public:
         successors.clear();
     }
 
-    std::set<std::shared_ptr<Event>>& getPredecessors() {
+    std::set<std::shared_ptr<Event>> &getPredecessors() {
         return predecessors;
     }
 
-    std::set<std::shared_ptr<Event>>& getSuccessors() {
+    std::set<std::shared_ptr<Event>> &getSuccessors() {
         return successors;
     }
 
@@ -171,18 +173,18 @@ public:
 
     void removeOurselfFromSuccessors(Event *us);
 
-    void addPredecessorInPlanning(const shared_ptr<Event>& pred) {
+    void addPredecessorInPlanning(const shared_ptr<Event> &pred) {
         if (pred->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS PREDECESSOR!");
         }
         //cout<<" ADDING pred "<<pred->id<<" -> "<<this->id<<endl;
-        if(this->predecessors.find(pred)== this->predecessors.end()){
+        if (this->predecessors.find(pred) == this->predecessors.end()) {
 
             auto it = find_if(this->predecessors.begin(), this->predecessors.end(), [pred](const shared_ptr<Event> &e) {
                 return e->id == pred->id;
             });
-            if(it!= this->predecessors.end()){
-                cout<<"EVENT BY OTHER NAME"<<endl;
+            if (it != this->predecessors.end()) {
+                cout << "EVENT BY OTHER NAME " << pred->id << endl;
             }
             this->predecessors.insert(pred);
         }
@@ -199,13 +201,13 @@ public:
         pred->addSuccessorInPlanning(shared_from_this());
     }
 
-    void propagateChainInPlanning(const shared_ptr<Event>& event, double add) {
+    void propagateChainInPlanning(const shared_ptr<Event> &event, double add) {
         for (auto &successor: event->successors) {
-            if(successor->getExpectedTimeFire()!= successor->getActualTimeFire()){
-                cout<<"!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!!"<<endl;
+            if (successor->getExpectedTimeFire() != successor->getActualTimeFire()) {
+                cout << "!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!!" << endl;
             }
-           
-            
+
+
             double newTime = successor->getVisibleTimeFireForPlanning() + add;
             successor->setActualTimeFire(newTime);
             successor->setExpectedTimeFire(newTime);
@@ -214,19 +216,19 @@ public:
         }
     }
 
-    void addSuccessorInPlanning(const shared_ptr<Event>& succ) {
+    void addSuccessorInPlanning(const shared_ptr<Event> &succ) {
         assert(succ != nullptr);
         //cout<<"add successor "<<succ->id <<" to " <<this->id<<endl;
         if (succ->id == this->id) {
             throw runtime_error("ADDING OURSELVES AS SUCCESSOR!");
         }
-        if(this->successors.find(succ)== this->successors.end()){
+        if (this->successors.find(succ) == this->successors.end()) {
 
             auto it = find_if(this->successors.begin(), this->successors.end(), [succ](const shared_ptr<Event> &e) {
                 return e->id == succ->id;
             });
-            if(it!= this->successors.end()){
-             //   cout<<"succ EVENT BY OTHER NAME"<<endl;
+            if (it != this->successors.end()) {
+                //   cout<<"succ EVENT BY OTHER NAME"<<endl;
                 //assert((*it)->predecessors.size()== succ->predecessors.size());
                 this->successors.erase(it);
             }
@@ -260,8 +262,8 @@ public:
 
     void setActualTimeFire(double d) {
         const double EPSILON = 1e-9;  // Adjust this if needed
-        if (fabs(d - 34783261.252439588) < EPSILON){
-            cout<<"";
+        if (fabs(d - 34783261.252439588) < EPSILON) {
+            cout << "";
         }
         if (d != this->actualTimeFire) {
             //   cout << "changing actual time fire for " << this->id << " from " << this->actualTimeFire << " to " << d
@@ -273,9 +275,9 @@ public:
     double getActualTimeFire() {
         return this->actualTimeFire;
     }
-    
-    double getVisibleTimeFireForPlanning(){
-        return this->isDone? this->getActualTimeFire() : this->getExpectedTimeFire();
+
+    double getVisibleTimeFireForPlanning() {
+        return this->isDone ? this->getActualTimeFire() : this->getExpectedTimeFire();
     }
 
     void setBothTimesFire(double d) {
@@ -320,56 +322,6 @@ public:
 };
 
 
-/*struct CompareByTimestamp {
-    bool customCharCompare(char a, char b) const {
-        if (tolower(a) == tolower(b)) {
-            return islower(a) && isupper(b);  // Uppercase is "greater" if letters are same
-        }
-        if (a == 's' && b == 'f')
-            return true;
-        if (b == 's' && a == 'f') {
-            return false;
-        }
-        if (a == 'w' && b == 'r') {
-            return true;
-        }
-        if (b == 'w' && a == 'r') {
-            return false;
-        }
-        return tolower(a) < tolower(b);
-    }
-
-    bool customIDCompare(const std::string &a, const std::string &b) const {
-        size_t min_len = std::min(a.size(), b.size());
-        for (size_t i = 0; i < min_len; ++i) {
-            if (a[i] != b[i])
-                return customCharCompare(a[i], b[i]);
-        }
-        return a.size() < b.size();  // Compare by length if all chars are equal
-    }
-
-    bool operator()(const shared_ptr<Event> a, const shared_ptr<Event> b) const {
-        cout<<"compare "<<a->id<<" and "<< b->id<<endl;
-        if (a->getActualTimeFire() != b->getActualTimeFire()) {
-            return a->getActualTimeFire() < b->getActualTimeFire();
-        }
-        if (std::any_of(a->predecessors.begin(), a->predecessors.end(),
-                        [&b](const shared_ptr<Event> &pred) { return pred->id == b->id; })) {
-           // cout << "Event " << a->id << " is a successor of " << b->id << " => a > b (return false)" << endl;
-            return false;
-        }
-        if (std::any_of(b->predecessors.begin(), b->predecessors.end(),
-                        [&a](const shared_ptr<Event> &pred) { return pred->id == a->id; })) {
-            //cout << "Event " << a->id << " is a predecessor of " << b->id << " => a < b (return true)" << endl;
-            return true;
-        }
-
-        bool compare = customIDCompare(a->id, b->id);
-        return compare;
-    }
-}; */
-
-
 struct CompareByTimestamp {
     int extractTaskNumber(const std::string &taskName) const {
         std::regex rgx("\\d+$");  // Matches digits at the end of the string
@@ -379,27 +331,6 @@ struct CompareByTimestamp {
         }
         return -1;  // Return -1 if no valid task number is found (shouldn't happen if task names are well-formed)
     }
-
-
-   bool isDeepSuccessor(const shared_ptr<Event> &a, const shared_ptr<Event> &b, unordered_set<string> &visited) const {
-       if (a->id == b->id) {
-           return true; // Direct match
-       }
-
-       if (visited.count(a->id)) {
-           return false; // Already checked this node, no need to repeat work
-       }
-
-       visited.insert(a->id); // Mark as visited
-
-       for (const auto &pred : a->getPredecessors()) {
-           if (isDeepSuccessor(pred, b, visited)) {
-               return true;
-           }
-       }
-
-       return false;
-   }
 
 
     bool operator()(const shared_ptr<Event> a, const shared_ptr<Event> b) const {
@@ -421,32 +352,18 @@ struct CompareByTimestamp {
             return true;  // b is a successor of a => b should come later
         }
 
-        if(a->getPredecessors().empty() && !b->getPredecessors().empty()){
+        if (a->getPredecessors().empty() && !b->getPredecessors().empty()) {
             return true;
         }
-        if(!a->getPredecessors().empty() && b->getPredecessors().empty()){
+        if (!a->getPredecessors().empty() && b->getPredecessors().empty()) {
             return false;
         }
-
-
-     /*   if (isDeepSuccessor(a, b)) {
-            return false;  // a is a deep successor of b, so b must come first
-        }
-
-        if (isDeepSuccessor(b, a)) {
-            return true;  // b is a deep successor of a, so a must come first
-        }
-        assert(!(isDeepSuccessor(a, b) && isDeepSuccessor(b, a)) && "Cycle detected in event dependency graph!");
-        if (isDeepSuccessor(a, b) && (a->type < b->type)) {
-            cout << "Warning: Successor ordering conflicts with type sorting for "
-                 << a->id << " and " << b->id << endl;
-        } */
 
         if (a->type != b->type) {
             return a->type < b->type;
         } else {
             if (a->id == b->id) {
-                cout << "compare with myself " << a->id << endl;
+                //cout << "compare with myself " << a->id << endl;
                 return true;
             }
             //   cout<<"ID COMPARE "<<a->id<<" "<<b->id<<endl;
@@ -507,12 +424,10 @@ struct CompareByTimestamp {
             if (a->task && b->task) {
                 int taskA = extractTaskNumber(a->task->name);
                 int taskB = extractTaskNumber(b->task->name);
-                if(taskA!=taskB) {
+                if (taskA != taskB) {
                     return taskA < taskB;  // Smaller task number comes first
-                }
-                else
-                {
-                    return a->id<b->id;
+                } else {
+                    return a->id < b->id;
                 }
             }
 
@@ -546,19 +461,15 @@ struct CompareByTimestamp {
                 // If tail numbers are the same, compare based on head task number
                 int headA = extractTaskNumber(a->edge->head->name);
                 int headB = extractTaskNumber(b->edge->head->name);
-                if(headA!=headB) {
+                if (headA != headB) {
                     return headA < headB;  // Compare based on head task number
-                }
-                else
-                {
-                    return a->id<b->id;
+                } else {
+                    return a->id < b->id;
                 }
             }
 
         }
-
-        cout << "could NOT COMPARE!! " << a->id << " " << b->id << endl;
-        return a->id<b->id;
+        return a->id < b->id;
         // return customIDCompare(a->id, b->id);
     }
 };
@@ -567,66 +478,103 @@ struct CompareByTimestamp {
 class EventManager {
 private:
     std::set<shared_ptr<Event>, CompareByTimestamp> eventSet; // Sorted by timestamp
-    std::unordered_map<string, std::set<shared_ptr<Event>>::iterator> eventMap; // Fast lookup by ID
+    std::unordered_map<string, std::set<shared_ptr<Event>>::iterator> eventByIdMap; // Fast lookup by ID
+    std::unordered_map<int, std::set<std::shared_ptr<Event>, CompareByTimestamp>> eventsByProcessorIdMap;
+
 public:
     // Insert a new event
     void insert(const shared_ptr<Event> &event) {
-        auto foundIterator = eventMap.find(event->id);
-        if (foundIterator != eventMap.end()) {
+       // cout << "inserting event " << event->id << endl;
+        auto foundIterator = eventByIdMap.find(event->id);
+        if (foundIterator != eventByIdMap.end()) {
             remove(event->id);
         } else {
             for (const auto &pred: event->getPredecessors()) {
-                if (eventMap.find(pred->id) == eventMap.end()) {
+                if (eventByIdMap.find(pred->id) == eventByIdMap.end()) {
                 }
             }
+            //auto it = eventSet.insert(event);
+            auto [it, inserted] = eventSet.insert(event);
+            if (!inserted) {
+                std::cout << "Event " << event->id << " was NOT inserted. Conflicted with: " << (*it)->id << std::endl;
+            }
+            eventByIdMap[event->id] = it;
+            eventsByProcessorIdMap[event->processor->id].insert(*it);
         }
-        //auto it = eventSet.insert(event);
-        auto [it, inserted] = eventSet.insert(event);
-        if (!inserted) {
-            std::cout << "Event "<<event->id<<" was NOT inserted. Conflicted with: " << (*it)->id << std::endl;
-        }
-        eventMap[event->id] = it;
     }
 
-    shared_ptr<Event> find(string id) {
-        if (eventMap.find(id) != eventMap.end()) {
-            return *eventMap[id];
+    shared_ptr<Event> findByEventId(string id) {
+        if (eventByIdMap.find(id) != eventByIdMap.end()) {
+            return *eventByIdMap[id];
         }
         return nullptr;
     }
 
-
-    // Update an event's timestamp
-    bool update(const string &id, double newTimestamp) {
-        auto it = eventMap.find(id);
-        if (it != eventMap.end() && (*it->second)->getActualTimeFire() != newTimestamp) {
-            shared_ptr<Event> updatedEvent = *(it->second);
-            eventSet.erase(it->second);
-
-            // Update the timestamp and reinsert
-            updatedEvent->setActualTimeFire(newTimestamp);
-            auto newIt = eventSet.insert(updatedEvent);
-
-            // Update map entry
-            eventMap[id] = newIt.first;
-            // checkAllEvents();
-            return true;
+    const std::set<std::shared_ptr<Event>, CompareByTimestamp> &findByProcessorId(int processorId) {
+        static const std::set<std::shared_ptr<Event>, CompareByTimestamp> emptySet;  // Constant empty set with the same comparator
+        auto it = eventsByProcessorIdMap.find(processorId);
+        if (it != eventsByProcessorIdMap.end()) {
+            return it->second;  // Return the const set of events for that processor
         }
-        //checkAllEvents();
-        return false; // Event not found
+        return emptySet;  // Return an empty const set with the same comparator
     }
 
-    // Remove an event by ID
+
+    bool update(const string &id, double newTimestamp) {
+        //cout << "updating event " << id << endl;
+        auto it = eventByIdMap.find(id);
+        if (it != eventByIdMap.end()) {
+            shared_ptr<Event> event = *(it->second);
+
+            if (event->getActualTimeFire() != newTimestamp) {
+                // Remove from eventSet
+                eventSet.erase(it->second);
+
+                // Remove from processor map
+                eventsByProcessorIdMap[event->processor->id].erase(event);
+
+                // Update the timestamp
+                event->setActualTimeFire(newTimestamp);
+
+                // Reinsert updated event
+                auto [newIt, inserted] = eventSet.insert(event);
+                if (inserted) {
+                    // Update the ID map and processor map
+                    eventByIdMap[id] = newIt;
+                    eventsByProcessorIdMap[event->processor->id].insert(event);
+                    return true;
+                } else {
+                    std::cerr << "Failed to reinsert updated event: " << id << std::endl;
+                }
+            }
+        }
+        return false; // Event not found or timestamp unchanged
+    }
+
     bool remove(string id) {
-        //  cout<<"removing "<<id<<endl;
-        auto it = eventMap.find(id);
-        if (it != eventMap.end()) {
-            // Remove from multiset and map
+
+        auto it = eventByIdMap.find(id);
+        if (it != eventByIdMap.end()) {
+            std::shared_ptr<Event> event = *(it->second);
+
+            // Remove from processor map
+            int pid = event->processor->id;  // Assuming you have this field
+            auto processorIt = eventsByProcessorIdMap.find(pid);
+            if (processorIt != eventsByProcessorIdMap.end()) {
+                processorIt->second.erase(event);
+                if (processorIt->second.empty()) {
+                    eventsByProcessorIdMap.erase(pid);  // optional cleanup
+                }
+            }
+
+            // Remove from set and map
             eventSet.erase(it->second);
-            eventMap.erase(it);
+            eventByIdMap.erase(it);
+
             return true;
         }
-        return false; // Event not found
+        cout << "not removed" << endl;
+        return false;
     }
 
     // Get the earliest event (smallest timestamp)
@@ -638,11 +586,11 @@ public:
     }
 
     // Print all events (for debugging)
-    void printAll(int until=-1) const {
+    void printAll(int until = -1) const {
         cout << endl;
-        int cntr=0;
+        int cntr = 0;
         for (const auto &event: eventSet) {
-           // if(until!=-1 && cntr<until)
+            // if(until!=-1 && cntr<until)
             std::cout << "\tID: " << event->id << " at " << event->getActualTimeFire() << endl;// ",\t";
             cntr++;
         }
@@ -650,25 +598,11 @@ public:
         cout << endl;
     }
 
-    void printTree() const {
-        printHelper(eventSet.begin(), eventSet.end(), 0);
-    }
-
 
     bool empty() {
         return eventSet.empty();
     }
 
-    void reinsertAll() {
-        std::vector<std::shared_ptr<Event>> tempEvents(eventSet.begin(), eventSet.end());
-        eventSet.clear();
-        eventMap.clear();
-
-        for (const auto &event: tempEvents) {
-            auto it = eventSet.insert(event);
-            eventMap[event->id] = it.first;
-        }
-    }
 
     static void
     printHelper(std::set<shared_ptr<Event>>::const_iterator begin, _Rb_tree_const_iterator<shared_ptr<Event>> end,
@@ -719,9 +653,11 @@ public:
 
         }
     }
-    void deleteAll(){
+
+    void deleteAll() {
         eventSet.clear();
-        eventMap.clear();
+        eventByIdMap.clear();
+        eventsByProcessorIdMap.clear();
     }
 
     void checkAllEvents() {
@@ -738,7 +674,8 @@ public:
 
                 if (fabs((*it_event)->getActualTimeFire() - (*it_pred)->getActualTimeFire()) <= EPSILON) {
                     string error = "ERROR: A predecessor " + (*it_pred)->id + " at " +
-                                   to_string((*it_pred)->getActualTimeFire()) + " appears after its dependent event! " +
+                                   to_string((*it_pred)->getActualTimeFire()) +
+                                   " appears after its dependent event! " +
                                    (*it_event)->id + " at " +
                                    to_string((*it_event)->getActualTimeFire());
                     if (std::distance(eventSet.begin(), it_pred) > std::distance(eventSet.begin(), it_event)) {
@@ -769,18 +706,17 @@ public:
 };
 
 
-
 struct CompareByRank {
-    bool operator()(vertex_t * a,vertex_t * b) const {
-        assert(a->rank!=-1);
-        assert(b->rank!=-1);
+    bool operator()(vertex_t *a, vertex_t *b) const {
+        assert(a->rank != -1);
+        assert(b->rank != -1);
         return a->rank > b->rank;
     }
 };
 
-class ReadyQueue{
+class ReadyQueue {
 public:
-    std::set<vertex_t*, CompareByRank> readyTasks;
+    std::set<vertex_t *, CompareByRank> readyTasks;
 };
 
 

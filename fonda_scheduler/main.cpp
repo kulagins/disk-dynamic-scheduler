@@ -18,7 +18,7 @@ int currentAlgoNum = 0;
 
 /*
  *
- *  Call: memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty,workflow, inputSize, algorithmNumber, isBaseline, root directory, machines file, number of deviation function
+ *  Call: memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty,workflow, inputSize, algorithmNumber, isBaseline, root directory, machines file, number of deviation function, yes/no for preemptive writes
  *  1000000, 100, 1, 0.001, true ../ machines.csv 1
  *
  * algos with  memory awareness: 1 - HEFT-BL, 2- HEFT-BL, 3- HEFT-MM
@@ -39,6 +39,7 @@ int currentAlgoNum = 0;
 //1000000 100 1 0.001 chipseq_1000 3793245764 1 no ../ machines.csv -> für beide gültig
 //100000000 100 1 1 chipseq_2000 3793245764 1 yes ../ machines.csv
 //1000000 100 1 0.001 eager_2000 25705994498 1 no ../ machines.csv
+//100000000 100 1 0.001 eager 8330435694 1 no ../ machines.csv 3
 int main(int argc, char *argv[]) {
 
     for (int i = 0; i < argc; ++i) {
@@ -59,6 +60,7 @@ int main(int argc, char *argv[]) {
     string dotPrefix= argv[9];
     string machinesFile = (argc<10)?"input/machines.csv" : std::string("input/") + argv[10];
     int deviationVariant = stoi(argv[11]);
+    bool usePreemptiveWrites = std::string(argv[12]) =="yes";
     //1000000, 100, 1, 0.001
     csv2::Reader<csv2::delimiter<','>,
             csv2::quote_character<'"'>,
@@ -203,7 +205,7 @@ int main(int argc, char *argv[]) {
     assert(cluster->getProcessors().at(2)->getMemorySize()== actualCluster->getProcessors().at(2)->getMemorySize());
     assert(cluster->getProcessors().at(3)->getMemorySize()== actualCluster->getProcessors().at(3)->getMemorySize());
 
-    double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant);
+    double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant, usePreemptiveWrites);
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;

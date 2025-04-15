@@ -297,7 +297,7 @@ public:
 
     void setAfterPendingMemories( set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> &memories);
 
-    edge_t * getBiggestPendingEdgeThatIsNotIncomingOf(vertex_t* v){
+    edge_t * getBiggestPendingEdgeThatIsNotIncomingOfAndLocatedOnProc(vertex_t* v){
         auto it = pendingMemories.begin();
         while(it!= pendingMemories.end()){
             if((*it)->head->name!=v->name){
@@ -389,16 +389,19 @@ public:
 
         for (const auto& [key, value] : this->processors) {
             cout << "Processor " << value->id<< "with memory " << value->getMemorySize() << ", speed " << value->getProcessorSpeed()
-                 << " and busy? " << value->isBusy << "assigned " << (value->isBusy?value->getAssignedTaskId(): -1)
+                 << " and busy? " << value->isBusy //<< " assigned " << (value->isBusy?value->getAssignedTaskId(): -1)
                 << " ready time compute " << value->getReadyTimeCompute()
                  << " ready time read " << value->getReadyTimeRead()
                  << " ready time write " << value->getReadyTimeWrite()
                  //<< " ready time write soft " << value->softReadyTimeWrite
                  //<< " avail memory " << value->availableMemory
-                 << " pending in memory "<<value->getPendingMemories().size()<<" pcs: ";
+                 << " writing queue size "<<value->writingQueue.size()
+                 << " pending in memory "<<value->getPendingMemories().size()<<" pcs: "
+
+                 ;
 
             for (const auto &item: value->getPendingMemories()){
-                print_edge(item);
+                cout<< buildEdgeName(item)<<", ";
             }
             cout<< endl;
         }

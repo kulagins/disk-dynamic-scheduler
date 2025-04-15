@@ -1,9 +1,10 @@
 #include "fonda_scheduler/DynamicSchedulerHeader.hpp"
 #include "fonda_scheduler/SchedulerHeader.hpp"
 
+
 vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<shared_ptr<Processor>> &bestModifiedProcs,
                                                   shared_ptr<Processor> &bestProcessorToAssign, double notEarlierThan) {
-   // cout << "!!!START BEST tent assign for " << vertex->name << endl;
+    // cout << "!!!START BEST tent assign for " << vertex->name << endl;
     double bestStartTime = numeric_limits<double>::max(), bestFinishTime = numeric_limits<double>::max(),
             bestReallyUsedMem;
     vector<shared_ptr<Event>> bestEvents;
@@ -13,7 +14,7 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
         double finTime = -1, startTime = -1, reallyUsedMem = 0;
         int resultingEvictionVariant = -1;
         auto ourModifiedProc = make_shared<Processor>(*processor);
-      //  cout<<"adding our proc "<<ourModifiedProc->id<<endl;
+        //  cout<<"adding our proc "<<ourModifiedProc->id<<endl;
         vector<shared_ptr<Event>> newEvents = {};
         //checkIfPendingMemoryCorrect(ourModifiedProc);
         vector<shared_ptr<Processor>> modifiedProcs = tentativeAssignment(vertex, ourModifiedProc,
@@ -23,7 +24,7 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
 
         //cout<<"on "<<processor->id<<" fin time "<<finTime<<endl;
         if (bestFinishTime > finTime) {
-           // cout << "best acutalize to " << ourModifiedProc->id << " act used mem " << reallyUsedMem << endl;
+            // cout << "best acutalize to " << ourModifiedProc->id << " act used mem " << reallyUsedMem << endl;
             assert(!modifiedProcs.empty());
             bestModifiedProcs.clear();
             bestModifiedProcs = modifiedProcs;
@@ -36,7 +37,7 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
             bestEvents = newEvents;
             bestReallyUsedMem = reallyUsedMem;
         } else {
-            if(ourModifiedProc!=nullptr){
+            if (ourModifiedProc != nullptr) {
                 ourModifiedProc->resetPendingMemories();
                 ourModifiedProc->resetAfterPendingMemories();
                 ourModifiedProc.reset();
@@ -74,61 +75,20 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
         assert(iterator->second->getPendingMemories().size() == item->getPendingMemories().size());
     }
 
-    for ( auto &item: bestEvents){
+    for (auto &item: bestEvents) {
         int procid = item->processor->id;
         item->processor.reset();
         item->processor = cluster->getProcessorById(procid);
     }
 
 
-        for (int j = 0; j < vertex->in_degree; j++) {
+    for (int j = 0; j < vertex->in_degree; j++) {
         assert(//vertex->in_edges[j]->tail->makespan==-1 ||
                 bestFinishTime > vertex->in_edges[j]->tail->makespan);
     }
 
-   // cout << "resulting var " << resultingVar<<" on "<<bestProcessorToAssign->id << endl;
+    // cout << "resulting var " << resultingVar<<" on "<<bestProcessorToAssign->id << endl;
     return bestEvents;
-}
-
-void checkBestEvents(vector<shared_ptr<Event>> &bestEvents) {
-    for (auto &item: bestEvents) {
-        cout << item->id << " at " << item->getExpectedTimeFire() << ", " << endl;
-        assert(item->getExpectedTimeFire() == item->getActualTimeFire());
-        bool hasCycle = item->checkCycleFromEvent();
-        assert(!hasCycle);
-
-        if (item->id.find("-w-f") != std::string::npos) {
-            auto itWriteStart = std::find_if(bestEvents.begin(), bestEvents.end(),
-                                             [item](shared_ptr<Event> e) {
-                                                 return e->id == item->id.substr(0,
-                                                                                 item->id.length() -
-                                                                                 4) + "-w-s";
-                                             });
-            if (itWriteStart != bestEvents.end()) {
-                auto actualLength = item->getExpectedTimeFire() - (*itWriteStart)->getExpectedTimeFire();
-                assert(abs(actualLength - item->edge->weight / item->processor->writeSpeedDisk) < 0.00001);
-            } else {
-                throw runtime_error("no pair found ofr " + item->id);
-            }
-
-        }
-        if (item->id.find("-r-f") != std::string::npos) {
-            auto itReadStart = std::find_if(bestEvents.begin(), bestEvents.end(),
-                                            [item](shared_ptr<Event> e) {
-                                                return e->id == item->id.substr(0,
-                                                                                item->id.length() -
-                                                                                4) + "-r-s";
-                                            });
-            if (itReadStart != bestEvents.end()) {
-                auto actualLength = item->getExpectedTimeFire() - (*itReadStart)->getExpectedTimeFire();
-                assert(abs(actualLength - item->edge->weight / item->processor->readSpeedDisk) < 0.00001);
-                cout << "ys" << endl;
-            } else {
-                throw runtime_error("no pair found ofr " + item->id);
-            }
-        }
-    }
-    cout << endl;
 }
 
 
@@ -176,7 +136,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
     double amountToOffloadWithoutAllFiles = 0;
     double Res = howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(vertex, ourModifiedProc);
     if (Res < 0) {
-       // cout<<" overflow! ";
+        // cout<<" overflow! ";
         double amountToOffload = -Res;
         double shortestFT = std::numeric_limits<double>::max();
 
@@ -187,7 +147,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
             //cout<<"cant"<<endl;
             timeToFinishNoEvicted = std::numeric_limits<double>::max();
         }
-        if (sumIn> ourModifiedProc->getAvailableMemory()) {
+        if (sumIn > ourModifiedProc->getAvailableMemory()) {
             timeToFinishNoEvicted = std::numeric_limits<double>::max();
         }
 
@@ -201,12 +161,12 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
                 ourModifiedProc->getExpectedOrActualReadyTimeCompute() > startTime ?
                 ourModifiedProc->getExpectedOrActualReadyTimeCompute() : startTime;
 
-        edge_t *biggestPendingEdge = ourModifiedProc->getBiggestPendingEdgeThatIsNotIncomingOf(vertex);
+        edge_t *biggestPendingEdge = ourModifiedProc->getBiggestPendingEdgeThatIsNotIncomingOfAndLocatedOnProc(vertex);
         if (!ourModifiedProc->getPendingMemories().empty() && biggestPendingEdge != nullptr) {
             assert(biggestPendingEdge->weight >=
                    (*ourModifiedProc->getPendingMemories().rbegin())->weight);
             //  cout << "case 2, before " << buildEdgeName(biggestPendingEdge);
-            biggestPendingEdge = ourModifiedProc->getBiggestPendingEdgeThatIsNotIncomingOf(vertex);
+            biggestPendingEdge = ourModifiedProc->getBiggestPendingEdgeThatIsNotIncomingOfAndLocatedOnProc(vertex);
 
             //      cout << " after " << buildEdgeName(biggestPendingEdge) << endl;
             biggestFileWeight = biggestPendingEdge->weight;
@@ -273,17 +233,29 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
             resultingVar = 1;
         } else if (timeToFinishBiggestEvicted == minTTF) {
             std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
-            auto it = scheduleWriteForEdge(ourModifiedProc, biggestPendingEdge, writeEvents);
-            newEvents.emplace_back(writeEvents.first);
-            newEvents.emplace_back(writeEvents.second);
+
+            shared_ptr<Event> eventStartFromQueue = events.findByEventId(
+                    buildEdgeName(biggestPendingEdge) + "-w-s");
+            shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(biggestPendingEdge) + "-w-f");
+            if(eventStartFromQueue== nullptr && eventFinishFromQueue==nullptr) {
+                //not scheduled to write yet or already written
+
+                if(isLocatedOnDisk(biggestPendingEdge,false)){
+                    //already written to disk, enough to remove from pending memories.
+                    ourModifiedProc->removePendingMemory(biggestPendingEdge);
+                }
+                else {
+                    auto it = scheduleWriteForEdge(ourModifiedProc, biggestPendingEdge, writeEvents);
+                    newEvents.emplace_back(writeEvents.first);
+                    newEvents.emplace_back(writeEvents.second);
+                }
+            }
+
             resultingVar = 2;
             assert(startTime <= startTimeFor1Evicted);
             startTime = startTimeFor1Evicted;
 
             assert(biggestPendingEdge != nullptr);
-            assert(biggestPendingEdge->tail->status == Status::Scheduled ||
-                   biggestPendingEdge->tail->status == Status::Running ||
-                   isLocatedOnThisProcessor(biggestPendingEdge, ourModifiedProc->id, false));
         } else if (timeToFinishAllEvicted == minTTF) {
             //  cout<<"case 3 avail mem "<<ourModifiedProc->getAvailableMemory()<<" "<<ourModifiedProc->getAfterAvailableMemory()<<endl;
             resultingVar = 3;
@@ -295,10 +267,26 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
                     temp.insert(edge);
                     ourModifiedProc->removePendingMemory(edge);
                 } else {
+                    shared_ptr<Event> eventStartFromQueue = events.findByEventId(
+                            buildEdgeName(edge) + "-w-s");
+                    shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(edge) + "-w-f");
+
                     std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
-                    scheduleWriteForEdge(ourModifiedProc, edge, writeEvents);
-                    newEvents.emplace_back(writeEvents.first);
-                    newEvents.emplace_back(writeEvents.second);
+                    if(eventStartFromQueue== nullptr && eventFinishFromQueue==nullptr){
+                        //not scheduled to write yet or already written
+                        if(isLocatedOnDisk(biggestPendingEdge,false)){
+                            //already written to disk, enough to remove from pending memories.
+                            ourModifiedProc->removePendingMemory(edge);
+                        }
+                        else {
+                            scheduleWriteForEdge(ourModifiedProc, edge, writeEvents);
+                            newEvents.emplace_back(writeEvents.first);
+                            newEvents.emplace_back(writeEvents.second);
+                        }
+                    }
+                    else{
+                        ourModifiedProc->removePendingMemory(edge);
+                    }
                 }
             }
             for (auto &temEd: temp) {
@@ -335,6 +323,9 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
         }
 
     } else {
+        if (vertex->name == "circularmapper") {
+            cout << "!";
+        }
         processIncomingEdges(vertex, eventStartTask, ourModifiedProc, modifiedProcs, newEvents);
 
         actuallyUsedMemory = peakMemoryRequirementOfVertex(vertex);
@@ -423,6 +414,11 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
     // if(ind>0){
     for (int p = 0; p < ind; p++) {
         edge *incomingEdge = v->in_edges[p];
+        shared_ptr<Event> eventStartFromQueue = events.findByEventId(
+                buildEdgeName(incomingEdge) + "-w-s");
+        shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-f");
+
+        // cout<<"processing inc edge "<<buildEdgeName(incomingEdge)<<endl;
         vertex_t *predecessor = incomingEdge->tail;
         if (predecessor->makespan > 0) {
             ourEvent->setBothTimesFire(max(ourEvent->getExpectedTimeFire(), predecessor->makespan));
@@ -450,35 +446,35 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
             if (plannedOnThisProc == nullptr) {
                 //  throw runtime_error("Edge located nowhere " + buildEdgeName(incomingEdge));
                 //it has been written to disk, but not yet fired the event
-                auto readEvents = scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(),
-                                                ourModifiedProc,
-                                                incomingEdge);
-                const shared_ptr<Event> &eventFinishThisEdgeWrite = events.find(buildEdgeName(incomingEdge) + "-w-f");
-                if (eventFinishThisEdgeWrite != nullptr) {
-                    double eventFinishThisEdgeWritebef = eventFinishThisEdgeWrite->getExpectedTimeFire();
-                    readEvents.first->addPredecessorInPlanning(eventFinishThisEdgeWrite);
-                    assert(eventFinishThisEdgeWritebef == eventFinishThisEdgeWrite->getExpectedTimeFire());
-                } else {
-                    if (isLocatedOnDisk(incomingEdge, false) || incomingEdge
-                                                                        ->tail->name == "GRAPH_SOURCE") {
-                    } else {
-                        cout << "no event finish write - AND THE FILE IS NOT ON DISK " << buildEdgeName(incomingEdge)
-                             << endl;
-                    }
-                }
+
+                organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents,
+                                                 ourEvent->getExpectedTimeFire());
 
             } else {
                 auto predProc = findPredecessorsProcessor(incomingEdge, modifiedProcs);
                 assert(predProc->id == plannedOnThisProc->id);
-                scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,
-                                     incomingEdge,
-                                     modifiedProcs);
+                if (eventStartFromQueue != nullptr || eventFinishFromQueue != nullptr) {
+                    //the write has already started, no other option but to finish it
+                    //schedule only a read
+                    cout << "already exist write events" << endl;
+                    organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents,
+                                                     eventFinishFromQueue->getExpectedTimeFire());
+
+                    scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,
+                                         incomingEdge,
+                                         modifiedProcs);
+
+                    continue;
+                } else {
+                    scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,
+                                         incomingEdge,
+                                         modifiedProcs);
+                }
             }
 
         } else if (isLocatedOnThisProcessor(incomingEdge, ourModifiedProc->id, false)) {
             //   cout << "edge " << buildEdgeName(incomingEdge) << " already on proc" << endl;
         } else if (isLocatedOnDisk(incomingEdge, false)) {
-
             // schedule a read
             scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge,
                           ourEvent->getExpectedTimeFire());
@@ -488,7 +484,7 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
                 predecessorsProc->getAfterPendingMemories().end()) {
                 //    cout << "edge " << buildEdgeName(incomingEdge) << " not found in after pending mems on proc "
                 //        << predecessorsProc->id << endl;
-                auto plannedWriteFinishOfIncomingEdge = events.find(buildEdgeName(incomingEdge) + "-w-f");
+                auto plannedWriteFinishOfIncomingEdge = events.findByEventId(buildEdgeName(incomingEdge) + "-w-f");
                 assert(plannedWriteFinishOfIncomingEdge != nullptr);
                 std::pair<shared_ptr<Event>, shared_ptr<Event>> readEVents;
                 double prev = plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning();
@@ -510,12 +506,24 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
                     readEVents.first->addPredecessorInPlanning(plannedWriteFinishOfIncomingEdge);
                 }
                 assert(prev == plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning());
-                assert(incomingEdge->weight<1 || readEVents.first->getActualTimeFire() < readEVents.second->getActualTimeFire());
+                assert(incomingEdge->weight < 1 ||
+                       readEVents.first->getActualTimeFire() < readEVents.second->getActualTimeFire());
             } else {
                 //schedule a write
-                scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,
-                                     incomingEdge,
-                                     modifiedProcs);
+                // cout<<buildEdgeName(incomingEdge)+"-w-s"<<endl;
+                if (eventStartFromQueue != nullptr || eventFinishFromQueue != nullptr) {
+                    //the write has already started, no other option but to finish it
+                    //schedule only a read
+                    cout << "already exist write events" << endl;
+                    organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents,
+                                                     eventFinishFromQueue->getExpectedTimeFire());
+                    continue;
+                } else {
+                    scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,
+                                         incomingEdge,
+                                         modifiedProcs);
+                }
+
             }
         }
     }
@@ -528,19 +536,41 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
     return 0;
 }
 
+void organizeAReadAndPredecessorWrite(const vertex_t *v, edge *incomingEdge, shared_ptr<Event> &ourEvent,
+                                      shared_ptr<Processor> &ourModifiedProc,
+                                      vector<shared_ptr<Event>> &createdEvents, double afterWhen) {
+    auto readEvents = scheduleARead(v, ourEvent, createdEvents, afterWhen,
+                                    ourModifiedProc,
+                                    incomingEdge);
+    const shared_ptr<Event> &eventFinishThisEdgeWrite = events.findByEventId(
+            buildEdgeName(incomingEdge) + "-w-f");
+    if (eventFinishThisEdgeWrite != nullptr) {
+        double eventFinishThisEdgeWritebef = eventFinishThisEdgeWrite->getExpectedTimeFire();
+        readEvents.first->addPredecessorInPlanning(eventFinishThisEdgeWrite);
+        assert(eventFinishThisEdgeWritebef == eventFinishThisEdgeWrite->getExpectedTimeFire());
+    } else {
+        if (isLocatedOnDisk(incomingEdge, false) || incomingEdge
+                                                            ->tail->name == "GRAPH_SOURCE") {
+        } else {
+            cout << "no event finish write - AND THE FILE IS NOT ON DISK " << buildEdgeName(incomingEdge)
+                 << endl;
+        }
+    }
+}
+
 std::pair<shared_ptr<Event>, shared_ptr<Event>>
 scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<Event>> &createdEvents,
               double startTimeOfTask,
               shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, double atThisTime) {
-    assert(events.find(buildEdgeName(incomingEdge)+"-r-s")==nullptr);
-    assert(events.find(buildEdgeName(incomingEdge)+"-r-f")==nullptr);
+    assert(events.findByEventId(buildEdgeName(incomingEdge) + "-r-s") == nullptr);
+    assert(events.findByEventId(buildEdgeName(incomingEdge) + "-r-f") == nullptr);
 
     double estimatedStartOfRead = startTimeOfTask - incomingEdge->weight / ourModifiedProc->readSpeedDisk;
     estimatedStartOfRead = max(estimatedStartOfRead, ourModifiedProc->getExpectedOrActualReadyTimeRead());
     vector<shared_ptr<Event>> predsOfRead = vector<shared_ptr<Event>>{};
     vector<shared_ptr<Event>> succsOfRead = vector<shared_ptr<Event>>{};
-    if (events.find(v->name + "-s") != nullptr) {
-        succsOfRead.emplace_back(events.find(v->name + "-s"));
+    if (events.findByEventId(v->name + "-s") != nullptr) {
+        succsOfRead.emplace_back(events.findByEventId(v->name + "-s"));
     }
 
     //if this start of the read is happening during the runtime  of the previous task
@@ -555,8 +585,8 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
 
     if (atThisTime != -1) {
         assert(estimatedStartOfRead <= atThisTime
-        ||
-        abs(estimatedStartOfRead - atThisTime)<0.1
+               ||
+               abs(estimatedStartOfRead - atThisTime) < 0.1
         );
         estimatedStartOfRead = atThisTime;
     }
@@ -581,11 +611,11 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
         assert(prev == ourModifiedProc->getLastReadEvent().lock()->getActualTimeFire());
     }
 
-    if (events.find(buildEdgeName(incomingEdge) + "-w-f") != nullptr) {
-        eventStartRead->addPredecessorInPlanning(events.find(buildEdgeName(incomingEdge) + "-w-f"));
+    if (events.findByEventId(buildEdgeName(incomingEdge) + "-w-f") != nullptr) {
+        eventStartRead->addPredecessorInPlanning(events.findByEventId(buildEdgeName(incomingEdge) + "-w-f"));
     }
 
-    const shared_ptr<Event> &eventFinishPredecessorComputing = events.find(incomingEdge->tail->name + "-f");
+    const shared_ptr<Event> &eventFinishPredecessorComputing = events.findByEventId(incomingEdge->tail->name + "-f");
     if (eventFinishPredecessorComputing != nullptr) {
         double prev = eventFinishPredecessorComputing->getActualTimeFire();
         eventStartRead->addPredecessorInPlanning(eventFinishPredecessorComputing);
@@ -616,8 +646,8 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
                                               buildEdgeName(incomingEdge) + "-r-f");
 
     eventFinishRead->addSuccessorInPlanning(ourEvent);
-    if (events.find(v->name + "-s") != nullptr) {
-        eventFinishRead->addSuccessorInPlanning(events.find(v->name + "-s"));
+    if (events.findByEventId(v->name + "-s") != nullptr) {
+        eventFinishRead->addSuccessorInPlanning(events.findByEventId(v->name + "-s"));
     }
     eventFinishRead->addPredecessorInPlanning(eventStartRead);
 
@@ -648,28 +678,28 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
 }
 
 
-vector<shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc, edge_t* edgeToFit) {
+vector<shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc, edge_t *edgeToFit) {
 
-    assert(thisProc->getPendingMemories().find(edgeToFit)== thisProc->getPendingMemories().end());
-    double weightToFit= edgeToFit->weight;
+    assert(thisProc->getPendingMemories().find(edgeToFit) == thisProc->getPendingMemories().end());
+    double weightToFit = edgeToFit->weight;
     vector<shared_ptr<Event>> newEvents;
-    if(thisProc->getAvailableMemory() >= weightToFit){
+    if (thisProc->getAvailableMemory() >= weightToFit) {
         return newEvents;
     }
-  //  cout<<"evict for "<<buildEdgeName(edgeToFit)<<endl;
-      auto begin = thisProc->getPendingMemories().begin();
+    //  cout<<"evict for "<<buildEdgeName(edgeToFit)<<endl;
+    auto begin = thisProc->getPendingMemories().begin();
     while (begin != thisProc->getPendingMemories().end()) {
         edge_t *edgeToEvict = *begin;
-        if (thisProc->getAvailableMemory() < weightToFit &&edgeToEvict->head->name!= edgeToFit->head->name ) {
-           // cout<<"evict "<<buildEdgeName(edgeToEvict)<<endl;
+        if (thisProc->getAvailableMemory() < weightToFit && edgeToEvict->head->name != edgeToFit->head->name) {
+            // cout<<"evict "<<buildEdgeName(edgeToEvict)<<endl;
             std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
             auto iterator = scheduleWriteForEdge(thisProc, edgeToEvict, writeEvents);
             newEvents.emplace_back(writeEvents.first);
             newEvents.emplace_back(writeEvents.second);
             begin = iterator;
-           // cout<<"evicted, new candidate is "<<buildEdgeName(*begin)<<endl;
-        }else {
-         //   cout<<"not evict"<<endl;
+            // cout<<"evicted, new candidate is "<<buildEdgeName(*begin)<<endl;
+        } else {
+            //   cout<<"not evict"<<endl;
             begin++;
         }
     }
@@ -679,11 +709,11 @@ vector<shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc
 //std::pair<shared_ptr<Event>, shared_ptr<Event>>
 set<edge_t *, bool (*)(edge_t *, edge_t *)>::iterator
 scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict,
-                     std::pair<shared_ptr<Event>, shared_ptr<Event>> &writeEvents) {
+                     std::pair<shared_ptr<Event>, shared_ptr<Event>> &writeEvents, bool onlyPreemptive) {
     //cout << "schedule write for edge evicting " << buildEdgeName(edgeToEvict) << endl;
 
-    assert(events.find(buildEdgeName(edgeToEvict)+"-w-s")==nullptr);
-    assert(events.find(buildEdgeName(edgeToEvict)+"-w-f")==nullptr);
+    assert(events.findByEventId(buildEdgeName(edgeToEvict) + "-w-s") == nullptr);
+    assert(events.findByEventId(buildEdgeName(edgeToEvict) + "-w-f") == nullptr);
 
     vector<shared_ptr<Event>> pred, succ = vector<shared_ptr<Event>>{};
     auto eventStartWrite = Event::createEvent(nullptr, edgeToEvict, OnWriteStart, thisProc,
@@ -701,7 +731,7 @@ scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict,
         assert(prev == thisProc->getLastWriteEvent().lock()->getActualTimeFire());
     }
 
-    auto eventOfFinishPredecessor = events.find(edgeToEvict->tail->name + "-f");
+    auto eventOfFinishPredecessor = events.findByEventId(edgeToEvict->tail->name + "-f");
     if (eventOfFinishPredecessor == nullptr) {
         //  cout << " no event of finish prdecesor found for edge " << buildEdgeName(edgeToEvict) << endl;
         eventStartWrite->setBothTimesFire(max(eventStartWrite->getExpectedTimeFire(), edgeToEvict->tail->makespan));
@@ -734,7 +764,10 @@ scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict,
     assert(eventFinishWrite->getExpectedTimeFire() ==
            eventStartWrite->getExpectedTimeFire() + edgeToEvict->weight / thisProc->writeSpeedDisk);
 
-    return thisProc->removePendingMemory(edgeToEvict);
+    if (!onlyPreemptive) {
+        return thisProc->removePendingMemory(edgeToEvict);
+    } else return thisProc->getPendingMemories().find(edgeToEvict);
+
 
 }
 
@@ -760,9 +793,9 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
     double estimatedStartOfWrite = estimatedStartOfRead - incomingEdge->weight / predecessorsProc->writeSpeedDisk;
     estimatedStartOfWrite = max(estimatedStartOfWrite, predecessorsProc->getExpectedOrActualReadyTimeWrite());
 
-    if (events.find(incomingEdge->tail->name + "-f") != nullptr) {
+    if (events.findByEventId(incomingEdge->tail->name + "-f") != nullptr) {
         estimatedStartOfWrite = max(estimatedStartOfWrite,
-                                    events.find(incomingEdge->tail->name + "-f")->getExpectedTimeFire());
+                                    events.findByEventId(incomingEdge->tail->name + "-f")->getExpectedTimeFire());
     } else {
         assert(incomingEdge->tail->makespan != -1);
         estimatedStartOfWrite = max(estimatedStartOfWrite, incomingEdge->tail->makespan);
@@ -783,9 +816,6 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
     vector<shared_ptr<Event>> predsOfWrite = vector<shared_ptr<Event>>{};
     vector<shared_ptr<Event>> succsOfWrite = vector<shared_ptr<Event>>{};
 
-    assert(events.find(buildEdgeName(incomingEdge)+"-w-s")==nullptr);
-    assert(events.find(buildEdgeName(incomingEdge)+"-w-f")==nullptr);
-
     auto eventStartWrite = Event::createEvent(nullptr, incomingEdge, OnWriteStart, predecessorsProc,
                                               estimatedStartOfWrite, estimatedStartOfWrite, predsOfWrite,
                                               succsOfWrite, false,
@@ -798,10 +828,10 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
     }
 
 
-    if (events.find(incomingEdge->tail->name + "-f") != nullptr) {
-        double prev = events.find(incomingEdge->tail->name + "-f")->getActualTimeFire();
-        eventStartWrite->addPredecessorInPlanning(events.find(incomingEdge->tail->name + "-f"));
-        assert(prev == events.find(incomingEdge->tail->name + "-f")->getActualTimeFire());
+    if (events.findByEventId(incomingEdge->tail->name + "-f") != nullptr) {
+        double prev = events.findByEventId(incomingEdge->tail->name + "-f")->getActualTimeFire();
+        eventStartWrite->addPredecessorInPlanning(events.findByEventId(incomingEdge->tail->name + "-f"));
+        assert(prev == events.findByEventId(incomingEdge->tail->name + "-f")->getActualTimeFire());
     }
 
     createdEvents.emplace_back(eventStartWrite);
@@ -816,8 +846,8 @@ void scheduleWriteAndRead(const vertex_t *v, shared_ptr<Event> ourEvent, vector<
                                                succsOfWrite, false,
                                                buildEdgeName(incomingEdge) + "-w-f");
 
-    if (events.find(v->name + "-s")) {
-        eventFinishWrite->addSuccessorInPlanning(events.find(v->name + "-s"));
+    if (events.findByEventId(v->name + "-s")) {
+        eventFinishWrite->addSuccessorInPlanning(events.findByEventId(v->name + "-s"));
     }
     eventFinishWrite->addPredecessorInPlanning(eventStartWrite);
     eventFinishWrite->addSuccessorInPlanning(readEvents.first);
@@ -886,6 +916,47 @@ void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t 
     }
 }
 
-double assessWritingOfEdge(edge_t* edge, shared_ptr<Processor> proc){
-    return edge->weight/ proc->writeSpeedDisk;
+double assessWritingOfEdge(edge_t *edge, shared_ptr<Processor> proc) {
+    return edge->weight / proc->writeSpeedDisk;
+}
+
+void checkBestEvents(vector<shared_ptr<Event>> &bestEvents) {
+    for (auto &item: bestEvents) {
+        cout << item->id << " at " << item->getExpectedTimeFire() << ", " << endl;
+        assert(item->getExpectedTimeFire() == item->getActualTimeFire());
+        bool hasCycle = item->checkCycleFromEvent();
+        assert(!hasCycle);
+
+        if (item->id.find("-w-f") != std::string::npos) {
+            auto itWriteStart = std::find_if(bestEvents.begin(), bestEvents.end(),
+                                             [item](shared_ptr<Event> e) {
+                                                 return e->id == item->id.substr(0,
+                                                                                 item->id.length() -
+                                                                                 4) + "-w-s";
+                                             });
+            if (itWriteStart != bestEvents.end()) {
+                auto actualLength = item->getExpectedTimeFire() - (*itWriteStart)->getExpectedTimeFire();
+                assert(abs(actualLength - item->edge->weight / item->processor->writeSpeedDisk) < 0.00001);
+            } else {
+                throw runtime_error("no pair found ofr " + item->id);
+            }
+
+        }
+        if (item->id.find("-r-f") != std::string::npos) {
+            auto itReadStart = std::find_if(bestEvents.begin(), bestEvents.end(),
+                                            [item](shared_ptr<Event> e) {
+                                                return e->id == item->id.substr(0,
+                                                                                item->id.length() -
+                                                                                4) + "-r-s";
+                                            });
+            if (itReadStart != bestEvents.end()) {
+                auto actualLength = item->getExpectedTimeFire() - (*itReadStart)->getExpectedTimeFire();
+                assert(abs(actualLength - item->edge->weight / item->processor->readSpeedDisk) < 0.00001);
+                cout << "ys" << endl;
+            } else {
+                throw runtime_error("no pair found ofr " + item->id);
+            }
+        }
+    }
+    cout << endl;
 }

@@ -191,4 +191,8 @@ Processor::Processor(const Processor &copy)
     for (auto *mem: copy.afterPendingMemories) {
         afterPendingMemories.insert(mem);
     }
+
+    for (auto *wq: copy.writingQueue) {
+        writingQueue.emplace_back(wq);
+    }
 }

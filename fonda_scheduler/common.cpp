@@ -307,15 +307,6 @@ void Processor::updateFrom(const Processor& other){
 
 
     std::unordered_map<std::string, std::weak_ptr<Event>> updatedEvents;
-    // Keep valid old events and add new ones from 'other'
-   /* for (const auto& [key, weak_event] : other.eventsOnProc) {
-        if (auto shared_event = weak_event.lock()) {  // Ensure the weak_ptr is still valid
-            updatedEvents[key] = weak_event;  // Insert or update
-            shared_event->processor = shared_from_this();
-        }
-    }
-    // Swap the updated map into place
-    eventsOnProc.swap(updatedEvents); */
 
     this->readyTimeCompute= other.readyTimeCompute;
     this->readyTimeRead = other.readyTimeRead;
@@ -345,6 +336,10 @@ void Processor::updateFrom(const Processor& other){
     this->lastWriteEvent= other.lastWriteEvent;
     this->lastComputeEvent= other.lastComputeEvent;
 
+    this->writingQueue.clear();
+    for(edge_t* e: other.writingQueue){
+        this->writingQueue.emplace_back(e);
+    }
 
 }
 

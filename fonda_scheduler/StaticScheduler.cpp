@@ -214,7 +214,8 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
         startTimeFor1Evicted = startTimeForAllEvicted =
                 result.processorOfAssignment->getReadyTimeWrite() > result.startTime ?
                 result.processorOfAssignment->getReadyTimeWrite() : result.startTime;
-        auto biggestPendingEdge = result.processorOfAssignment->getBiggestPendingEdgeThatIsNotIncomingOf(v);
+        auto biggestPendingEdge = result.processorOfAssignment->getBiggestPendingEdgeThatIsNotIncomingOfAndLocatedOnProc(
+                v);
         if (!result.processorOfAssignment->getPendingMemories().empty() && biggestPendingEdge != nullptr) {
             assert((*result.processorOfAssignment->getPendingMemories().begin())->weight >=
                    (*result.processorOfAssignment->getPendingMemories().rbegin())->weight);

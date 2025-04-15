@@ -17,7 +17,7 @@ extern EventManager events;
 extern ReadyQueue readyQueue;
 
 
-double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft, int deviationNumber);
+double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft, int deviationNumber, bool upw);
 
 double applyDeviationTo(double &in);
 vector<shared_ptr<Processor>>
@@ -40,10 +40,14 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
 //std::pair<shared_ptr<Event>, shared_ptr<Event>> scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict);
 set<edge_t *, bool (*)(edge_t *, edge_t *)>::iterator
 scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict,
-                     std::pair<shared_ptr<Event>, shared_ptr<Event>> &writeEvents);
+                     std::pair<shared_ptr<Event>, shared_ptr<Event>> &writeEvents, bool onlyPreemptive=false);
 void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t* ourVertex);
 void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc);
 bool dealWithPredecessors(shared_ptr<Event> us);
 void checkBestEvents(vector<shared_ptr<Event>> &bestEvents);
 double assessWritingOfEdge(edge_t* edge, shared_ptr<Processor> proc);
+
+
+void organizeAReadAndPredecessorWrite(const vertex_t *v, edge *incomingEdge, shared_ptr<Event> &ourEvent,
+                                      shared_ptr<Processor> &ourModifiedProc, vector<shared_ptr<Event>> &createdEvents, double afterWhen);
 #endif //RESHI_TXT_DYNSCHED_HPP
