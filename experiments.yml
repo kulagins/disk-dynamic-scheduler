@@ -907,27 +907,27 @@ experiments:
     args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '1', 'no', './', 'machines.csv', '1']
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: A2-dev
     args: ['./build/fonda_scheduler', '@EXTRA_ARGS@', '2', 'no' , './', 'machines.csv', '1']
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: A3-dev
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '3', 'no', './', 'machines.csv', '1']
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: BASE-dev
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@',  '1', 'yes', './', 'machines.csv', '1']
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: A1-bdev
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '1', 'no', './', 'machines.csv', '2' ]
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: A2-bdev
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '2', 'no' , './', 'machines.csv', '2' ]
     stdout: out
@@ -937,7 +937,7 @@ experiments:
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '3', 'no', './', 'machines.csv', '2' ]
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: BASE-bdev
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@',  '1', 'yes', './', 'machines.csv', '2', 'yes' ]
     stdout: out
@@ -946,22 +946,22 @@ experiments:
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '1', 'no', './', 'machines.csv', '3', 'yes' ]
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: A2-ndev
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '2', 'no' , './', 'machines.csv', '3','yes' ]
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: A3-ndev
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@', '3', 'no', './', 'machines.csv', '3', 'yes' ]
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
   - name: BASE-ndev
     args: [ './build/fonda_scheduler', '@EXTRA_ARGS@',  '1', 'yes', './', 'machines.csv', '3', 'yes' ]
     stdout: out
     num_threads: 24
-    slurm_args: [priority', '1'] #'--partition', 'core8a',
+    slurm_args: ['priority', '1'] #'--partition', 'core8a',
 
 ##
 matrix:
