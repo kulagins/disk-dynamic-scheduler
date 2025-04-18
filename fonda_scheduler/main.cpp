@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
         }
         pv= pv->next;
     }
-    cout<<endl;
+  //  cout<<endl;
     // cluster->printProcessors();
 
     auto end = std::chrono::system_clock::now();
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
-    cout<<"makespan_1 "<<d<<"\t\n";
+    cout<<"makespan_1 "<<d<<"\t";
 
 
     delete cluster;

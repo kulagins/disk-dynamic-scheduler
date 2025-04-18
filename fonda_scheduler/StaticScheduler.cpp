@@ -456,24 +456,30 @@ evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &best
                              bool real) {
     bool shouldUseImaginary = isHeft && !real;
     bool canAlreadyBeEvicted = !isHeft && real;
+    auto findEdgeInChanges = bestSchedulingResult.edgesToChangeStatus.end();
+    edge_t *edgeToKick = bestSchedulingResult.edgeToKick;
     switch (bestSchedulingResult.resultingVar) {
         case 1:
             break;
         case 2:
         //    cout<<"best with 1 kick"<<endl;
-            assert(bestSchedulingResult.edgeToKick != nullptr);
+
+            assert(edgeToKick != nullptr);
+            assert(bestSchedulingResult.edgesToChangeStatus.size()==1);
+
+            findEdgeInChanges = std::find_if(
+                    bestSchedulingResult.edgesToChangeStatus.begin(),
+                    bestSchedulingResult.edgesToChangeStatus.end(), [edgeToKick](EdgeChange e) {
+                        return edgeToKick == e.edge;
+                    });
+            assert(findEdgeInChanges!= bestSchedulingResult.edgesToChangeStatus.end());
 
             canAlreadyBeEvicted ?
-            bestSchedulingResult.processorOfAssignment->delocateToDiskOptionally(bestSchedulingResult.edgeToKick,
-                                                                                 shouldUseImaginary)
+            bestSchedulingResult.processorOfAssignment->delocateToDiskOptionally(edgeToKick,
+                                                                                 shouldUseImaginary, findEdgeInChanges->newLocation.afterWhen.value())
                                 : bestSchedulingResult.processorOfAssignment->delocateToDisk(
-                    bestSchedulingResult.edgeToKick,
-                    shouldUseImaginary);
-
-            assert(bestSchedulingResult.edgesToChangeStatus.size()==1);
-            getLocationOnDisk(bestSchedulingResult.edgeToKick, shouldUseImaginary).afterWhen=bestSchedulingResult.edgesToChangeStatus.at(0).newLocation.afterWhen;
-
-
+                    edgeToKick,
+                    shouldUseImaginary, findEdgeInChanges->newLocation.afterWhen.value());
             numberWithEvictedCases++;
             checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
             break;
@@ -485,20 +491,22 @@ evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &best
                 edge_t *nextEdge = *it;
                // cout << buildEdgeName(nextEdge) << endl;
                 if (nextEdge->head->name != pVertex->name) {
-                    it = canAlreadyBeEvicted ?
-                         bestSchedulingResult.processorOfAssignment->delocateToDiskOptionally(nextEdge,
-                                                                                              shouldUseImaginary)
-                                             : bestSchedulingResult.processorOfAssignment->delocateToDisk(nextEdge,
-                                                                                                          shouldUseImaginary);
-                    assert(isLocatedOnDisk(nextEdge, shouldUseImaginary));
-                    auto findEdgeInChanges = std::find_if(
+
+                    auto findEdgeInChanges1 = std::find_if(
                             bestSchedulingResult.edgesToChangeStatus.begin(),
                             bestSchedulingResult.edgesToChangeStatus.end(), [nextEdge](EdgeChange e) {
                                 return nextEdge == e.edge;
                             });
-                    assert(findEdgeInChanges!= bestSchedulingResult.edgesToChangeStatus.end());
-                    getLocationOnDisk(nextEdge, shouldUseImaginary).afterWhen= findEdgeInChanges->newLocation.afterWhen;
-                    cout<<"";
+                    assert(findEdgeInChanges1!= bestSchedulingResult.edgesToChangeStatus.end());
+
+                    it = canAlreadyBeEvicted ?
+                         bestSchedulingResult.processorOfAssignment->delocateToDiskOptionally(nextEdge,
+                                                                                              shouldUseImaginary,
+                                                                                              findEdgeInChanges1->newLocation.afterWhen.value())
+                                             : bestSchedulingResult.processorOfAssignment->delocateToDisk(nextEdge,
+                                                                                                          shouldUseImaginary,
+                                                                                                          findEdgeInChanges1->newLocation.afterWhen.value());
+                    assert(isLocatedOnDisk(nextEdge, shouldUseImaginary));
                 } else {
                     it++;
                 }
@@ -533,8 +541,8 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
       //  cout<<"change status "<<buildEdgeName(e.edge)<<endl;
         assert(!shouldUseImaginary);
         if(isLocatedOnThisProcessor(e.edge,schedulingResult.processorOfAssignment->id, shouldUseImaginary )){
-            delocateFromThisProcessorToDisk(e.edge,schedulingResult.processorOfAssignment->id, shouldUseImaginary);
-            getLocationOnDisk(e.edge,shouldUseImaginary).afterWhen= e.newLocation.afterWhen;
+            delocateFromThisProcessorToDisk(e.edge,schedulingResult.processorOfAssignment->id, shouldUseImaginary,
+                                            e.newLocation.afterWhen.value());
         }
     }
 
@@ -554,10 +562,10 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
 
         if (onWhichProcessor == schedulingResult.processorOfAssignment->id) {
             //optionally, because edge could have been force removed during calculation of caorrect result in HEFT
-            schedulingResult.processorOfAssignment->delocateToDiskOptionally(ine, shouldUseImaginary);
+            schedulingResult.processorOfAssignment->delocateToNowhereOptionally(ine, shouldUseImaginary, -1);
         } else {
             if (onWhichProcessor != -1) {
-                cluster->getProcessorById(onWhichProcessor)->delocateToDiskOptionally(ine, shouldUseImaginary);
+                cluster->getProcessorById(onWhichProcessor)->delocateToNowhereOptionally(ine, shouldUseImaginary, -1);
             } else {
                 //edge has been read
                 //cout<<"bla"<<endl;
@@ -566,9 +574,9 @@ putChangeOnCluster(vertex_t *vertex, SchedulingResult &schedulingResult, Cluster
 
                 if (proc != nullptr) {
                     if (proc->id == schedulingResult.processorOfAssignment->id)
-                        schedulingResult.processorOfAssignment->delocateToDiskOptionally(ine, shouldUseImaginary);
+                        schedulingResult.processorOfAssignment->delocateToNowhereOptionally(ine, shouldUseImaginary, -1);
                     else
-                        proc->delocateToDiskOptionally(ine, shouldUseImaginary);
+                        proc->delocateToNowhereOptionally(ine, shouldUseImaginary, -1);
                 }
 
                 // assert(proc == nullptr);

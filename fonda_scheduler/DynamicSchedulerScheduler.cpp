@@ -274,9 +274,10 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
                     std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
                     if(eventStartFromQueue== nullptr && eventFinishFromQueue==nullptr){
                         //not scheduled to write yet or already written
-                        if(isLocatedOnDisk(biggestPendingEdge,false)){
+                        if(isLocatedOnDisk(edge,false)){
                             //already written to disk, enough to remove from pending memories.
                             ourModifiedProc->removePendingMemory(edge);
+
                         }
                         else {
                             scheduleWriteForEdge(ourModifiedProc, edge, writeEvents);
@@ -476,8 +477,13 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
             //   cout << "edge " << buildEdgeName(incomingEdge) << " already on proc" << endl;
         } else if (isLocatedOnDisk(incomingEdge, false)) {
             // schedule a read
+            double atThisTime = ourEvent->getExpectedTimeFire();
             scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge,
-                          ourEvent->getExpectedTimeFire());
+                          atThisTime);
+            if(atThisTime>ourEvent->getExpectedTimeFire()){
+                ourEvent->propagateChainInPlanning(ourEvent, atThisTime-ourEvent->getExpectedTimeFire());
+                ourEvent->setBothTimesFire(atThisTime);
+            }
         } else if (isLocatedOnAnyProcessor(incomingEdge, false)) {
             shared_ptr<Processor> predecessorsProc = findPredecessorsProcessor(incomingEdge, modifiedProcs);
             if (predecessorsProc->getAfterPendingMemories().find(incomingEdge) ==
@@ -493,16 +499,23 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
                     plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning() >
                     ourModifiedProc->getExpectedOrActualReadyTimeRead()) {
 
+                    double atWhatTime=plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning();
                     readEVents = scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(),
                                                ourModifiedProc,
                                                incomingEdge,
-                                               plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning());
+                                               atWhatTime);
+
+                    if(atWhatTime>ourEvent->getExpectedTimeFire()){
+                        ourEvent->propagateChainInPlanning(ourEvent, atWhatTime-ourEvent->getExpectedTimeFire());
+                        ourEvent->setBothTimesFire(atWhatTime);
+                    }
                     readEVents.first->addPredecessorInPlanning(plannedWriteFinishOfIncomingEdge);
 
                 } else {
+                    double atWhatTime= -1;
                     readEVents = scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(),
                                                ourModifiedProc,
-                                               incomingEdge);
+                                               incomingEdge, atWhatTime);
                     readEVents.first->addPredecessorInPlanning(plannedWriteFinishOfIncomingEdge);
                 }
                 assert(prev == plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning());
@@ -539,9 +552,10 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
 void organizeAReadAndPredecessorWrite(const vertex_t *v, edge *incomingEdge, shared_ptr<Event> &ourEvent,
                                       shared_ptr<Processor> &ourModifiedProc,
                                       vector<shared_ptr<Event>> &createdEvents, double afterWhen) {
+    double atWhatTIme=-1;
     auto readEvents = scheduleARead(v, ourEvent, createdEvents, afterWhen,
                                     ourModifiedProc,
-                                    incomingEdge);
+                                    incomingEdge, atWhatTIme);
     const shared_ptr<Event> &eventFinishThisEdgeWrite = events.findByEventId(
             buildEdgeName(incomingEdge) + "-w-f");
     if (eventFinishThisEdgeWrite != nullptr) {
@@ -561,7 +575,7 @@ void organizeAReadAndPredecessorWrite(const vertex_t *v, edge *incomingEdge, sha
 std::pair<shared_ptr<Event>, shared_ptr<Event>>
 scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<Event>> &createdEvents,
               double startTimeOfTask,
-              shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, double atThisTime) {
+              shared_ptr<Processor> &ourModifiedProc, edge *&incomingEdge, double &atThisTime) {
     assert(events.findByEventId(buildEdgeName(incomingEdge) + "-r-s") == nullptr);
     assert(events.findByEventId(buildEdgeName(incomingEdge) + "-r-f") == nullptr);
 
@@ -584,11 +598,13 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
     }
 
     if (atThisTime != -1) {
-        assert(estimatedStartOfRead <= atThisTime
-               ||
-               abs(estimatedStartOfRead - atThisTime) < 0.1
-        );
-        estimatedStartOfRead = atThisTime;
+        if(estimatedStartOfRead>atThisTime){
+            atThisTime = estimatedStartOfRead;
+        }
+        else{
+            estimatedStartOfRead = atThisTime;
+        }
+
     }
 
     vector<shared_ptr<Event>> newEvents = evictFilesUntilThisFits(ourModifiedProc, incomingEdge);
@@ -766,7 +782,11 @@ scheduleWriteForEdge(shared_ptr<Processor> &thisProc, edge_t *edgeToEvict,
 
     if (!onlyPreemptive) {
         return thisProc->removePendingMemory(edgeToEvict);
-    } else return thisProc->getPendingMemories().find(edgeToEvict);
+    } else {
+        writeEvents.first->onlyPreemptive= true;
+        writeEvents.second->onlyPreemptive= true;
+        return thisProc->getPendingMemories().find(edgeToEvict);
+    }
 
 
 }

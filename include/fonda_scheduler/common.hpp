@@ -92,7 +92,7 @@ public:
     shared_ptr<Processor> processor;
 
 
-    bool isEviction;
+    bool onlyPreemptive;
     bool isDone = false;
     int timesFired = 0;
 private:
@@ -111,7 +111,7 @@ private:
               processor(processor),  // shared ownership
               expectedTimeFire(expectedTimeFire),
               actualTimeFire(actualTimeFire),
-              isEviction(isEviction),
+              onlyPreemptive(isEviction),
               id(std::move(idN)) {}
 
 

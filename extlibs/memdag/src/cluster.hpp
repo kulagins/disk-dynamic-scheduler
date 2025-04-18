@@ -187,10 +187,12 @@ public:
 
     void assignSubgraph(vertex_t *taskToBeAssigned);
 
-    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge, bool shouldUseImaginary);
-    void loadFromDisk(edge_t* edge, bool shouldUseImaginary);
+    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToDisk(edge_t* edge, bool shouldUseImaginary, double afterWhen);
+    std::set<edge_t *, decltype(comparePendingMemories)*>::iterator delocateToNowhere(edge_t* edge, bool shouldUseImaginary, double afterWhen);
+    void loadFromDisk(edge_t* edge, bool shouldUseImaginary, double afterWhen);
     void loadFromNowhere(edge_t* edge, bool shouldUseImaginary, double afterWhen);
-    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator delocateToDiskOptionally(edge_t* edge, bool shouldUseImaginary);
+    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator delocateToDiskOptionally(edge_t* edge, bool shouldUseImaginary, double afterWhen);
+    std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator delocateToNowhereOptionally(edge_t* edge, bool shouldUseImaginary, double afterWhen);
 
     std::set<edge_t *, decltype(Processor::comparePendingMemories)*>::iterator
     //bool
