@@ -147,44 +147,46 @@ int main(int argc, char *argv[]) {
             pv->memoryRequirement=peakMemoryRequirementOfVertex(pv)+1000;
             //cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
         }
-        if(outMemoryRequirement(pv)> biggestMem){
-          //  cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-            for (int i = 0; i < pv->out_degree; i++) {
-                pv->out_edges[i]->weight /= 4;
-            }
-            double d = inMemoryRequirement(pv);
-            double requirement = outMemoryRequirement(pv);
-            if(outMemoryRequirement(pv)> biggestMem){
-               // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                for (int i = 0; i < pv->out_degree; i++) {
-                    pv->out_edges[i]->weight /= 4;
-                }
-                if(outMemoryRequirement(pv)> biggestMem) {
-                    return 0;
-                }
-            }
+       if(outMemoryRequirement(pv)> biggestMem) {
+          // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+
+       for (int i = 0; i < pv->out_degree; i++) {
+                     pv->out_edges[i]->weight /= 4;
+                 }
+                 double d = inMemoryRequirement(pv);
+                 double requirement = outMemoryRequirement(pv);
+                 if(outMemoryRequirement(pv)> biggestMem){
+
+                    // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                     for (int i = 0; i < pv->out_degree; i++) {
+                         pv->out_edges[i]->weight /= 4;
+                     }
+                     if(outMemoryRequirement(pv)> biggestMem) {
+                         return 0;
+                     }
+                 }
 
 
-        }
+             }
 
-        if(inMemoryRequirement(pv)> biggestMem){
-            //  cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-            for (int i = 0; i < pv->in_degree; i++) {
-                pv->in_edges[i]->weight /= 4;
-            }
+             if(inMemoryRequirement(pv)> biggestMem){
+                  // cout<<"WILL BE INVALID "<< inMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                 for (int i = 0; i < pv->in_degree; i++) {
+                     pv->in_edges[i]->weight /= 4;
+                 }
 
-            if(inMemoryRequirement(pv)> biggestMem){
-                // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                for (int i = 0; i < pv->in_degree; i++) {
-                    pv->in_edges[i]->weight /= 4;
-                }
-                if(inMemoryRequirement(pv)> biggestMem) {
-                    return 0;
-                }
-            }
+                 if(inMemoryRequirement(pv)> biggestMem){
+                     // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                     for (int i = 0; i < pv->in_degree; i++) {
+                         pv->in_edges[i]->weight /= 4;
+                     }
+                     if(inMemoryRequirement(pv)> biggestMem) {
+                         return 0;
+                     }
+                 }
 
 
-        }
+             }
         pv= pv->next;
     }
   //  cout<<endl;

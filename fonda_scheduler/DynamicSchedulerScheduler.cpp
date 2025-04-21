@@ -457,7 +457,7 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
                 if (eventStartFromQueue != nullptr || eventFinishFromQueue != nullptr) {
                     //the write has already started, no other option but to finish it
                     //schedule only a read
-                    cout << "already exist write events" << endl;
+                   // cout << "already exist write events" << endl;
                     organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents,
                                                      eventFinishFromQueue->getExpectedTimeFire());
 
@@ -527,7 +527,7 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
                 if (eventStartFromQueue != nullptr || eventFinishFromQueue != nullptr) {
                     //the write has already started, no other option but to finish it
                     //schedule only a read
-                    cout << "already exist write events" << endl;
+                 //   cout << "already exist write events" << endl;
                     organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents,
                                                      eventFinishFromQueue->getExpectedTimeFire());
                     continue;
