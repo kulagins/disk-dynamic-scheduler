@@ -99,7 +99,6 @@ private:
     double expectedTimeFire = -1;
     double actualTimeFire = -1;
 
-    set<shared_ptr<Event>> predecessors, successors;
 
     Event(vertex_t *task, edge_t *edge,
           eventType type, const shared_ptr<Processor> &processor,
@@ -125,6 +124,27 @@ private:
         }
     }
 
+    struct EventHasher {
+        size_t operator()(const std::shared_ptr<Event>& e) const {
+            return std::hash<std::string>()(e->id);  // Use unique id for hashing
+        }
+    };
+
+    struct EventEqual {
+        bool operator()(const std::shared_ptr<Event>& lhs, const std::shared_ptr<Event>& rhs) const {
+            //if(lhs->id!= rhs->id){
+                return lhs->id == rhs->id;  // Compare by id for equality
+            //}
+            //else
+            //    throw runtime_error("");
+
+        }
+    };
+
+    //set<shared_ptr<Event>> predecessors, successors;
+    std::unordered_set<std::shared_ptr<Event>, EventHasher, EventEqual> predecessors, successors;
+
+
 public:
     static std::shared_ptr<Event> createEvent(vertex_t *task, edge_t *edge,
                                               eventType type, std::shared_ptr<Processor> processor,
@@ -149,13 +169,14 @@ public:
         successors.clear();
     }
 
-    std::set<std::shared_ptr<Event>> &getPredecessors() {
+    std::unordered_set<std::shared_ptr<Event>, EventHasher, EventEqual>& getPredecessors() {
         return predecessors;
     }
 
-    std::set<std::shared_ptr<Event>> &getSuccessors() {
+    std::unordered_set<std::shared_ptr<Event>, EventHasher, EventEqual>& getSuccessors() {
         return successors;
     }
+
 
     void fire();
 
@@ -173,19 +194,31 @@ public:
 
     void removeOurselfFromSuccessors(Event *us);
 
-    void addPredecessorInPlanning(const shared_ptr<Event> &pred) {
-        if (pred->id == this->id) {
-            throw runtime_error("ADDING OURSELVES AS PREDECESSOR!");
-        }
-        //cout<<" ADDING pred "<<pred->id<<" -> "<<this->id<<endl;
-        if (this->predecessors.find(pred) == this->predecessors.end()) {
 
-            auto it = find_if(this->predecessors.begin(), this->predecessors.end(), [pred](const shared_ptr<Event> &e) {
-                return e->id == pred->id;
-            });
-            if (it != this->predecessors.end()) {
-                cout << "EVENT BY OTHER NAME " << pred->id << endl;
+
+    void propagateChainInPlanning(const shared_ptr<Event> &event, double add, unordered_set<Event*> &visited) {
+        if (visited.count(event.get())) return;
+        visited.insert(event.get());
+
+        for (auto &successor : event->successors) {
+            if (successor->getExpectedTimeFire() != successor->getActualTimeFire()) {
+                cout << "!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!!" << endl;
             }
+
+            double newTime = successor->getVisibleTimeFireForPlanning() + add;
+            successor->setActualTimeFire(newTime);
+            successor->setExpectedTimeFire(newTime);
+
+            propagateChainInPlanning(successor, add, visited);
+        }
+    }
+
+    void addPredecessorInPlanning(const std::shared_ptr<Event>& pred) {
+        if (pred->id == this->id) {
+            throw std::runtime_error("ADDING OURSELVES AS PREDECESSOR!");
+        }
+
+        if (this->predecessors.find(pred) == this->predecessors.end()) {
             this->predecessors.insert(pred);
         }
 
@@ -195,59 +228,37 @@ public:
             this->setActualTimeFire(predsVisibleTime);
             this->setExpectedTimeFire(predsVisibleTime);
 
-            propagateChainInPlanning(shared_from_this(), diff);
+            std::unordered_set<Event*> visited;
+            propagateChainInPlanning(shared_from_this(), diff, visited);
         }
 
         pred->addSuccessorInPlanning(shared_from_this());
     }
 
-    void propagateChainInPlanning(const shared_ptr<Event> &event, double add) {
-        for (auto &successor: event->successors) {
-            if (successor->getExpectedTimeFire() != successor->getActualTimeFire()) {
-                cout << "!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!!" << endl;
-            }
-
-
-            double newTime = successor->getVisibleTimeFireForPlanning() + add;
-            successor->setActualTimeFire(newTime);
-            successor->setExpectedTimeFire(newTime);
-
-            propagateChainInPlanning(successor, add);
-        }
-    }
-
-    void addSuccessorInPlanning(const shared_ptr<Event> &succ) {
+    // Modified addSuccessorInPlanning to use unordered_set
+    void addSuccessorInPlanning(const std::shared_ptr<Event>& succ) {
         assert(succ != nullptr);
-        //cout<<"add successor "<<succ->id <<" to " <<this->id<<endl;
+
         if (succ->id == this->id) {
-            throw runtime_error("ADDING OURSELVES AS SUCCESSOR!");
-        }
-        if (this->successors.find(succ) == this->successors.end()) {
-
-            auto it = find_if(this->successors.begin(), this->successors.end(), [succ](const shared_ptr<Event> &e) {
-                return e->id == succ->id;
-            });
-            if (it != this->successors.end()) {
-                //   cout<<"succ EVENT BY OTHER NAME"<<endl;
-                //assert((*it)->predecessors.size()== succ->predecessors.size());
-                this->successors.erase(it);
-            }
-            this->successors.insert(succ);
+            throw std::runtime_error("ADDING OURSELVES AS SUCCESSOR!");
         }
 
+        this->successors.insert(succ);  // Always insert (either first time or replacing one with same ID)
+
+        // Adjust successor timing if needed
         double succsVisibleTime = succ->getVisibleTimeFireForPlanning();
         if (succsVisibleTime < this->expectedTimeFire) {
-            double diff = abs(succsVisibleTime - this->expectedTimeFire);
+            double diff = this->expectedTimeFire - succsVisibleTime;
             succ->setActualTimeFire(this->expectedTimeFire);
             succ->setExpectedTimeFire(this->expectedTimeFire);
 
-            propagateChainInPlanning(succ, diff);
+            std::unordered_set<Event*> visited;
+            propagateChainInPlanning(succ, diff, visited);
         }
-        string thisId = this->id;
-        auto it = find_if(succ->predecessors.begin(), succ->predecessors.end(),
-                          [&thisId](const shared_ptr<Event> obj) { return obj->id == thisId; });
 
-        if (it == succ->predecessors.end()) {
+        // Add this as a predecessor of succ if not already present
+        bool alreadyPredecessor = succ->predecessors.find(shared_from_this()) != succ->predecessors.end();
+        if (!alreadyPredecessor) {
             succ->addPredecessorInPlanning(shared_from_this());
         }
     }

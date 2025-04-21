@@ -481,7 +481,8 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
             scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge,
                           atThisTime);
             if(atThisTime>ourEvent->getExpectedTimeFire()){
-                ourEvent->propagateChainInPlanning(ourEvent, atThisTime-ourEvent->getExpectedTimeFire());
+                unordered_set<Event*> visited;
+                ourEvent->propagateChainInPlanning(ourEvent, atThisTime-ourEvent->getExpectedTimeFire(), visited);
                 ourEvent->setBothTimesFire(atThisTime);
             }
         } else if (isLocatedOnAnyProcessor(incomingEdge, false)) {
@@ -506,7 +507,8 @@ processIncomingEdges(const vertex_t *v, shared_ptr<Event> &ourEvent, shared_ptr<
                                                atWhatTime);
 
                     if(atWhatTime>ourEvent->getExpectedTimeFire()){
-                        ourEvent->propagateChainInPlanning(ourEvent, atWhatTime-ourEvent->getExpectedTimeFire());
+                        unordered_set<Event*> visited;
+                        ourEvent->propagateChainInPlanning(ourEvent, atWhatTime-ourEvent->getExpectedTimeFire(), visited);
                         ourEvent->setBothTimesFire(atWhatTime);
                     }
                     readEVents.first->addPredecessorInPlanning(plannedWriteFinishOfIncomingEdge);
@@ -642,7 +644,9 @@ scheduleARead(const vertex_t *v, shared_ptr<Event> &ourEvent, vector<shared_ptr<
                 double diff = incomingEdge->tail->makespan - eventStartRead->getExpectedTimeFire();
                 eventStartRead->setBothTimesFire(incomingEdge->tail->makespan);
                 if (!eventStartRead->getSuccessors().empty()) {
-                    eventStartRead->propagateChainInPlanning(eventStartRead, diff);
+
+                    unordered_set<Event*> visited;
+                    eventStartRead->propagateChainInPlanning(eventStartRead, diff, visited);
                 }
             }
         } else {

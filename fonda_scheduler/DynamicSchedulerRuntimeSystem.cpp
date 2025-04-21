@@ -195,8 +195,9 @@ void Event::fireTaskStart() {
                 finishWrite->isDone=true;
 
 
+                unordered_set<Event*> visited;
                 propagateChainInPlanning(finishWrite,
-                                         startWrite->getActualTimeFire() - finishWrite->getActualTimeFire());
+                                         startWrite->getActualTimeFire() - finishWrite->getActualTimeFire(), visited);
             } else {
                 if (finishWrite != nullptr) {
                     finishWrite->setActualTimeFire(this->getActualTimeFire());
