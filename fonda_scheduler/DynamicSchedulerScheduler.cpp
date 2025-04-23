@@ -712,11 +712,28 @@ vector<shared_ptr<Event>> evictFilesUntilThisFits(shared_ptr<Processor> thisProc
         edge_t *edgeToEvict = *begin;
         if (thisProc->getAvailableMemory() < weightToFit && edgeToEvict->head->name != edgeToFit->head->name) {
             // cout<<"evict "<<buildEdgeName(edgeToEvict)<<endl;
-            std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
-            auto iterator = scheduleWriteForEdge(thisProc, edgeToEvict, writeEvents);
-            newEvents.emplace_back(writeEvents.first);
-            newEvents.emplace_back(writeEvents.second);
-            begin = iterator;
+
+            shared_ptr<Event> eventPreemptiveStart = events.findByEventId(buildEdgeName(edgeToEvict) + "-w-s");
+            shared_ptr<Event> eventPreemptiveFinish = events.findByEventId(buildEdgeName(edgeToEvict) + "-w-f");
+            if(eventPreemptiveStart != nullptr){
+                newEvents.emplace_back(eventPreemptiveStart);
+            }
+            if(eventPreemptiveFinish!=nullptr){
+                newEvents.emplace_back(eventPreemptiveFinish);
+            }
+
+            if(eventPreemptiveStart== nullptr&& eventPreemptiveFinish== nullptr){
+                assert(!isLocatedOnDisk(edgeToEvict,false));
+                std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
+                auto iterator = scheduleWriteForEdge(thisProc, edgeToEvict, writeEvents);
+                newEvents.emplace_back(writeEvents.first);
+                newEvents.emplace_back(writeEvents.second);
+                begin = iterator;
+            }
+            else{
+                begin++;
+            }
+
             // cout<<"evicted, new candidate is "<<buildEdgeName(*begin)<<endl;
         } else {
             //   cout<<"not evict"<<endl;
