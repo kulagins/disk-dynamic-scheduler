@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <graphviz/cgraph.h>
 #include "fifo.hpp"
 #include "graph.hpp"
 #include "heap.hpp"
