@@ -26,10 +26,10 @@ if (DEFINED ENV{CONDA_PREFIX})
 endif ()
 
 if (FONDA_BUILD_MEMDAG)
-    find_path(IGRAPH_INCLUDE_DIRS NAMES igraph.h
+    find_path(IGRAPH_INCLUDE_DIRS NAMES igraph/igraph.h
             HINTS "/usr/local/include"
             "/usr/local/include/igraph"
-            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/include/igraph")
+            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/include")
     find_library(IGRAPH_LIBRARIES igraph
             HINTS
             "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/lib"
