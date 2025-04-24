@@ -29,7 +29,7 @@ if (FONDA_BUILD_MEMDAG)
     find_path(IGRAPH_INCLUDE_DIRS NAMES igraph.h
             HINTS "/usr/local/include"
             "/usr/local/include/igraph"
-            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/include")
+            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/include/igraph")
     find_library(IGRAPH_LIBRARIES igraph
             "$ENV{LD_LIBRARY_PATH}"
             "$ENV{DYLD_LIBRARY_PATH}")
