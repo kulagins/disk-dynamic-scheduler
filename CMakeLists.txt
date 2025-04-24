@@ -54,7 +54,7 @@ if (FONDA_BUILD_MEMDAG)
             ${MEMDAG_SOURCE_DIR}/cluster.cpp
     )
 
-    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS} extlibs/csv2/single_include)
+    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS} extlibs/csv/single_include)
     target_link_libraries(memdag PRIVATE ${IGRAPH_LIBRARIES} -lcgraph -lcdt -lm -lgvc)
 
     set_target_properties(memdag PROPERTIES
