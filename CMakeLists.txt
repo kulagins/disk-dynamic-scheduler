@@ -31,6 +31,8 @@ if (FONDA_BUILD_MEMDAG)
             "/usr/local/include/igraph"
             "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/include/igraph")
     find_library(IGRAPH_LIBRARIES igraph
+            HINTS
+            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/lib"
             "$ENV{LD_LIBRARY_PATH}"
             "$ENV{DYLD_LIBRARY_PATH}")
 
