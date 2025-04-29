@@ -106,7 +106,8 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
         if (makespanPerceived < bestSchedulingResult.finishTime)
             makespanPerceived = bestSchedulingResult.finishTime;
     }
-    cout << " #eviction " << numberWithEvictedCases << " " << " ms perceived " << makespanPerceived << " ";
+    cout <<// " #eviction " << numberWithEvictedCases << " " <<
+         " ms perceived " << makespanPerceived << " ";
     return makespan;
 }
 

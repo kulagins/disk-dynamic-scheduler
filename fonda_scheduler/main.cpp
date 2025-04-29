@@ -42,10 +42,10 @@ int currentAlgoNum = 0;
 //100000000 100 1 0.001 eager 8330435694 1 no ../ machines.csv 3
 int main(int argc, char *argv[]) {
 
-    for (int i = 0; i < argc; ++i) {
-        std::cout << argv[i] << " ";
-    }
-    cout<<endl;
+ //   for (int i = 0; i < argc; ++i) {
+  //      std::cout << argv[i] << " ";
+   // }
+   // cout<<endl;
 
     auto start = std::chrono::system_clock::now();
     string workflowName = argv[5];
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-    std::cout << " duration_of_prep " << elapsed_seconds.count()<<" ";// << endl;
+   // std::cout << " duration_of_prep " << elapsed_seconds.count()<<" ";// << endl;
 
     start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;

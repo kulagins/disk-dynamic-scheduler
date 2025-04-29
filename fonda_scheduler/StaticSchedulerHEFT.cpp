@@ -105,7 +105,9 @@ cout<<"imagine"<<endl;
         if (makespanPerceived < bestSchedulingResult.finishTime)
             makespanPerceived = bestSchedulingResult.finishTime;
     }
-    cout << " #eviction " << numberWithEvictedCases << " " << " ms perceived " << makespanPerceived << " ";
+    cout <<
+    //" #eviction " << numberWithEvictedCases << " " <<
+    " ms perceived " << makespanPerceived << " ";
     return makespan;
 }
 

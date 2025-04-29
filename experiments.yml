@@ -887,10 +887,14 @@ variants:
   #      extra_args: [ '3' ]
   - axis: 'penalties'
     items:
-      - name: '1'
-        extra_args: ['10000000', '10', '10', '0.1']
-      - name: '2'
-        extra_args: [ '100000000', '10', '10', '0.1' ]
+      #- name: '1'
+      #  extra_args: ['10000000', '10', '10', '0.1']
+      #- name: '2'
+      #  extra_args: ['100000000', '10', '10', '0.1' ]
+      - name: '10^9-10-10-01'
+        extra_args: [ '1000000000', '10', '10', '0.1' ]
+      #- name: '10^9-10-10-01'
+      #  extra_args: [ '1000000000', '10', '10', '0.1' ]
 
 #args: ['./build/fonda_scheduler', '@INSTANCE@', '1', '@EXTRA_ARGS@', 'no'] #'@INSTANCE@',
 experiments:
