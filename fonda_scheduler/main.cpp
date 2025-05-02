@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     string dotPrefix= argv[9];
     string machinesFile = (argc<10)?"input/machines.csv" : std::string("input/") + argv[10];
     int deviationVariant = stoi(argv[11]);
-    bool usePreemptiveWrites = std::string(argv[12]) =="yes";
+    bool usePreemptiveWrites = argc< 13 || std::string(argv[12]) =="yes";
     //1000000, 100, 1, 0.001
     csv2::Reader<csv2::delimiter<','>,
             csv2::quote_character<'"'>,

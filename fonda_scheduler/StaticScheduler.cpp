@@ -337,9 +337,7 @@ tentativeAssignmentHEFT(vertex_t *v, bool real, SchedulingResult &result, Schedu
     assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
 
     double timeToRun = real ? v->time * v->factorForRealExecution : v->time;
-    if(v->name=="TRIMGALORE_00000080"|| v->name=="CHECK_DESIGN_00000174"){
-        cout<<"";
-    }
+
     double sumOut = getSumOut(v);
     assert(sumOut == outMemoryRequirement(v));
    if (result.processorOfAssignment->getMemorySize() < outMemoryRequirement(v) ||
