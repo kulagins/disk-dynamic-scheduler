@@ -159,6 +159,7 @@ void Event::fireTaskStart() {
             throw runtime_error("NOt found finish event to " + this->task->name);
         }
         double durationTask = ourFinishEvent->getExpectedTimeFire() - this->getExpectedTimeFire();
+        assert(durationTask>0);
         assert(this->task->name == "GRAPH_SOURCE" ||
                durationTask >= this->task->time / this->processor->getProcessorSpeed()
                || abs(durationTask - this->task->time / this->processor->getProcessorSpeed()) < 0.1
@@ -692,18 +693,22 @@ void transferAfterMemoriesToBefore(shared_ptr<Processor> &ourModifiedProc) {
 
 double applyDeviationTo(double &in) {
     if (in == 0) {
+        double result;
         switch (devationVariant) {
             case 1:
-                return 1.1;
+                result = 1.1;
             case 2:
-                return 1.5;
+                result =  1.5;
             case 3:
-                return 1;
+                result =  1;
             case 4:
-                return 2;
+                result =  2;
             default:
                 throw runtime_error("unknown deviation variant");
         }
+
+        in = result;
+        return result / 1.0;  // to preserve interface
     }
     static std::random_device rd;
     static std::mt19937 gen(rd());  // Mersenne Twister PRNG
@@ -727,6 +732,7 @@ double applyDeviationTo(double &in) {
 
     std::normal_distribution<double> dist(in, stddev);
     result = dist(gen);
+    result = max(result, 1.0);
     if (devationVariant == 4) {
         result *= 2;
     }
