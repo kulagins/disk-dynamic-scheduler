@@ -703,6 +703,8 @@ double applyDeviationTo(double &in) {
                 result =  1;
             case 4:
                 result =  2;
+            case 5:
+                result= 1.3;
             default:
                 throw runtime_error("unknown deviation variant");
         }
@@ -725,6 +727,9 @@ double applyDeviationTo(double &in) {
             break;
         case 4:
             stddev = 0;
+            break;
+        case 5:
+            stddev = in * 0.3;
             break;
         default:
             throw runtime_error("unknown deviation variant");

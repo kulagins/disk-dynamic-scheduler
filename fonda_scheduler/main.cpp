@@ -27,7 +27,7 @@ int currentAlgoNum = 0;
  *  2 - normal deviation function around historical value with 50% deviation
  *  3 - no deviation
  *  4 - everything x2
- *
+ *  5 - 30% deviation
  */
 //1 1 0.1 0.01 debug 10 1 no ../ machines_debug.csv 3 -> gives evictions
 //1000000 100 100 0.1 chipseq_200 41366257414 1 yes ../ machines.csv 3
