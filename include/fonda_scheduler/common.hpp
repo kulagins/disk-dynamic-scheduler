@@ -201,8 +201,10 @@ public:
         visited.insert(event.get());
 
         for (auto &successor : event->successors) {
-            if (successor->getExpectedTimeFire() != successor->getActualTimeFire()) {
-                cout << "!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!!" << endl;
+            if (successor->getExpectedTimeFire() != successor->getActualTimeFire() && add!=0) {
+                cout << "!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!! " <<
+              successor->getExpectedTimeFire()<<" vs "<<successor->getActualTimeFire() <<
+                endl;
             }
 
             double newTime = successor->getVisibleTimeFireForPlanning() + add;

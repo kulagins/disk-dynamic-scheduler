@@ -51,6 +51,7 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
             tentativeAssignmentHEFT(vertex, true, bestSchedulingResultOnReal, bestCorrectSchedulingResultOnReal);
             bestSchedulingResultOnReal = bestCorrectSchedulingResultOnReal;
         } else {
+            bestSchedulingResultOnReal.resultingVar=bestSchedulingResult.resultingVar;
             tentativeAssignment(vertex, true, bestSchedulingResultOnReal);
         }
 
@@ -59,18 +60,18 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
             cout << "Invalid assignment of " << vertex->name;
             return -1;
         } else {
-       /*     cout  << vertex->name << " best " <<
+           /* cout  << vertex->name << " best " <<
            " "<< bestSchedulingResult.startTime << " "
                 << bestSchedulingResult.finishTime << " on "
                  << bestSchedulingResult.processorOfAssignment->id
                  << " variant " << bestSchedulingResult.resultingVar
-                 << endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl;
+                <<" with av mem "<<bestSchedulingResult.processorOfAssignment->getAvailableMemory()<<endl;
 
             cout << " for " << vertex->name << " best real " << bestSchedulingResultOnReal.startTime << " "
                  << bestSchedulingResultOnReal.finishTime << " on proc "
                  << bestSchedulingResultOnReal.processorOfAssignment->id
                  << " variant " << bestSchedulingResultOnReal.resultingVar
-                 << endl;//<<" with av mem "<<bestProcessorToAssign->availableMemory<<endl; */
+                 <<" with av mem "<<bestSchedulingResultOnReal.processorOfAssignment->getAvailableMemory()<<endl; */
         }
 
 
@@ -91,8 +92,18 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
 
         if (!isHeft) {
             for (const auto &item: imaginedCluster->getProcessors()) {
-                assert(item.second->getPendingMemories().size() ==
-                       actualCluster->getProcessorById(item.second->id)->getPendingMemories().size());
+                if(item.second->getPendingMemories().size() !=
+                      actualCluster->getProcessorById(item.second->id)->getPendingMemories().size()){
+                    for (const auto &item2: item.second->getPendingMemories()){
+                        cout<<buildEdgeName(item2)<<endl;
+                    }
+                    cout<<"----------------"<<endl;
+                    for (const auto &item2: actualCluster->getProcessorById(item.second->id)->getPendingMemories()){
+                        cout<<buildEdgeName(item2)<<endl;
+                    }
+                    assert(item.second->getPendingMemories().size() ==
+                          actualCluster->getProcessorById(item.second->id)->getPendingMemories().size());
+                }
             }
         }
 
@@ -161,7 +172,6 @@ void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &re
 void
 tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
 
-    result.resultingVar = 1;
     double timeToRun = real ? v->time * v->factorForRealExecution : v->time;
 
     double sumOut = getSumOut(v);
@@ -282,37 +292,39 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
             result.finishTime = std::numeric_limits<double>::max();
             return;
         }
-        assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
-        result.processorOfAssignment->setReadyTimeCompute(minTTF);
-        result.finishTime = result.processorOfAssignment->getReadyTimeCompute();
-        assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
 
-        if (timeToFinishBiggestEvicted == minTTF) {
-            result.edgeToKick = biggestPendingEdge;
-            //cout<<"best tentative with biggest Evicted "; print_edge(toKick);
-            result.resultingVar = 2;
-            double biggestWeightToWrite = real ? biggestPendingEdge->weight * biggestPendingEdge->factorForRealExecution
-                                               : biggestPendingEdge->weight;
-            result.processorOfAssignment->setReadyTimeWrite(result.processorOfAssignment->getReadyTimeWrite() +
-                                                            biggestWeightToWrite /
-                                                            result.processorOfAssignment->writeSpeedDisk);
-            // ourModifiedProc->pendingMemories.erase()
-            //penMemsAsVector.erase(penMemsAsVector.begin());
-            result.edgesToChangeStatus= changedEdgesOne;
-            assert(result.startTime <= startTimeFor1Evicted);
-            result.startTime = startTimeFor1Evicted;
-            assert(result.edgeToKick != nullptr);
-            assert(!result.edgeToKick->locations.empty());
-            assert(isLocatedOnThisProcessor(result.edgeToKick, result.processorOfAssignment->id, false));
-        } else if (timeToFinishAllEvicted == minTTF) {
-            result.resultingVar = 3;
-            // cout<<"best tentative with all Evicted ";
-            result.processorOfAssignment->setReadyTimeWrite(
-                    result.processorOfAssignment->getReadyTimeWrite() + timeToWriteAllPending);
-            assert(result.startTime <= startTimeForAllEvicted);
-            result.startTime = startTimeForAllEvicted;
-            result. edgesToChangeStatus = changedEdgesAll;
-            //penMemsAsVector.resize(0);
+
+        if(result.resultingVar!=-1){
+            assert(real);
+
+            if(result.resultingVar==2){
+                handleBiggestEvict(real, result, changedEdgesOne, startTimeFor1Evicted, biggestPendingEdge, timeToFinishBiggestEvicted);
+            }
+            else if(result.resultingVar==3){
+                handleAllEvict(result, timeToWriteAllPending, changedEdgesAll, startTimeForAllEvicted, timeToFinishAllEvicted);
+                //assert(minTTF==timeToFinishAllEvicted);
+            }
+            else{
+              //  assert(minTTF==timeToFinishNoEvicted);
+                assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
+                result.processorOfAssignment->setReadyTimeCompute(timeToFinishNoEvicted);
+                result.finishTime = result.processorOfAssignment->getReadyTimeCompute();
+                assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
+
+            }
+        } else{
+            if (timeToFinishBiggestEvicted == minTTF ) {
+                handleBiggestEvict(real, result, changedEdgesOne, startTimeFor1Evicted, biggestPendingEdge, minTTF);
+            } else if (timeToFinishAllEvicted == minTTF) {
+                handleAllEvict(result, timeToWriteAllPending, changedEdgesAll, startTimeForAllEvicted, minTTF);
+            }
+            else{
+                result.resultingVar = 1;
+                assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
+                result.processorOfAssignment->setReadyTimeCompute(minTTF);
+                result.finishTime = result.processorOfAssignment->getReadyTimeCompute();
+                assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
+            }
 
         }
 
@@ -320,6 +332,7 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
     } else {
         //startTime =  ourModifiedProc->readyTimeCompute;
         // printInlineDebug("should be successful");
+        result.resultingVar = 1;
         result.processorOfAssignment->setReadyTimeCompute(
                 result.startTime + timeToRun / result.processorOfAssignment->getProcessorSpeed());
         result.finishTime = result.processorOfAssignment->getReadyTimeCompute();
@@ -328,6 +341,7 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
     // cout<<endl;
     assert(result.finishTime > result.startTime);
     result.modifiedProcs = modifiedProcs;
+    assert( result.resultingVar != -1);
 }
 
 
@@ -704,6 +718,52 @@ processIncomingEdges(const vertex_t *v, bool realAsNotImaginary, bool realAsReal
             }
         }
     }
+}
+
+void handleBiggestEvict(bool real, SchedulingResult &result, const vector<EdgeChange> &changedEdgesOne,
+                        double startTimeFor1Evicted, edge_t *biggestPendingEdge, double readyTimeComput) {
+
+    assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
+    result.processorOfAssignment->setReadyTimeCompute(readyTimeComput);
+    result.finishTime = result.processorOfAssignment->getReadyTimeCompute();
+    assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
+
+    result.edgeToKick = biggestPendingEdge;
+    //cout<<"best tentative with biggest Evicted "; print_edge(toKick);
+    result.resultingVar = 2;
+    double biggestWeightToWrite = real ? biggestPendingEdge->weight * biggestPendingEdge->factorForRealExecution
+                                       : biggestPendingEdge->weight;
+    result.processorOfAssignment->setReadyTimeWrite(result.processorOfAssignment->getReadyTimeWrite() +
+                                                    biggestWeightToWrite /
+                                                    result.processorOfAssignment->writeSpeedDisk);
+    // ourModifiedProc->pendingMemories.erase()
+    //penMemsAsVector.erase(penMemsAsVector.begin());
+    result.edgesToChangeStatus= changedEdgesOne;
+    assert(result.startTime <= startTimeFor1Evicted);
+    result.startTime = startTimeFor1Evicted;
+    assert(result.edgeToKick != nullptr);
+    assert(!result.edgeToKick->locations.empty());
+    assert(isLocatedOnThisProcessor(result.edgeToKick, result.processorOfAssignment->id, false));
+
+
+}
+
+void handleAllEvict(SchedulingResult &result, double timeToWriteAllPending, const vector<EdgeChange> &changedEdgesAll,
+                    double startTimeForAllEvicted, double readyTimeComput) {
+
+    assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
+    result.processorOfAssignment->setReadyTimeCompute(readyTimeComput);
+    result.finishTime = result.processorOfAssignment->getReadyTimeCompute();
+    assert(result.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
+    result.resultingVar = 3;
+    // cout<<"best tentative with all Evicted ";
+    result.processorOfAssignment->setReadyTimeWrite(
+            result.processorOfAssignment->getReadyTimeWrite() + timeToWriteAllPending);
+    assert(result.startTime <= startTimeForAllEvicted);
+    result.startTime = startTimeForAllEvicted;
+    result. edgesToChangeStatus = changedEdgesAll;
+    //penMemsAsVector.resize(0);
+
 }
 
 

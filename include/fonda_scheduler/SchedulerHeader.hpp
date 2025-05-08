@@ -87,4 +87,11 @@ void putChangeOnCluster(vertex_t * vertex,SchedulingResult &schedulingResult, Cl
 
 shared_ptr<Processor> findProcessorThatHoldsEdge(edge_t *incomingEdge, Cluster* clusterToLookIn);
 
+void handleBiggestEvict(bool real, SchedulingResult &result, const vector<EdgeChange> &changedEdgesOne,
+                        double startTimeFor1Evicted, edge_t *biggestPendingEdge, double readyTimeComput);
+
+void handleAllEvict(SchedulingResult &result, double timeToWriteAllPending, const vector<EdgeChange> &changedEdgesAll,
+         double startTimeForAllEvicted, double readyTimeComput);
+
+
 #endif //RESHI_TXT_DYNSCHED_HPP
