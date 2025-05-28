@@ -960,8 +960,11 @@ vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int botto
         sumOut += pendingMemorie->weight;
     }
     double busy = p->getAvailableMemory() + sumOut;
-    if (abs(p->getMemorySize() - busy) > 0.1)
-        cout << "check " << p->getMemorySize() << " vs " << busy << endl;
+    if (abs(p->getMemorySize() - busy) > 0.1){
+       // cout << "check " << p->getMemorySize() << " vs " << busy << endl;
+        p->setAvailableMemory(p->getAvailableMemory()+ abs(p->getMemorySize() - busy) );
+    }
+
     assert(abs(p->getMemorySize() - busy) < 1);
     assert(p->getReadyTimeCompute() < std::numeric_limits<double>::max());
 }
