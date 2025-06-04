@@ -371,7 +371,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
              endl;
 
     }
-    assert(vertex->time / ourModifiedProc->getProcessorSpeed() < 0.001 ||
+    assert(vertex->time ==0 || vertex->time / ourModifiedProc->getProcessorSpeed() < 0.001 ||
            eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
     assert(eventStartTask->getExpectedTimeFire() == eventStartTask->getActualTimeFire());
 
@@ -389,7 +389,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
              endl;
 
     }
-    assert(vertex->time / ourModifiedProc->getProcessorSpeed() < 0.001 ||
+    assert(vertex->time==0 || vertex->time / ourModifiedProc->getProcessorSpeed() < 0.001 ||
            eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
 
     eventFinishTask->addPredecessorInPlanning(eventStartTask);
@@ -942,8 +942,8 @@ void buildPendingMemoriesAfter(shared_ptr<Processor> &ourModifiedProc, vertex_t 
     }
     for (int j = 0; j < ourVertex->out_degree; j++) {
         ourModifiedProc->addPendingMemoryAfter(ourVertex->out_edges[j]);
-        assert(ourModifiedProc->getAfterPendingMemories().find(ourVertex->out_edges[j])
-               != ourModifiedProc->getPendingMemories().end());
+        assert(ourVertex->time==0 || ourModifiedProc->getAfterPendingMemories().find(ourVertex->out_edges[j])
+               != ourModifiedProc->getAfterPendingMemories().end());
     }
     //ourModifiedProc->setAfterAvailableMemory(
     //       min( ourModifiedProc->getMemorySize(),

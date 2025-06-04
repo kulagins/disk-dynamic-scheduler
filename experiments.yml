@@ -905,18 +905,20 @@ variants:
      #   extra_args: [ '100000000', '10', '0.001', '0.00001' ]
      # - name: 'rw301'
      #   extra_args: [ '100000000', '10', '0.0001', '0.00001' ]
-      - name: 'pspw+4'
-        extra_args: [ '100000000', '10000', '1', '0.00001' ]
-      - name: 'pspw+3'
-        extra_args: [ '100000000', '1000', '1', '0.00001' ]
-      - name: 'pspw+2'
-        extra_args: [ '100000000', '100', '1', '0.00001' ]
-      - name: 'pspw+1'
-        extra_args: [ '100000000', '10', '1', '0.00001' ]
-      - name: 'pspw-1'
-        extra_args: [ '100000000', '0.1', '1', '0.00001' ]
-      - name: 'pspw-2'
-        extra_args: [ '100000000', '0.01', '1', '0.00001' ]
+     # - name: 'pspw+4'
+     #   extra_args: [ '100000000', '10000', '1', '0.00001' ]
+     ## - name: 'pspw+3'
+     #   extra_args: [ '100000000', '1000', '1', '0.00001' ]
+     # - name: 'pspw+2'
+     #   extra_args: [ '100000000', '100', '1', '0.00001' ]
+     # - name: 'pspw+1'
+     #   extra_args: [ '100000000', '10', '1', '0.00001' ]
+     # - name: 'pspw-1'
+     #   extra_args: [ '100000000', '0.1', '1', '0.00001' ]
+     # - name: 'pspw-2'
+     #   extra_args: [ '100000000', '0.01', '1', '0.00001' ]
+     - name: 'final'
+       extra_args: [ '100000000', '100', '1', '0.00001' ]
 
 
 experiments:
@@ -1006,5 +1008,5 @@ experiments:
 ##
 matrix:
   include:
-    - experiments: [BASE-ndev, A1-ndev, A3-ndev ] #, A1-dev, A2-dev, A3-dev, BASE-dev, A1-bdev, A2-bdev, A3-bdev, BASE-bdev,A1-30dev, A2-30dev, A3-30dev, BASE-30dev,
+    - experiments: [ A1-dev, A2-dev, A3-dev, BASE-dev, A1-bdev, A2-bdev, A3-bdev, BASE-bdev, A1-30dev, A2-30dev, A3-30dev, BASE-30dev] #BASE-ndev, A1-ndev, A3-ndev ] #,
       axes: [penalties]

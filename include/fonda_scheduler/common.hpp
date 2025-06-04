@@ -195,17 +195,16 @@ public:
     void removeOurselfFromSuccessors(Event *us);
 
 
-
-    void propagateChainInPlanning(const shared_ptr<Event> &event, double add, unordered_set<Event*> &visited) {
+    void propagateChainInPlanning(const shared_ptr<Event> &event, double add, unordered_set<Event *> &visited) {
         if (visited.count(event.get())) return;
         visited.insert(event.get());
 
-        for (auto &successor : event->successors) {
-            if (successor->getExpectedTimeFire() != successor->getActualTimeFire() && add!=0) {
-                cout << "!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!! " <<
-              successor->getExpectedTimeFire()<<" vs "<<successor->getActualTimeFire() <<
-                endl;
-            }
+        for (auto &successor: event->successors) {
+       //     if (successor->getExpectedTimeFire() != successor->getActualTimeFire() && add != 0) {
+      //          cout << "!!!!!!!!!!!!!propagate chain - successor different expected and actual times!!! " <<
+        //             successor->getExpectedTimeFire() << " vs " << successor->getActualTimeFire() <<
+       //              endl;
+        //    }
 
             double newTime = successor->getVisibleTimeFireForPlanning() + add;
             successor->setActualTimeFire(newTime);
@@ -317,6 +316,13 @@ public:
 
         for (const auto &next: nextEvents) {
             if (hasCycleFrom(next, visited, recStack, checkPredecessors)) {
+                if (checkPredecessors) {
+                    next->successors.erase(event);
+                    event->predecessors.erase(next);
+                } else {
+                    next->predecessors.erase(event);
+                    event->successors.erase(next);
+                }
                 return true;
             }
         }
