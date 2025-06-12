@@ -19,7 +19,9 @@
 
 **Call**
 memoryMultiplicator speedMultiplicator readWritePenalty offloadPenalty,workflow, inputSize, algorithmNumber, isBaseline, root directory, machines file, number of deviation function
-e.g. ./fonda_scheduler 1000000 100 1 0.001 chipseq_200 41366257414 1 no ../ machines.csv 1
+
+***Example call***
+1000000000 1000 1 0.00001 methylseq 110641579976 1 no ../ machines.csv 2 yes  -> for MeDiH-BL with the largest deviations
 
 * algos with  memory awareness: 1 - HEFT-BL, 2- HEFT-BL, 3- HEFT-MM
 * HEFT (no memory awareness) : yes at isBaseline, algoNum is irrelevant then
@@ -28,5 +30,6 @@ deviations :
 * 1 - normal deviation function around historical value with 10% deviation
 *  2 - normal deviation function around historical value with 50% deviation
 *  3 - no deviation
+* 4 - 30% deviation
   
 One call computes first the *dynamic* schedule, then the *static* one with the same deviations.
