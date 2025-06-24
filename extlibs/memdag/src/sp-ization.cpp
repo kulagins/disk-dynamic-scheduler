@@ -47,7 +47,7 @@ parallel_tree_node_t *find_lca(parallel_tree_node_t *n1, parallel_tree_node_t *n
     return n2;
   if (n2==NULL)
     return n1;
-  
+
   parallel_tree_node_t *lca = NULL;
   for(parallel_tree_node_t *n = n1; n; n=n->parent) {
     n->label = 1;
@@ -76,7 +76,7 @@ void put_subtree_edges_in_fifo(parallel_tree_node_t *root, fifo_t *fifo) {
       put_subtree_edges_in_fifo(root->children[i], fifo);
   }
 }
-    
+
 
 /* int number_of_leaves_in_subtree(parallel_tree_node_t *root) { */
 /*   if (root->number_of_children == 0) */
@@ -143,14 +143,16 @@ parallel_tree_node_t *replace_subtree(parallel_tree_node_t *tree, parallel_tree_
 ///@private
 void remove_subtrees(fifo_t *subtree_to_remove_fifo) {
   while (!fifo_is_empty(subtree_to_remove_fifo)) {
-    parallel_tree_node_t *node_to_remove = fifo_read(subtree_to_remove_fifo);
-    parallel_tree_node_t *parent = node_to_remove->parent;
+    parallel_tree_node_t *node_to_remove =
+      static_cast<parallel_tree_node_t*>(fifo_read(subtree_to_remove_fifo));
+    parallel_tree_node_t *parent =
+      static_cast<parallel_tree_node_t*>(node_to_remove->parent);
     int child_index = 0;
     while(parent->children[child_index] != node_to_remove) {
       child_index++;
     }
     free_composition_tree(node_to_remove);
-   
+
     for(int i=child_index+1; i<parent->number_of_children; i++) {
       parent->children[i-1] = parent->children[i];
     }
@@ -182,39 +184,39 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
   merge_multiple_edges(graph);
   remove_transitivity_edges_weight_conservative(graph);
   compute_bottom_and_top_levels(graph);
-  
+
   parallel_tree_node_t *parallel_tree = new_leaf(NULL, NULL, graph->source); // mimics fake edge from NULL to source
   ACQUIRE(graph->generic_edge_pointer_lock);
   for(edge_t *e = graph->first_edge; e; e=e->next) {
     e->generic_pointer = NULL;
   }
-  
+
 
   int sync_vertex_counter = 0;
 
   // 0. Pre-compute a list of sorted vertices. This is needed as we
   // will transform the graph while traversing it, and we do not want
   // to disturb the traversal.
-  
+
   fifo_t *sorted_vertices = fifo_new();
   for(vertex_t *current_vertex = graph->source; current_vertex; current_vertex = next_vertex_in_sorted_topological_order(graph, current_vertex, sort_by_increasing_avg_level)) {
     fifo_write(sorted_vertices, current_vertex);
   }
 
   while (!fifo_is_empty(sorted_vertices)) {
-    vertex_t *current_vertex = fifo_read(sorted_vertices);
+    vertex_t *current_vertex = static_cast<vertex_t*>(fifo_read(sorted_vertices));
 
     // When merging several branch, check for SP problems.  In all
     // cases, find the branch where the current node is (after merging
     // all incoming branches)
     parallel_tree_node_t *tree_branch_of_current_vertex = NULL;
-    if (current_vertex->in_degree > 1) { 
+    if (current_vertex->in_degree > 1) {
 
       // 1. Find the LCA of all branches closed by the fork
       parallel_tree_node_t *lca = NULL;
       for(int i=0; i<current_vertex->in_degree; i++) {
 	assert(current_vertex->in_edges[i]->generic_pointer);
-	lca = find_lca(lca, current_vertex->in_edges[i]->generic_pointer);
+	lca = find_lca(lca, static_cast<parallel_tree_node_t*>(current_vertex->in_edges[i]->generic_pointer));
       }
 #ifdef DEBUG_SP_IZATION
       fprintf(stderr, "Merge at vertex %s, LCA is vertex %s, with children:\n",current_vertex->name, lca->source->name);
@@ -227,7 +229,7 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
       fifo_t *leaves_to_be_closed = fifo_new();
       fifo_t *successors_of_lca_to_remove = fifo_new();
       for(int i=0; i<current_vertex->in_degree; i++) {
-	parallel_tree_node_t *successor_of_lca = current_vertex->in_edges[i]->generic_pointer;
+	parallel_tree_node_t *successor_of_lca = static_cast<parallel_tree_node_t*>(current_vertex->in_edges[i]->generic_pointer);
 	while (successor_of_lca->parent != lca) {
 	  successor_of_lca = successor_of_lca->parent;
 	}
@@ -240,7 +242,7 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
 	}
       }
 
-      
+
       // 2. Check if we have a SP problem
       int number_of_leaves_to_synchronise = fifo_size(leaves_to_be_closed);
       parallel_tree_node_t *node_result_of_the_merge = NULL;
@@ -249,12 +251,12 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
 	fprintf(stderr,"  SP problem at node %s: %d inputs vs. %d leaves to be closed from root %s\n",
 		current_vertex->name, current_vertex->in_degree, number_of_leaves_to_synchronise, lca->source->name);
 #endif
-	
+
 	// 3. Create a new synchronisation vertex s in the graph
 	char sync_name[255];
-	snprintf(sync_name, 254, "SYNC_%d_%s", sync_vertex_counter++, lca->source->name);
+	snprintf(sync_name, 254, "SYNC_%d_%s", sync_vertex_counter++, lca->source->name.c_str());
 	vertex_t *sync_vertex = new_vertex(graph, sync_name, 0, NULL);
-	  
+
 	// 4. Create the corresponding node in the tree
 	// NB: We first estimate its number of children: this is an
 	// upper bound on the actual number of children. First, the
@@ -263,7 +265,7 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
 	// the same target (different from the current vertex), so we
 	// may end up with less edges. This number will be corrected
 	// afterwards.
-	
+
 	parallel_tree_node_t *sync_node = new_leaf(NULL, sync_vertex, NULL); // NB: the parent will be set later (to lca or lca->parent)
 	sync_node->number_of_children = number_of_leaves_to_synchronise - current_vertex->in_degree + 1; // Upper bound
 #ifdef DEBUG_SP_IZATION
@@ -277,10 +279,10 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
 	// synchronisation node: i->s->j. We never create multiple
 	// edges, so some edges' data may be lost, and weights are
 	// accumulated when needed.
-	
+
 	int next_sync_node_child_index = 0;
 	while (!fifo_is_empty(leaves_to_be_closed)) {
-	  parallel_tree_node_t *leaf = fifo_read(leaves_to_be_closed);
+	  parallel_tree_node_t *leaf = static_cast<parallel_tree_node_t*>(fifo_read(leaves_to_be_closed));
 	  edge_t *edge_to_be_removed = find_edge(leaf->source, leaf->target);
 	  double edge_weight = edge_to_be_removed->weight;
 
@@ -293,15 +295,15 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
 	  if (first_edge) {
 	    first_edge->weight += edge_weight;
 	  } else {
-	    new_edge(graph, leaf->source, sync_vertex, edge_weight, NULL); 
+	    new_edge(graph, leaf->source, sync_vertex, edge_weight, NULL);
 	  }
-	  
+
 	  edge_t *second_edge = find_edge(sync_vertex, leaf->target);
 	  if (second_edge) {
 	    second_edge->weight += edge_weight;
 	  } else {
 	    second_edge = new_edge(graph, sync_vertex, leaf->target, edge_weight, NULL);
-	    // Create a leaf of s in the tree corresponding to the newly created edge s->j 
+	    // Create a leaf of s in the tree corresponding to the newly created edge s->j
 	    parallel_tree_node_t *s_leaf = new_leaf(sync_node, sync_vertex, leaf->target);
 	    sync_node->children[next_sync_node_child_index] = s_leaf;
 	    next_sync_node_child_index++;
@@ -330,33 +332,33 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
       if (lca->number_of_children == fifo_size(successors_of_lca_to_remove)) {
 #ifdef DEBUG_SP_IZATION
 	fprintf(stderr,"  Result of the merge: replace LCA at %s by result node\n",lca->source->name);
-#endif 
+#endif
 	parallel_tree = replace_subtree(parallel_tree, lca, node_result_of_the_merge);
       } else {
 #ifdef DEBUG_SP_IZATION
 	fprintf(stderr,"  Result of the merge: remove only %d branches of LCA at %s and add one for the result of the merge\n",
 		fifo_size(successors_of_lca_to_remove), lca->source->name);
 #endif
-	parallel_tree = replace_subtree(parallel_tree, fifo_read(successors_of_lca_to_remove), node_result_of_the_merge);
+	parallel_tree = replace_subtree(parallel_tree, static_cast<parallel_tree_node_t*>(fifo_read(successors_of_lca_to_remove)), node_result_of_the_merge);
 	remove_subtrees(successors_of_lca_to_remove);
       }
       fifo_free(successors_of_lca_to_remove);
       fifo_free(leaves_to_be_closed);
 
     } else if (current_vertex->in_degree == 1) {
-      tree_branch_of_current_vertex = current_vertex->in_edges[0]->generic_pointer;
+      tree_branch_of_current_vertex = static_cast<parallel_tree_node_t*>(current_vertex->in_edges[0]->generic_pointer);
     } else { // current_vertex->in_degree == 0, special case for the source node
       tree_branch_of_current_vertex = parallel_tree;
     }
-      
+
     parallel_tree_node_t *current_node = tree_branch_of_current_vertex;
 #ifdef DEBUG_SP_IZATION
     //    fprintf(stderr,"At node %s between merge and fork, current_node=%p\n", current_vertex->name, (void*)current_node);
 #endif
-    
+
     // In case of a fork, create new children to the current node of
     // the tree to account for the new edges.
-    if (current_vertex->out_degree > 1) { 
+    if (current_vertex->out_degree > 1) {
       // Transform current_node from leaf to inner node
       current_node->source = current_vertex;
       current_node->target = NULL;
@@ -385,13 +387,13 @@ graph_t *graph_sp_ization(graph_t *original_graph) { // Uses edges' generic_poin
       current_vertex->out_edges[0]->generic_pointer = current_node;
     }
   }
-  fifo_free(sorted_vertices);  
-  
+  fifo_free(sorted_vertices);
+
   for(edge_t *e = graph->first_edge; e; e=e->next) {
     e->generic_pointer = NULL;
   }
   RELEASE(graph->generic_edge_pointer_lock);
-  
+
   return graph;
 }
 

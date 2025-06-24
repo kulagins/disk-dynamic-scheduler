@@ -17,7 +17,7 @@ void update_subtree_stats(tree_t tree) {
   double local_subtree_time = tree->time;
   int local_subtree_size = 1;
   double local_total_inputs = 0.0;
-  
+
   int k;
   tree->critical_path = tree->time;
   if (tree->parent) {
@@ -78,17 +78,17 @@ tree_t read_tree_as_node_list(const char *filename) {
       switch (r) {
       case 4: use_processing_size = 0; break;
       case 5: use_processing_size = 1; break;
-      default: break; 
+      default: break;
       }
     }
-    
+
     max_id = max_memdag(max_id, id);
     if (fgets(line, 255, input)==NULL) {
       break;
     }
-  } 
+  }
   fclose(input);
- 
+
   ///////////////////////// STEP 2: fill the tree
   input = fopen(filename, "r");
 
@@ -110,12 +110,12 @@ tree_t read_tree_as_node_list(const char *filename) {
     /// ...
     /// 2N-1 | N_begin
     /// 2N | N_end
-    
-    
-    nb_of_nodes = 2*max_id+1; 
-    tree = (node_t*) calloc(nb_of_nodes, sizeof(node_t)); 
+
+
+    nb_of_nodes = 2*max_id+1;
+    tree = (node_t*) calloc(nb_of_nodes, sizeof(node_t));
     assert(tree);
-    
+
     /// Adding node 0: (not in the file)
     tree[0].id = 0;
     tree[0].name=strdup("root");
@@ -124,8 +124,8 @@ tree_t read_tree_as_node_list(const char *filename) {
     tree[0].max_nb_of_children = 0;
     tree[0].out_size = 0;
     tree[0].time = MIN_PROCESSING_TIME;
-    
-    
+
+
     do {
       fgets(line, 255, input);
     } while (line[0] == '%');
@@ -137,21 +137,21 @@ tree_t read_tree_as_node_list(const char *filename) {
       if (sscanf(line,"%*d %*d %*d %*d %*d # %254s", comment)==1) {
 	has_orig_comment=1;
       }
-      
+
       DEBUG_TREES(fprintf(stderr,"Seen node %d with parent %d...",id,parent));
-      
+
       /// Translation
       int orig_id = id;
       id = id*2-1;
       parent = max_memdag(2 * parent - 1, 0);
-      
+
       DEBUG_TREES(fprintf(stderr,"allocated to node %d with parent %d with parent %d.\n",id,id+1,parent));
       char s[128];
 
       /// id_begin
       tree[id].id = id;
       snprintf(s,128,"begin_%d%s",orig_id, (has_orig_comment?comment:""));
-      tree[id].name = strdup(s); 
+      tree[id].name = strdup(s);
       tree[id].parent = &(tree[id+1]);
       tree[id].nb_of_children = 0;
       tree[id].max_nb_of_children = 0;
@@ -159,7 +159,7 @@ tree_t read_tree_as_node_list(const char *filename) {
       tree[id].out_size = (double) (processing_size + out_size); // emulate our model (sum inputs + ni + outout) using Liu's model (max(sum inputs, outputs))
       // the sum of the inputs will be done when registering the children
       tree[id].time = max_memdag((double) time, MIN_PROCESSING_TIME);
-      
+
       /// id_end
       tree[id+1].id = id+1;
       snprintf(s,128,"end_%d%s",orig_id, (has_orig_comment?comment:""));
@@ -170,14 +170,14 @@ tree_t read_tree_as_node_list(const char *filename) {
       tree[id+1].children = NULL;
       tree[id+1].out_size = (double) out_size;
       tree[id+1].time = MIN_PROCESSING_TIME;
-      
+
       if (fgets(line, 255, input)==NULL) {
 	break;
       }
     }
 
-    
-    // Then register all nodes in their parent's children array, 
+
+    // Then register all nodes in their parent's children array,
     // For end nodes only (with even index), add their output to the output of the father (input present during the computation of the father)
     for(id=0; id < nb_of_nodes; id++) {
       if (tree[id].parent) {
@@ -193,12 +193,12 @@ tree_t read_tree_as_node_list(const char *filename) {
 	//      fprintf(stderr,"Node %d registered at its parent %d\n",id, tree[id].parent->id);
       }
     }
-  
+
   } else { // No processing size given, Liu's model
-    nb_of_nodes = max_id+1; 
-    tree = (node_t*) calloc(nb_of_nodes, sizeof(node_t)); 
+    nb_of_nodes = max_id+1;
+    tree = (node_t*) calloc(nb_of_nodes, sizeof(node_t));
     assert(tree);
-    
+
     /// Adding node 0: (not in the file)
     tree[0].id = 0;
     tree[0].parent = NULL;
@@ -206,24 +206,24 @@ tree_t read_tree_as_node_list(const char *filename) {
     tree[0].max_nb_of_children = 0;
     tree[0].out_size = 0;
     tree[0].time = MIN_PROCESSING_TIME;
-        
+
     do {
       fgets(line, 255, input);
     } while (line[0] == '%');
-    
+
     while (sscanf(line,"%d %d %lld %lld",&id, &parent, &out_size, &time) == 4) {
       assert(id < nb_of_nodes);
       assert(parent >= 0);
       char comment[255];
       int has_orig_comment = 0;
-      
+
       if (sscanf(line,"%*d %*d %*d %*d # %254s", comment)==1) {
 	has_orig_comment=1;
 	//fprintf(stderr, "Seen node with comment \"%s\"\n", comment);
       }
 
       DEBUG_TREES(fprintf(stderr,"Seen node %d with parent %d...",id,parent));
-      
+
       tree[id].id = id;
       if (has_orig_comment) {
 	tree[id].name = strdup(comment);
@@ -240,7 +240,7 @@ tree_t read_tree_as_node_list(const char *filename) {
       }
     }
 
-    // Then register all nodes in their parent's children array, 
+    // Then register all nodes in their parent's children array,
     for(id=0; id < nb_of_nodes; id++) {
       if (tree[id].parent) {
 	//fprintf(stderr,"treating node %d with parent %d\n",id, tree[id].parent->id);
@@ -252,12 +252,12 @@ tree_t read_tree_as_node_list(const char *filename) {
       }
     }
   }
-    
+
   fclose(input);
-    
-  
+
+
   update_subtree_stats(tree);
-    
+
   DEBUG_TREES(fprintf(stderr,"created tree of size %d\n",tree->subtree_size));
   return tree;
 }
@@ -333,9 +333,9 @@ void print_dot_tree(FILE *out, tree_t tree) {
 tree_t copy_tree(tree_t tree) {
   tree_t new_tree;
   int new_leaf_counter = tree->subtree_size;
-  
+
   new_tree = (node_t*) calloc(tree->subtree_size, sizeof(node_t));
-    
+
   int i;
   for(i=0; i<tree->subtree_size; i++) {
     //    fprintf(stderr,"copying node %d\n",i);
@@ -345,22 +345,22 @@ tree_t copy_tree(tree_t tree) {
     new_tree[i].time = tree[i].time;
     new_tree[i].nb_of_children = tree[i].nb_of_children;
     new_tree[i].max_nb_of_children = new_tree[i].nb_of_children;
-    
+
     if (tree[i].parent) {
       new_tree[i].parent = &(new_tree[tree[i].parent->id]); // careful here
     } else {
       new_tree[i].parent = NULL;
     }
-    
+
     if (new_tree[i].nb_of_children > 0) {
       new_tree[i].children = (tree_t*)calloc(new_tree[i].nb_of_children, sizeof(tree_t));
     } else {
       new_tree[i].children = NULL;
     }
-    
+
     int k;
-    
-    for(k=0; k<tree[i].nb_of_children; k++) { 
+
+    for(k=0; k<tree[i].nb_of_children; k++) {
       new_tree[i].children[k] = &(new_tree[tree[i].children[k]->id]); // here too
     }
   }
@@ -370,7 +370,7 @@ tree_t copy_tree(tree_t tree) {
 
 void free_tree(tree_t tree) {
   int i;
-  for(i=0; i<tree->subtree_size; i++) 
+  for(i=0; i<tree->subtree_size; i++)
     free(tree[i].children);
   free(tree);
 }
@@ -388,7 +388,7 @@ void free_tree(tree_t tree) {
 int check_if_tree(graph_t *graph, int add_common_root_if_forest) {
   vertex_t *target = NULL;
   int several_targets = 0;
-  
+
   for(vertex_t *v = graph->first_vertex; v; v=v->next) {
     if (v->out_degree > 1) {
       //      fprintf(stderr,"out_degree > 1\n");
@@ -425,7 +425,7 @@ int check_if_tree(graph_t *graph, int add_common_root_if_forest) {
 
 /**
  * Convert from graph format to tree format
- * All vertices in the graph should have an out-degree of 1, except the target (out-degree 0). Otherwise, NULL is returned. 
+ * All vertices in the graph should have an out-degree of 1, except the target (out-degree 0). Otherwise, NULL is returned.
  */
 
 tree_t graph_to_tree(graph_t *graph) {
@@ -435,7 +435,7 @@ tree_t graph_to_tree(graph_t *graph) {
   tree_t tree = (node_t*) calloc(graph->number_of_vertices, sizeof(node_t));
 
   /* First pass: register IDs of tree nodes (target=root should be at id 0) */
-  int *graph_id_to_tree_id =calloc(graph->next_vertex_index, sizeof(int));
+  int *graph_id_to_tree_id = (int*) calloc(graph->next_vertex_index, sizeof(int));
   int next_tree_id=1;
   for(vertex_t *v = graph->first_vertex; v; v=v->next) {
     if (v != graph->target) {
@@ -464,7 +464,7 @@ tree_t graph_to_tree(graph_t *graph) {
   }
   free(graph_id_to_tree_id);
   update_subtree_stats(tree);
-  return tree;  
+  return tree;
 }
 
 
@@ -489,7 +489,7 @@ graph_t *tree_to_graph(tree_t tree) {
       new_edge(graph,graph_vertex_by_tree_id[i], graph_vertex_by_tree_id[tree[i].parent->id], tree[i].out_size, NULL);
     }
   }
-  
+
   free(graph_vertex_by_tree_id);
   return graph;
 }

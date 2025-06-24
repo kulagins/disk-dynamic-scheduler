@@ -2,6 +2,18 @@ cmake_minimum_required(VERSION 3.12)
 project(fonda_sched CXX)
 enable_language(C)
 
+option(PEDANTIC_FLAGS "Enable pedantic compiler flags" OFF)
+option(WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+
+if (PEDANTIC_FLAGS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wextra")
+endif ()
+if (WARNINGS_AS_ERRORS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+endif ()
+
 option(FONDA_BUILD_MEMDAG "Build external tool dagp" ON)
 
 
@@ -26,6 +38,12 @@ if (DEFINED ENV{CONDA_PREFIX})
 endif ()
 
 if (FONDA_BUILD_MEMDAG)
+    find_package(PkgConfig)
+
+    pkg_check_modules(GraphViz REQUIRED IMPORTED_TARGET libgvc)
+
+    message(STATUS "GraphViz include dirs: ${GraphViz_INCLUDE_DIRS}")
+
     find_path(IGRAPH_INCLUDE_DIRS NAMES igraph/igraph.h
             HINTS "/usr/local/include"
             "/usr/local/include/igraph"
@@ -54,8 +72,8 @@ if (FONDA_BUILD_MEMDAG)
             ${MEMDAG_SOURCE_DIR}/cluster.cpp
     )
 
-    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS} extlibs/csv/single_include)
-    target_link_libraries(memdag PRIVATE ${IGRAPH_LIBRARIES} -lcgraph -lcdt -lm -lgvc)
+    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS} ${GraphViz_INCLUDE_DIRS} extlibs/csv/single_include)
+    target_link_libraries(memdag PRIVATE ${IGRAPH_LIBRARIES} PkgConfig::GraphViz)
 
     set_target_properties(memdag PROPERTIES
             CXX_STANDARD ${FONDA_CXX_STANDARD}
@@ -64,7 +82,6 @@ if (FONDA_BUILD_MEMDAG)
 
 endif ()
 
-find_package(PkgConfig)
 #pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 
 add_executable(fonda_scheduler "${PROJECT_SOURCE_DIR}/fonda_scheduler/main.cpp"

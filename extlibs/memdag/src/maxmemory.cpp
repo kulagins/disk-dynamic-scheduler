@@ -2,7 +2,7 @@
 #include "graph.hpp"
 #include "restrict.hpp"
 
-/** 
+/**
  * \file maxmemory.c
  * \brief Compute the maximum topological cut of a graph
  */
@@ -12,7 +12,7 @@
  * @private
  *  Compute the maximum topological cut of a DAG stored as a igraph, as described in IPDPS'18
  *
- * 
+ *
  * @param  graph  the DAG in igraph format
  * @param value pointeur on a double (aka igraph_real_t), where the max cut value will be stored
  * @param cut pointer on a vector that will contain the edges of the cut
@@ -43,29 +43,29 @@ int get_maxcut(const igraph_t *graph, igraph_real_t *value,
   igraph_vector_init(&modifcap,0);
   igraph_vector_update(&modifcap,capacity);
   igraph_vector_scale(&modifcap, -1);
-  
+
   // sum of the capacities, used to initiate the flow
   double initflow = igraph_vector_sum(capacity);
-  
-  
-  
+
+
+
   // go through the edges, add a flow equal to initflow going through each one
-  
+
   igraph_integer_t edge, a,b;
   igraph_vector_t edges1, edges2;
-  
+
   igraph_vector_init(&edges1,0);
   igraph_vector_init(&edges2,0);
-  
-  
+
+
   for(edge=0; edge < igraph_ecount(graph) ; edge ++)
   {
-  
+
       // no need to add a flow if this edge already has a large modified capacity
       if ((VECTOR(modifcap)[edge]) > initflow)
         continue;
-  
-  
+
+
       igraph_edge(graph, edge, &a, &b); // edge = (a,b)
       // path from s to a
       igraph_get_shortest_path(graph, NULL, &edges1, source, a, IGRAPH_OUT);
@@ -82,12 +82,12 @@ int get_maxcut(const igraph_t *graph, igraph_real_t *value,
         int e = VECTOR(edges2)[i];
         VECTOR(modifcap)[e] += initflow;
       }
-      VECTOR(modifcap)[ edge ] += initflow; 
+      VECTOR(modifcap)[ edge ] += initflow;
   }
-  
+
   // compute the mincut with the new capacities (= maxcut with old ones)
   int errorcode = igraph_st_mincut(graph, value, cut, partition, partition2, source, target, &modifcap);
-  
+
   // correct the value of the cut with the old capacities
   *value = 0;
   for(int i=0; i< igraph_vector_size(cut); i++)
@@ -95,12 +95,12 @@ int get_maxcut(const igraph_t *graph, igraph_real_t *value,
       int e = VECTOR(*cut)[i];
       *value += VECTOR(*capacity)[e];
     }
-  
-  
+
+
   igraph_vector_destroy(&modifcap);
   igraph_vector_destroy(&edges1);
   igraph_vector_destroy(&edges2);
-  
+
   return errorcode;
 }
 
@@ -113,7 +113,7 @@ int get_maxcut(const igraph_t *graph, igraph_real_t *value,
 
 double maximum_parallel_memory(graph_t *graph) {
   enforce_single_source_and_target(graph);
-  
+
   igraph_vector_t edge_weights;
   igraph_t igraph = convert_to_igraph(graph, &edge_weights, NULL, NULL);
 
@@ -130,15 +130,15 @@ double maximum_parallel_memory(graph_t *graph) {
 
 
   igraph_real_t maxcutvalue;
-  igraph_vector_t cut; 
-  igraph_vector_init(&cut,0); 
+  igraph_vector_t cut;
+  igraph_vector_init(&cut,0);
   /* igraph_vector_init(&S,0); */
   /* igraph_vector_init(&T,0); */
 
   /* fprintf(stderr,"igraph:\n"); */
   /* igraph_write_graph_edgelist(&igraph, stderr); */
   /* fprintf(stderr,"\n\n source id:%d  target id:%d\n", graph->source->id,  graph->target->id); */
-  
+
   int error = get_maxcut(&igraph, &maxcutvalue, &cut, NULL, NULL, (igraph_integer_t) graph->source->id, (igraph_integer_t) graph->target->id, &edge_weights);
 
   fprintf(stderr,"Edges in the maximum topological cut:\n");
@@ -146,7 +146,7 @@ double maximum_parallel_memory(graph_t *graph) {
     int e = VECTOR(cut)[i];
     int a,b;
     igraph_edge(&igraph, e, &a, &b);
-    fprintf(stderr,"%s -> %s\n", graph->vertices_by_id[a]->name, graph->vertices_by_id[b]->name);
+    fprintf(stderr,"%s -> %s\n", graph->vertices_by_id[a]->name.c_str(), graph->vertices_by_id[b]->name.c_str());
     find_edge(graph->vertices_by_id[a], graph->vertices_by_id[b])->status = IN_CUT;
   }
 
@@ -155,7 +155,7 @@ double maximum_parallel_memory(graph_t *graph) {
     fprintf(stderr,"Error in igraph igraph_st_mincut\n");
   }
   return (double) maxcutvalue;
-		     
+
 
 }
 
@@ -187,14 +187,14 @@ int restrict_graph(graph_t *graph, igraph_t *igraph, igraph_vector_t *nodework, 
   igraph_vector_init(&cut,0);
   igraph_vector_init(&S,0);
   igraph_vector_init(&T,0);
-  
+
   get_maxcut(igraph,&max_cut,&cut, &S, &T, source,target,capacity);
 
   int i=0;
-      
+
   while(max_cut > memory_bound) {
     i++;
-        
+
     int success = (*edge_selection_function)(graph, igraph, &cut, sigma, nodework, capacity, source, target, &selected_head_vertex, &selected_tail_vertex);
     if(success == 0) {
 	fprintf(stderr,"Restrict: failed after %d iterations\n",i);
@@ -212,9 +212,9 @@ int restrict_graph(graph_t *graph, igraph_t *igraph, igraph_vector_t *nodework, 
     }
     get_maxcut(igraph,&max_cut,&cut, &S, &T, source,target,capacity);
   }
-    
+
   fprintf(stderr,"Restrict: converged after %d iterations\n",i);
-    
+
   igraph_vector_destroy(&cut);
   igraph_vector_destroy(&S);
   igraph_vector_destroy(&T);
@@ -243,14 +243,14 @@ int restrict_graph(graph_t *graph, igraph_t *igraph, igraph_vector_t *nodework, 
 
 int add_edges_to_cope_with_limited_memory(graph_t *graph, double memory_bound, edge_selection_heuristic_t edge_selection_heuristic) {
   enforce_single_source_and_target(graph);
-  
+
   igraph_vector_t edge_weights;
   igraph_vector_t vertex_times;
   igraph_t igraph = convert_to_igraph(graph, &edge_weights, NULL, &vertex_times);
 
   igraph_vector_t sigma_order;
   igraph_vector_init(&sigma_order, igraph_vcount(&igraph));
-  
+
   if (edge_selection_heuristic==RESPECT_ORDER) {
     int found = sigma_schedule(&igraph, graph->source->id, &sigma_order, &edge_weights, memory_bound);
     if (!found) {

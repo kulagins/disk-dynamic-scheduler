@@ -33,7 +33,7 @@ vertex_t *new_vertex_with_id(graph_t *graph, int id, const std::string name, dou
     new_vertex->id = id;
     graph->next_vertex_index = max_memdag(graph->next_vertex_index, id + 1);
   }
-  
+
   vertex_t *old_first = graph->first_vertex;
   new_vertex->next = old_first;
   new_vertex->prev = NULL;
@@ -49,7 +49,7 @@ vertex_t *new_vertex_with_id(graph_t *graph, int id, const std::string name, dou
   graph->vertices_by_id[new_vertex->id] = new_vertex;
 
   graph->number_of_vertices++;
-  
+
   return new_vertex;
 }
 ///\endcond
@@ -87,7 +87,7 @@ vertex_t *new_vertex2Weights(graph_t *graph, const char *name, double time, doub
 edge_t *new_edge(graph_t *graph, vertex_t *tail, vertex_t *head, double weight, void *data) {
   edge_t *new_edge = (edge_t*) calloc(1,sizeof(edge_t));
   new_edge->weight = weight;
-  new_edge->data = data;    
+  new_edge->data = data;
   new_edge->tail = tail;
   new_edge->head = head;
 
@@ -114,7 +114,7 @@ edge_t *new_edge(graph_t *graph, vertex_t *tail, vertex_t *head, double weight, 
   }
   head->in_edges[head->in_degree] = new_edge;
   head->in_degree++;
-  
+
   edge_t *old_first = graph->first_edge;
   new_edge->next = old_first;
   new_edge->prev = NULL;
@@ -124,7 +124,7 @@ edge_t *new_edge(graph_t *graph, vertex_t *tail, vertex_t *head, double weight, 
   graph->first_edge = new_edge;
 
   graph->number_of_edges++;
-  
+
   return new_edge;
 
 }
@@ -153,7 +153,7 @@ void remove_vertex(graph_t *graph, vertex_t *v) {
   }
   fifo_free(edges_to_be_suppressed);
 
-  
+
   // Remove from vertex list and array
   vertex_t *n = v->next;
   vertex_t *p = v->prev;
@@ -167,7 +167,7 @@ void remove_vertex(graph_t *graph, vertex_t *v) {
   graph->vertices_by_id[v->id] = NULL;
 
   graph->number_of_vertices--;
-  
+
   // Free vertex data
   free(v->in_edges);
   free(v->out_edges);
@@ -188,12 +188,12 @@ void remove_edge(graph_t *graph, edge_t *e) {
   vertex_t *head = e->head;
 
   if (graph->vertices_by_id[tail->id] != tail) {
-    fprintf(stderr,"ERROR: attempt to remove edge \"%s->%s\" from another graph.\n", tail->name, head->name);
+    fprintf(stderr,"ERROR: attempt to remove edge \"%s->%s\" from another graph.\n", tail->name.c_str(), head->name.c_str());
     exit(1);
   }
 
   //fprintf(stderr,"removing edge  \"%s->%s\" \n", tail->name, head->name);
-  
+
   // Remove in tail out_edges
   int index_in_tail_out_edges=0;
   for(int i=0; i<tail->out_degree; i++) {
@@ -307,7 +307,7 @@ graph_t *copy_graph(graph_t *graph, int reverse_edges) {
         new_g->vertices_by_id[v->id]->subgraph = copy_graph(v->subgraph,0);
     new_g->vertices_by_id[v->id]->assignedProcessorId = v->assignedProcessorId;
   }
-  
+
   for(edge_t *e=graph->first_edge; e; e=e->next) {
 #ifdef DEBUG_GRAPH
     fprintf(stderr,"Check original edge %s->%s\n", e->tail->name, e->head->name);
@@ -335,7 +335,7 @@ graph_t *copy_graph(graph_t *graph, int reverse_edges) {
     } else {
       new_g->target = new_g->vertices_by_id[graph->source->id];
     }
-  } 
+  }
   if (graph->target) {
     if (reverse_edges == 0) {
       new_g->target = new_g->vertices_by_id[graph->target->id];
@@ -360,7 +360,7 @@ graph_t *copy_graph(graph_t *graph, int reverse_edges) {
  */
 
 igraph_t convert_to_igraph(graph_t *graph, igraph_vector_t *edge_weights_p, igraph_strvector_t *node_names_p, igraph_vector_t *node_times_p) {
-  
+
   if (node_names_p) {
     igraph_strvector_init(node_names_p, graph->next_vertex_index);
     for(vertex_t *v=graph->first_vertex; v; v=v->next) {
@@ -413,7 +413,7 @@ void free_graph(graph_t *graph) {
       } while (v);
   }
 
-  
+
   edge_t *e = graph->first_edge;
   if(e) {
       do {
@@ -457,21 +457,21 @@ graph_t *read_dot_graph(const char *filename, const char *memory_label, const ch
     exit(1);
   }
   Agraph_t *ag_graph=agread(input_graph_file, 0);
-  fclose(input_graph_file); 
-  
+  fclose(input_graph_file);
+
   graph_t *graph = new_graph();
   graph->next_vertex_index=1;
-  
+
   /*
-   * 1. Assign id to nodes, going from 0 to n-1, 
+   * 1. Assign id to nodes, going from 0 to n-1,
    */
-  
+
   typedef struct my_node_s {
     Agrec_t header;
     /* programmer-defined fields follow */
     vertex_t *in_vertex, *out_vertex;
   } my_node_vertex_t;
-  aginit(ag_graph, AGNODE, "my_node_vertex_t", sizeof(my_node_vertex_t), TRUE);
+  aginit(ag_graph, AGNODE, "my_node_vertex_t", sizeof(my_node_vertex_t), true);
   ///\cond HIDDEN_SYMBOLS
 #define MY_NODE_IN_VERTEX(node) ((my_node_vertex_t *) (node->base.data))->in_vertex
 #define MY_NODE_OUT_VERTEX(node) ((my_node_vertex_t *) (node->base.data))->out_vertex
@@ -498,17 +498,17 @@ graph_t *read_dot_graph(const char *filename, const char *memory_label, const ch
       MY_NODE_IN_VERTEX(ag_node) = new_vertex(graph, in_name, time, NULL);
       MY_NODE_OUT_VERTEX(ag_node) = new_vertex(graph, out_name, 0.0, NULL);
       free(in_name);
-      free(out_name); 
+      free(out_name);
       edge_t *e = new_edge(graph, MY_NODE_IN_VERTEX(ag_node), MY_NODE_OUT_VERTEX(ag_node), node_memory, NULL);*/
       someV->memoryRequirement = node_memory;
     } else {
-      
+
     }
 
   }
- 
-  /* 
-   * 2.Get the edges and their memory 
+
+  /*
+   * 2.Get the edges and their memory
    */
   for (Agnode_t *ag_node = agfstnode(ag_graph); ag_node; ag_node = agnxtnode(ag_graph,ag_node)) {
     vertex_t *tail = MY_NODE_OUT_VERTEX(ag_node);
@@ -526,7 +526,7 @@ graph_t *read_dot_graph(const char *filename, const char *memory_label, const ch
 	edge_weight = 1.0;
       }
       new_edge(graph, tail, head, edge_weight, NULL);
-      /* 
+      /*
        * In case of a graph with node memory weight, add this weight
        * to the processing of the source and target vertices. Note
        * that the source (resp. target) vertex has a single input

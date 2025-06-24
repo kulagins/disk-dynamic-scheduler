@@ -624,7 +624,7 @@ public:
 
 
     static void
-    printHelper(std::set<shared_ptr<Event>>::const_iterator begin, _Rb_tree_const_iterator<shared_ptr<Event>> end,
+    printHelper(std::set<shared_ptr<Event>>::const_iterator begin, std::set<shared_ptr<Event>>::const_iterator end,
                 int depth) {
         if (begin == end) return;
 
