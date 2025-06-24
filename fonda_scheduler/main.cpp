@@ -5,6 +5,7 @@
 #include "../extlibs/memdag/src/graph.hpp"
 #include "../include/fonda_scheduler/SchedulerHeader.hpp"
 #include "../include/fonda_scheduler/io/graphWeightsBuilder.hpp"
+#include "../include/fonda_scheduler/options.hpp"
 #include "../extlibs/csv/single_include/csv2/csv2.hpp"
 #include "fonda_scheduler/DynamicSchedulerHeader.hpp"
 #include <iomanip>
@@ -41,26 +42,10 @@ int currentAlgoNum = 0;
 //1000000 100 1 0.001 eager_2000 25705994498 1 no ../ machines.csv
 //100000000 100 1 0.001 eager 8330435694 1 no ../ machines.csv 3
 int main(int argc, char *argv[]) {
-
- //   for (int i = 0; i < argc; ++i) {
-  //      std::cout << argv[i] << " ";
-   // }
-   // cout<<endl;
-
     auto start = std::chrono::system_clock::now();
-    string workflowName = argv[5];
-    workflowName = trimQuotes(workflowName);
-    long inputSize= stol(argv[6]);
-    int algoNumber = std::stoi(argv[7]);
-    cout << "algo_nr " << algoNumber << " " <<workflowName<<" "<<"input_size "<<inputSize<<" ";
 
-    int memoryMultiplicator = stoi(argv[1]), speedMultiplicator = stoi(argv[2]);
-    double readWritePenalty= stod(argv[3]), offloadPenalty= stod(argv[4]);
-    bool isBaseline = (std::string(argv[8]) == "yes");
-    string dotPrefix= argv[9];
-    string machinesFile = (argc<10)?"input/machines.csv" : std::string("input/") + argv[10];
-    int deviationVariant = stoi(argv[11]);
-    bool usePreemptiveWrites = argc< 13 || std::string(argv[12]) =="yes";
+    fonda::Options options = fonda::parseOptions(argc, argv);
+
     //1000000, 100, 1, 0.001
     csv2::Reader<csv2::delimiter<','>,
             csv2::quote_character<'"'>,
@@ -68,7 +53,7 @@ int main(int argc, char *argv[]) {
             csv2::trim_policy::trim_whitespace> csv;
 
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows;
-    string tracesFileName = dotPrefix+ "input/traces.csv";
+    string tracesFileName = options.dotPrefix + "input/traces.csv";
     if (csv.mmap(tracesFileName)) {
         for (const auto row: csv) {
             std::vector<std::string> row_data;
@@ -99,26 +84,26 @@ int main(int argc, char *argv[]) {
     }
 
 
-    imaginedCluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    imaginedCluster = Fonda::buildClusterFromCsv(options.dotPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
 
-    actualCluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    actualCluster = Fonda::buildClusterFromCsv(options.dotPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
 
 
     double biggestMem = imaginedCluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     string filename;
-    if(workflowName.rfind("/home", 0) == 0 || workflowName.rfind("/work", 0) == 0){
-        filename = workflowName.substr(0, workflowName.find("//")+1) + workflowName.substr(workflowName.find("//")+2, workflowName.size());
+    if(options.workflowName.rfind("/home", 0) == 0 || options.workflowName.rfind("/work", 0) == 0){
+        filename = options.workflowName.substr(0, options.workflowName.find("//")+1) + options.workflowName.substr(options.workflowName.find("//")+2, options.workflowName.size());
 
     }
     else{
-        filename= dotPrefix+"input/";
+        filename= options.dotPrefix+"input/";
         //string suffix = "00";
       //  bool isGenerated = workflowName.substr(workflowName.size() - suffix.size()) == suffix;
        // if (isGenerated) {
             filename += "generated/";//+filename;
       //  }
-        filename += workflowName;
+        filename += options.workflowName;
 
         size_t pos = filename.find(".dot");
         if(pos == std::string::npos){
@@ -130,15 +115,15 @@ int main(int argc, char *argv[]) {
     graph_t * graphMemTopology = read_dot_graph(filename.c_str(), NULL, NULL, NULL);
     checkForZeroMemories(graphMemTopology);
 
-    currentAlgoNum = algoNumber;
-    unsigned long i1 = workflowName.find("//");
-    workflowName = i1 == string::npos? workflowName :
-                   workflowName.substr(i1 + 2, workflowName.size());
-    unsigned long n4 = workflowName.find('_');
-    workflowName = workflowName.substr(0, n4);
+    currentAlgoNum = options.algoNumber;
+    unsigned long i1 = options.workflowName.find("//");
+    options.workflowName = i1 == string::npos? options.workflowName :
+                   options.workflowName.substr(i1 + 2, options.workflowName.size());
+    unsigned long n4 = options.workflowName.find('_');
+    options.workflowName = options.workflowName.substr(0, n4);
 
     //10, 100                                                               memShorteningDivision, ioShorteningCoef
-    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, imaginedCluster, 1, 10);
+    Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, options.workflowName, options.inputSize, imaginedCluster, 1, 10);
     //print_graph_to_cout(graphMemTopology);
 
     vertex_t *pv = graphMemTopology->first_vertex;
@@ -201,13 +186,13 @@ int main(int argc, char *argv[]) {
     cout<<std::setprecision(15);
 
 
-    cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    cluster = Fonda::buildClusterFromCsv(options.dotPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
     assert(cluster->getProcessors().at(0)->getMemorySize()== actualCluster->getProcessors().at(0)->getMemorySize());
     assert(cluster->getProcessors().at(1)->getMemorySize()== actualCluster->getProcessors().at(1)->getMemorySize());
     assert(cluster->getProcessors().at(2)->getMemorySize()== actualCluster->getProcessors().at(2)->getMemorySize());
     assert(cluster->getProcessors().at(3)->getMemorySize()== actualCluster->getProcessors().at(3)->getMemorySize());
 
-    double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant, usePreemptiveWrites);
+    double d = new_heuristic_dynamic(graphMemTopology, cluster, options.algoNumber, options.isBaseline, options.deviationVariant, options.usePreemptiveWrites);
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
@@ -215,11 +200,11 @@ int main(int argc, char *argv[]) {
 
 
     delete cluster;
-    cluster = Fonda::buildClusterFromCsv(dotPrefix +machinesFile, memoryMultiplicator,readWritePenalty, offloadPenalty, speedMultiplicator);
+    cluster = Fonda::buildClusterFromCsv(options.dotPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
 
     clearGraph(graphMemTopology);
     start = std::chrono::system_clock::now();
-    d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
+    d = new_heuristic(graphMemTopology,  options.algoNumber, options.isBaseline);
      end = std::chrono::system_clock::now();
      elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
