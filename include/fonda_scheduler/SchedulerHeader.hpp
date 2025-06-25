@@ -5,25 +5,26 @@
 #ifndef RESHI_TXT_DYNSCHED_HPP
 #define RESHI_TXT_DYNSCHED_HPP
 
-
-#include "graph.hpp"
 #include "cluster.hpp"
-#include "sp-graph.hpp"
 #include "common.hpp"
+#include "graph.hpp"
 #include "json.hpp"
+#include "sp-graph.hpp"
 
-extern Cluster * imaginedCluster;
-extern Cluster * actualCluster;
+extern Cluster* imaginedCluster;
+extern Cluster* actualCluster;
 
-struct EdgeChange{
+struct EdgeChange {
 
-     edge_t * edge;
+    edge_t* edge;
     Location newLocation;
 
-    EdgeChange(edge_t * e,  Location nl):
-    edge(e), newLocation(nl) {}
-
-} ;
+    EdgeChange(edge_t* e, Location nl)
+        : edge(e)
+        , newLocation(nl)
+    {
+    }
+};
 
 class SchedulingResult {
 public:
@@ -32,66 +33,62 @@ public:
     double finishTime;
     double startTime;
     int resultingVar;
-    edge_t *edgeToKick;
+    edge_t* edgeToKick;
     double peakMem;
     vector<EdgeChange> edgesToChangeStatus;
 
-    explicit SchedulingResult(const shared_ptr<Processor> &proc)
-            : processorOfAssignment(proc ? make_shared<Processor>(*proc) : nullptr),
-              modifiedProcs{},
-              finishTime(0),
-              startTime(0),
-              resultingVar(-1),
-              edgeToKick(nullptr),
-              peakMem(0) {}
+    explicit SchedulingResult(const shared_ptr<Processor>& proc)
+        : processorOfAssignment(proc ? make_shared<Processor>(*proc) : nullptr)
+        , modifiedProcs {}
+        , finishTime(0)
+        , startTime(0)
+        , resultingVar(-1)
+        , edgeToKick(nullptr)
+        , peakMem(0)
+    {
+    }
 };
 
+double calculateSimpleBottomUpRank(vertex_t* task);
 
+double calculateBLCBottomUpRank(vertex_t* task);
 
-double calculateSimpleBottomUpRank(vertex_t *task);
+std::vector<std::pair<vertex_t*, double>> calculateMMBottomUpRank(graph_t* graph);
 
-double calculateBLCBottomUpRank(vertex_t *task);
+double new_heuristic(graph_t* graph, int algoNum, bool isHeft);
 
-std::vector<std::pair<vertex_t *, double> > calculateMMBottomUpRank(graph_t *graph);
+vector<pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, int bottomLevelVariant);
 
-double new_heuristic(graph_t *graph, int algoNum, bool isHeft);
+double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t* v, const shared_ptr<Processor>& pj);
 
-vector<pair<vertex_t *, double>> calculateBottomLevels(graph_t *graph, int bottomLevelVariant);
+void tentativeAssignment(vertex_t* v, bool real, SchedulingResult& result);
 
-double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v, const shared_ptr<Processor> &pj);
+void tentativeAssignmentHEFT(vertex_t* v, bool real, SchedulingResult& result, SchedulingResult& resultCorrect);
 
-void tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result);
+graph_t* convertToNonMemRepresentation(graph_t* withMemories, map<int, int>& noMemToWithMem);
 
-void
-tentativeAssignmentHEFT(vertex_t *v, bool real,  SchedulingResult &result, SchedulingResult & resultCorrect);
+void processIncomingEdges(const vertex_t* v, bool realAsNotImaginary, bool realAsRealRuntimes, bool isHeft, shared_ptr<Processor>& ourDesiredProc,
+    vector<std::shared_ptr<Processor>>& modifiedProcs,
+    double& earliestStartingTimeToComputeVertex);
 
-graph_t *convertToNonMemRepresentation(graph_t *withMemories, map<int, int> &noMemToWithMem);
+void checkIfPendingMemoryCorrect(const shared_ptr<Processor>& p);
 
-void
-processIncomingEdges(const vertex_t *v, bool realAsNotImaginary, bool realAsRealRuntimes, bool isHeft, shared_ptr<Processor> &ourDesiredProc,
-                     vector<std::shared_ptr<Processor>> &modifiedProcs,
-                     double &earliestStartingTimeToComputeVertex);
+bool hasDuplicates(const std::vector<shared_ptr<Processor>>& vec);
 
-void checkIfPendingMemoryCorrect(const shared_ptr<Processor> &p);
+void bestTentativeAssignment(bool isHeft, vertex_t* vertex, SchedulingResult& result, SchedulingResult& correctResultForHeftOnly);
 
-bool hasDuplicates(const std::vector<shared_ptr<Processor>> &vec);
+void realSurplusOfOutgoingEdges(const vertex_t* v, shared_ptr<Processor>& ourModifiedProc, double& sumOut);
 
-void bestTentativeAssignment(bool isHeft, vertex_t *vertex, SchedulingResult &result, SchedulingResult &correctResultForHeftOnly);
+void evictAccordingToBestDecision(int& numberWithEvictedCases, SchedulingResult& bestSchedulingResult, vertex_t* pVertex, bool isHeft, bool real);
 
-void realSurplusOfOutgoingEdges(const vertex_t *v, shared_ptr<Processor> &ourModifiedProc, double &sumOut);
+void putChangeOnCluster(vertex_t* vertex, SchedulingResult& schedulingResult, Cluster* cluster, int& numberWithEvictedCases, bool real, bool isHeft = false);
 
-void
-evictAccordingToBestDecision(int &numberWithEvictedCases, SchedulingResult &bestSchedulingResult, vertex_t *pVertex, bool isHeft, bool real);
+shared_ptr<Processor> findProcessorThatHoldsEdge(edge_t* incomingEdge, Cluster* clusterToLookIn);
 
-void putChangeOnCluster(vertex_t * vertex,SchedulingResult &schedulingResult, Cluster * cluster, int &numberWithEvictedCases, bool real, bool isHeft=false);
+void handleBiggestEvict(bool real, SchedulingResult& result, const vector<EdgeChange>& changedEdgesOne,
+    double startTimeFor1Evicted, edge_t* biggestPendingEdge, double readyTimeComput);
 
-shared_ptr<Processor> findProcessorThatHoldsEdge(edge_t *incomingEdge, Cluster* clusterToLookIn);
+void handleAllEvict(SchedulingResult& result, double timeToWriteAllPending, const vector<EdgeChange>& changedEdgesAll,
+    double startTimeForAllEvicted, double readyTimeComput);
 
-void handleBiggestEvict(bool real, SchedulingResult &result, const vector<EdgeChange> &changedEdgesOne,
-                        double startTimeFor1Evicted, edge_t *biggestPendingEdge, double readyTimeComput);
-
-void handleAllEvict(SchedulingResult &result, double timeToWriteAllPending, const vector<EdgeChange> &changedEdgesAll,
-         double startTimeForAllEvicted, double readyTimeComput);
-
-
-#endif //RESHI_TXT_DYNSCHED_HPP
+#endif // RESHI_TXT_DYNSCHED_HPP

@@ -4,240 +4,237 @@
 
 #include "../include/fonda_scheduler/common.hpp"
 
-#include "graph.hpp"
 #include "fonda_scheduler/SchedulerHeader.hpp"
+#include "graph.hpp"
 
 bool Debug;
 
-void delayEverythingBy(vector<Assignment*> &assignments, Assignment * startingPoint, double delayTime){
+void delayEverythingBy(vector<Assignment*>& assignments, Assignment* startingPoint, double delayTime)
+{
 
-    for (auto &assignment: assignments){
-        if(assignment->startTime>= startingPoint->startTime){
-            assignment->startTime+=delayTime;
-            assignment->finishTime+=delayTime;
+    for (auto& assignment : assignments) {
+        if (assignment->startTime >= startingPoint->startTime) {
+            assignment->startTime += delayTime;
+            assignment->finishTime += delayTime;
         }
     }
 }
 
-
-std::string trimQuotes(const std::string& str) {
+std::string trimQuotes(const std::string& str)
+{
     if (str.empty()) {
         return str; // Return the empty string if input is empty
     }
 
     string result = str, prevResult;
-   do{
+    do {
         prevResult = result;
         size_t start = 0;
         size_t end = prevResult.length() - 1;
 
         // Check for leading quote
-        if (prevResult[start] == '"'||prevResult[start] == '\\'|| prevResult[start]==' ') {
+        if (prevResult[start] == '"' || prevResult[start] == '\\' || prevResult[start] == ' ') {
             start++;
         }
 
         // Check for trailing quote
-        if (prevResult[end] == '"'|| prevResult[end]=='\\'|| prevResult[end]==' ') {
+        if (prevResult[end] == '"' || prevResult[end] == '\\' || prevResult[end] == ' ') {
             end--;
         }
 
         result = prevResult.substr(start, end - start + 1);
-    } while(result!=prevResult);
+    } while (result != prevResult);
     return result;
 }
 
-
-
-void Cluster::printAssignment(){
-    int counter =0;
-    for (const auto &item: this->getProcessors()){
-        if(item.second->isBusy){
+void Cluster::printAssignment()
+{
+    int counter = 0;
+    for (const auto& item : this->getProcessors()) {
+        if (item.second->isBusy) {
             counter++;
-            cout<<"Processor"<<counter<<"."<<endl;
-            cout<<"\tMem: "<<item.second->getMemorySize()<<", Proc: "<<item.second->getProcessorSpeed()<<endl;
+            cout << "Processor" << counter << "." << endl;
+            cout << "\tMem: " << item.second->getMemorySize() << ", Proc: " << item.second->getProcessorSpeed() << endl;
 
-            vertex_t *assignedVertex = item.second->getAssignedTask();
-            if(assignedVertex==NULL)
-                cout<<"No assignment."<<endl;
-            else{
-                cout<<"Assigned subtree, id "<<assignedVertex->id<< ", leader "<<-1<<", memReq "<< assignedVertex->memoryRequirement<<endl;
-                for (vertex_t *u = assignedVertex->subgraph->source; u; u = next_vertex_in_topological_order(assignedVertex->subgraph, u)) {
-                    cout<<u->name<<", ";
+            vertex_t* assignedVertex = item.second->getAssignedTask();
+            if (assignedVertex == NULL)
+                cout << "No assignment." << endl;
+            else {
+                cout << "Assigned subtree, id " << assignedVertex->id << ", leader " << -1 << ", memReq " << assignedVertex->memoryRequirement << endl;
+                for (vertex_t* u = assignedVertex->subgraph->source; u; u = next_vertex_in_topological_order(assignedVertex->subgraph, u)) {
+                    cout << u->name << ", ";
                 }
-                cout<<endl;
+                cout << endl;
             }
         }
     }
 }
 
-
-void printDebug(string str){
-    if(Debug){
-        cout<<str<<endl;
+void printDebug(string str)
+{
+    if (Debug) {
+        cout << str << endl;
     }
 }
-void printInlineDebug(string str){
-    if(Debug){
-        cout<<str;
+void printInlineDebug(string str)
+{
+    if (Debug) {
+        cout << str;
     }
 }
 
-
-void checkForZeroMemories(graph_t *graph) {
-    for (vertex_t *vertex = graph->source; vertex; vertex = next_vertex_in_topological_order(graph, vertex)) {
+void checkForZeroMemories(graph_t* graph)
+{
+    for (vertex_t* vertex = graph->source; vertex; vertex = next_vertex_in_topological_order(graph, vertex)) {
         if (vertex->memoryRequirement == 0) {
             printDebug("Found a vertex with 0 memory requirement, name: " + vertex->name);
         }
     }
 }
 
-void removeSourceAndTarget(graph_t *graph, vector<pair<vertex_t *, double>> &ranks) {
+void removeSourceAndTarget(graph_t* graph, vector<pair<vertex_t*, double>>& ranks)
+{
 
     auto iterator = find_if(ranks.begin(), ranks.end(),
-                            [](pair<vertex_t *, int> pair1) { return pair1.first->name == "GRAPH_SOURCE"; });
-    if(iterator!= ranks.end()){
+        [](pair<vertex_t*, int> pair1) { return pair1.first->name == "GRAPH_SOURCE"; });
+    if (iterator != ranks.end()) {
         ranks.erase(iterator);
     }
     iterator = find_if(ranks.begin(), ranks.end(),
-                       [](pair<vertex_t *, int> pair1) { return pair1.first->name == "GRAPH_TARGET"; });
-    if(iterator!= ranks.end()){
+        [](pair<vertex_t*, int> pair1) { return pair1.first->name == "GRAPH_TARGET"; });
+    if (iterator != ranks.end()) {
         ranks.erase(iterator);
     }
 
-    vertex_t *startV = findVertexByName(graph, "GRAPH_SOURCE");
-    vertex_t *targetV = findVertexByName(graph, "GRAPH_TARGET");
-    if(startV!=NULL)
+    vertex_t* startV = findVertexByName(graph, "GRAPH_SOURCE");
+    vertex_t* targetV = findVertexByName(graph, "GRAPH_TARGET");
+    if (startV != NULL)
         remove_vertex(graph, startV);
-    if(targetV!=NULL)
+    if (targetV != NULL)
         remove_vertex(graph, targetV);
-
 }
 
+bool isLocatedNowhere(edge_t* edge, bool imaginary)
+{
 
-
-bool isLocatedNowhere(edge_t* edge, bool imaginary){
-
-    vector<Location>& locations = imaginary? edge->imaginedLocations: edge->locations;
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     auto it = std::find_if(locations.begin(), locations.end(),
-                           [](Location location) {
-                               return location.locationType == LocationType::Nowhere;
-                           });
+        [](Location location) {
+            return location.locationType == LocationType::Nowhere;
+        });
     return locations.empty() || it != locations.end();
 }
 
-bool isLocatedOnDisk(edge_t* edge, bool imaginary){
+bool isLocatedOnDisk(edge_t* edge, bool imaginary)
+{
 
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     return std::find_if(locations.begin(), locations.end(),
-                        [](Location location) {
-                            return location.locationType== LocationType::OnDisk;
-                        })
-           != locations.end();
+               [](Location location) {
+                   return location.locationType == LocationType::OnDisk;
+               })
+        != locations.end();
 }
 
+bool isLocatedOnThisProcessor(edge_t* edge, int id, bool imaginary)
+{
 
-bool isLocatedOnThisProcessor(edge_t* edge, int id, bool imaginary){
-
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     return std::find_if(locations.begin(), locations.end(),
-                        [id](Location location) {
-                            return location.locationType== LocationType::OnProcessor && location.processorId==id;
-                        })
-           != locations.end();
+               [id](Location location) {
+                   return location.locationType == LocationType::OnProcessor && location.processorId == id;
+               })
+        != locations.end();
 }
 
+bool isLocatedOnAnyProcessor(edge_t* edge, bool imaginary)
+{
 
-
-bool isLocatedOnAnyProcessor(edge_t* edge, bool imaginary){
-
-    vector<Location>& locations = imaginary? edge->imaginedLocations: edge->locations;
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     return std::find_if(locations.begin(), locations.end(),
-                        [](Location location) {
-                            return location.locationType== LocationType::OnProcessor;
-                        })
-           != locations.end();
+               [](Location location) {
+                   return location.locationType == LocationType::OnProcessor;
+               })
+        != locations.end();
 }
 
-int whatProcessorIsLocatedOn(edge_t* edge, bool imaginary){
+int whatProcessorIsLocatedOn(edge_t* edge, bool imaginary)
+{
 
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     auto locationOnProcessor = std::find_if(locations.begin(), locations.end(),
-                                            [](Location location) {
-                                                return location.locationType == LocationType::OnProcessor;
-                                            });
-    return (locationOnProcessor != locations.end()) ? locationOnProcessor->processorId.value(): -1;
-
+        [](Location location) {
+            return location.locationType == LocationType::OnProcessor;
+        });
+    return (locationOnProcessor != locations.end()) ? locationOnProcessor->processorId.value() : -1;
 }
 
-
-std::string buildEdgeName(edge_t* edge){
-    return edge->tail->name+"-"+ edge->head->name;
+std::string buildEdgeName(edge_t* edge)
+{
+    return edge->tail->name + "-" + edge->head->name;
 }
 
-void delocateFromThisProcessorToDisk(edge_t* edge, int id, bool imaginary, double afterWhen){
+void delocateFromThisProcessorToDisk(edge_t* edge, int id, bool imaginary, double afterWhen)
+{
 
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     auto locationOnThisProcessor = std::find_if(locations.begin(), locations.end(),
-                                                [id](Location location) {
-                                                    return location.locationType == LocationType::OnProcessor &&
-                                                           location.processorId == id;
-                                                });
-   //cout<<"delocating "; print_edge(edge);
-    //assert(locationOnThisProcessor  != edge->locations.end());
-    if(locationOnThisProcessor  == edge->locations.end()){
+        [id](Location location) {
+            return location.locationType == LocationType::OnProcessor && location.processorId == id;
+        });
+    // cout<<"delocating "; print_edge(edge);
+    // assert(locationOnThisProcessor  != edge->locations.end());
+    if (locationOnThisProcessor == edge->locations.end()) {
         locations.erase(locationOnThisProcessor);
-        if(!isLocatedOnDisk(edge, imaginary))
+        if (!isLocatedOnDisk(edge, imaginary))
             locations.emplace_back(LocationType::OnDisk, nullopt, afterWhen);
 
-        throw runtime_error("not located on proc "+ buildEdgeName(edge));
+        throw runtime_error("not located on proc " + buildEdgeName(edge));
     }
     locations.erase(locationOnThisProcessor);
-    if(!isLocatedOnDisk(edge, imaginary))
+    if (!isLocatedOnDisk(edge, imaginary))
         locations.emplace_back(LocationType::OnDisk, nullopt, afterWhen);
-
-
 }
 
-void delocateFromThisProcessorToNowhere(edge_t* edge, int id, bool imaginary, double afterWhen){
+void delocateFromThisProcessorToNowhere(edge_t* edge, int id, bool imaginary, double afterWhen)
+{
 
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     auto locationOnThisProcessor = std::find_if(locations.begin(), locations.end(),
-                                                [id](Location location) {
-                                                    return location.locationType == LocationType::OnProcessor &&
-                                                           location.processorId == id;
-                                                });
-    //cout<<"delocating "; print_edge(edge);
-    //assert(locationOnThisProcessor  != edge->locations.end());
-    if(locationOnThisProcessor  == edge->locations.end()){
-        throw runtime_error("not located on proc "+ buildEdgeName(edge));
+        [id](Location location) {
+            return location.locationType == LocationType::OnProcessor && location.processorId == id;
+        });
+    // cout<<"delocating "; print_edge(edge);
+    // assert(locationOnThisProcessor  != edge->locations.end());
+    if (locationOnThisProcessor == edge->locations.end()) {
+        throw runtime_error("not located on proc " + buildEdgeName(edge));
     }
     locations.erase(locationOnThisProcessor);
 }
 
+void locateToThisProcessorFromDisk(edge_t* edge, int id, bool imaginary, double afterWhen)
+{
 
-
-void locateToThisProcessorFromDisk(edge_t* edge, int id, bool imaginary, double afterWhen){
-
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
-  //  cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
-    if(!isLocatedOnDisk(edge, imaginary)){
-        cout<<"NOT located on disk yet! Write&Read? "<<buildEdgeName(edge)<<endl;
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
+    //  cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
+    if (!isLocatedOnDisk(edge, imaginary)) {
+        cout << "NOT located on disk yet! Write&Read? " << buildEdgeName(edge) << endl;
     }
-   // assert(isLocatedOnDisk(edge));
+    // assert(isLocatedOnDisk(edge));
     auto locationOnDisk = std::find_if(locations.begin(), locations.end(),
-                                       [](Location location) {
-                                           return location.locationType == LocationType::OnDisk;
-                                       });
-    if(!isLocatedOnThisProcessor(edge, id, imaginary))
+        [](Location location) {
+            return location.locationType == LocationType::OnDisk;
+        });
+    if (!isLocatedOnThisProcessor(edge, id, imaginary))
         locations.emplace_back(LocationType::OnProcessor, id, afterWhen);
 }
-Location &getLocationOnProcessor(edge_t* edge, int id, bool imaginary){
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
+Location& getLocationOnProcessor(edge_t* edge, int id, bool imaginary)
+{
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     return *std::find_if(locations.begin(), locations.end(),
-                        [id](Location &location) {
-                            return location.locationType == LocationType::OnProcessor &&
-                                   location.processorId == id;
-                        });
+        [id](Location& location) {
+            return location.locationType == LocationType::OnProcessor && location.processorId == id;
+        });
 }
 
 /*Location &getLocationOnDisk(edge_t* edge, bool imaginary){
@@ -247,13 +244,14 @@ Location &getLocationOnProcessor(edge_t* edge, int id, bool imaginary){
                              return location.locationType == LocationType::OnDisk;
                          });
 } */
-Location &getLocationOnDisk(edge_t* edge, bool imaginary){
-    vector<Location> &locations = imaginary ? edge->imaginedLocations : edge->locations;
+Location& getLocationOnDisk(edge_t* edge, bool imaginary)
+{
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
 
     auto it = std::find_if(locations.begin(), locations.end(),
-                           [](Location& location) { // Pass by reference ✅
-                               return location.locationType == LocationType::OnDisk;
-                           });
+        [](Location& location) { // Pass by reference ✅
+            return location.locationType == LocationType::OnDisk;
+        });
 
     if (it == locations.end()) {
         throw std::runtime_error("No OnDisk location found");
@@ -262,23 +260,24 @@ Location &getLocationOnDisk(edge_t* edge, bool imaginary){
     return *it; // ✅ Safe: Returns reference to actual Location in vector
 }
 
+void locateToThisProcessorFromNowhere(edge_t* edge, int id, bool imaginary, double afterWhen)
+{
 
-void locateToThisProcessorFromNowhere(edge_t* edge, int id, bool imaginary, double afterWhen){
-
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
-  //  cout<<"locating from nowhere to proc "<<id <<" edge "; print_edge(edge);
-    if(!isLocatedOnThisProcessor(edge, id, imaginary))
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
+    //  cout<<"locating from nowhere to proc "<<id <<" edge "; print_edge(edge);
+    if (!isLocatedOnThisProcessor(edge, id, imaginary))
         locations.emplace_back(LocationType::OnProcessor, id, afterWhen);
 }
-void locateToDisk(edge_t* edge, bool imaginary, double afterWhen){
-    vector<Location> &locations = imaginary? edge->imaginedLocations: edge->locations;
-    if(!isLocatedOnDisk(edge, imaginary))
+void locateToDisk(edge_t* edge, bool imaginary, double afterWhen)
+{
+    vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
+    if (!isLocatedOnDisk(edge, imaginary))
         locations.emplace_back(LocationType::OnDisk, afterWhen);
 }
 
-
-double getSumOut(vertex_t * v){
-    double sumOut=0;
+double getSumOut(vertex_t* v)
+{
+    double sumOut = 0;
     for (int i = 0; i < v->out_degree; i++) {
         sumOut += v->out_edges[i]->weight;
         //      cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
@@ -286,8 +285,9 @@ double getSumOut(vertex_t * v){
     return sumOut;
 }
 
-double getSumIn(vertex_t * v){
-    double sumIn=0;
+double getSumIn(vertex_t* v)
+{
+    double sumIn = 0;
     for (int i = 0; i < v->in_degree; i++) {
         sumIn += v->in_edges[i]->weight;
         //      cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
@@ -295,89 +295,87 @@ double getSumIn(vertex_t * v){
     return sumIn;
 }
 
-void Event::fire(){
-    switch(this->type){
-        case eventType::OnTaskStart:
-            fireTaskStart();
-            break;
-        case eventType::OnTaskFinish:
-            fireTaskFinish();
-            break;
-        case eventType::OnReadStart:
-            fireReadStart();
-            break;
-        case eventType::OnReadFinish:
-            fireReadFinish();
-            break;
-        case eventType::OnWriteStart:
-            fireWriteStart();
-            break;
-        case eventType::OnWriteFinish:
-            fireWriteFinish();
-            break;
+void Event::fire()
+{
+    switch (this->type) {
+    case eventType::OnTaskStart:
+        fireTaskStart();
+        break;
+    case eventType::OnTaskFinish:
+        fireTaskFinish();
+        break;
+    case eventType::OnReadStart:
+        fireReadStart();
+        break;
+    case eventType::OnReadFinish:
+        fireReadFinish();
+        break;
+    case eventType::OnWriteStart:
+        fireWriteStart();
+        break;
+    case eventType::OnWriteFinish:
+        fireWriteFinish();
+        break;
     }
     this->timesFired++;
-
 }
 
+void Processor::updateFrom(const Processor& other)
+{
 
-
-void Processor::updateFrom(const Processor& other){
-
-    assert(this->assignedTask== nullptr || this->assignedTask->id == other.assignedTask->id);
-
+    assert(this->assignedTask == nullptr || this->assignedTask->id == other.assignedTask->id);
 
     std::unordered_map<std::string, std::weak_ptr<Event>> updatedEvents;
 
-    this->readyTimeCompute= other.readyTimeCompute;
+    this->readyTimeCompute = other.readyTimeCompute;
     this->readyTimeRead = other.readyTimeRead;
     this->readyTimeWrite = other.readyTimeWrite;
 
-    assert(other.availableMemory<= other.getMemorySize() || abs(other.availableMemory- other.getMemorySize())<1);
+    assert(other.availableMemory <= other.getMemorySize() || abs(other.availableMemory - other.getMemorySize()) < 1);
     this->availableMemory = other.availableMemory;
-    set<edge_t *,  std::function<bool(edge_t*, edge_t*)>> updatedMemories(comparePendingMemories);
+    set<edge_t*, std::function<bool(edge_t*, edge_t*)>> updatedMemories(comparePendingMemories);
     // First, add elements that exist in both and new ones from 'other'
     for (auto* mem : other.pendingMemories) {
-        updatedMemories.insert(mem);  // Only inserts new ones, duplicates are ignored
+        updatedMemories.insert(mem); // Only inserts new ones, duplicates are ignored
     }
     // Swap the updated set into place
     pendingMemories.swap(updatedMemories);
 
-    assert(other.afterAvailableMemory < other.getMemorySize()|| abs(other.afterAvailableMemory - other.getMemorySize()) <0.01);
+    assert(other.afterAvailableMemory < other.getMemorySize() || abs(other.afterAvailableMemory - other.getMemorySize()) < 0.01);
     this->afterAvailableMemory = other.afterAvailableMemory;
     updatedMemories.clear();
     // First, add elements that exist in both and new ones from 'other'
     for (auto* mem : other.afterPendingMemories) {
-        updatedMemories.insert(mem);  // Only inserts new ones, duplicates are ignored
+        updatedMemories.insert(mem); // Only inserts new ones, duplicates are ignored
     }
     // Swap the updated set into place
     afterPendingMemories.swap(updatedMemories);
 
-    this->lastReadEvent= other.lastReadEvent;
-    this->lastWriteEvent= other.lastWriteEvent;
-    this->lastComputeEvent= other.lastComputeEvent;
+    this->lastReadEvent = other.lastReadEvent;
+    this->lastWriteEvent = other.lastWriteEvent;
+    this->lastComputeEvent = other.lastComputeEvent;
 
     this->writingQueue.clear();
-    for(edge_t* e: other.writingQueue){
+    for (edge_t* e : other.writingQueue) {
         this->writingQueue.emplace_back(e);
     }
-
 }
 
-void clearGraph(graph_t* graphMemTopology){
-    vertex_t *vertex = graphMemTopology->first_vertex;
+void clearGraph(graph_t* graphMemTopology)
+{
+    vertex_t* vertex = graphMemTopology->first_vertex;
     while (vertex != nullptr) {
-        vertex->makespan= vertex->makespanPerceived=-1;
-        vertex->visited= false;
-        vertex->status= Status::Unscheduled;
-        vertex->actuallyUsedMemory=-1;
-        vertex->rank=-1;
+        vertex->makespan = vertex->makespanPerceived = -1;
+        vertex->visited = false;
+        vertex->status = Status::Unscheduled;
+        vertex->actuallyUsedMemory = -1;
+        vertex->rank = -1;
         vertex->bottom_level = -1;
         vertex = vertex->next;
     }
 
-    edge_t * edge = graphMemTopology->first_edge;
-    while(edge!= nullptr){
+    edge_t* edge = graphMemTopology->first_edge;
+    while (edge != nullptr) {
         edge->locations.clear();
         edge = edge->next;
     }

@@ -82,6 +82,12 @@ if (FONDA_BUILD_MEMDAG)
 
 endif ()
 
+# Add "include/" and "extlibs/"
+include_directories(
+    "${PROJECT_SOURCE_DIR}/include"
+    "${PROJECT_SOURCE_DIR}/extlibs"
+)
+
 #pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 
 add_executable(fonda_scheduler "${PROJECT_SOURCE_DIR}/fonda_scheduler/main.cpp"
