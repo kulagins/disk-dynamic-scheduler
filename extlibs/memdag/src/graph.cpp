@@ -359,41 +359,41 @@ graph_t *copy_graph(graph_t *graph, int reverse_edges) {
  * data.
  */
 
-igraph_t convert_to_igraph(graph_t *graph, igraph_vector_t *edge_weights_p, igraph_strvector_t *node_names_p, igraph_vector_t *node_times_p) {
-
-  if (node_names_p) {
-    igraph_strvector_init(node_names_p, graph->next_vertex_index);
-    for(vertex_t *v=graph->first_vertex; v; v=v->next) {
-      igraph_strvector_set(node_names_p, v->id, v->name.c_str());
-    }
-  }
-
-  if (node_times_p) {
-    igraph_vector_init(node_times_p, graph->next_vertex_index);
-    for(vertex_t *v=graph->first_vertex; v; v=v->next) {
-      igraph_vector_set(node_times_p, v->id, v->time);
-    }
-  }
-
-  igraph_vector_t edges;
-  igraph_vector_init(&edges,0);
-  if (edge_weights_p) {
-    igraph_vector_init(edge_weights_p,0);
-  }
-
-  for(edge_t *e=graph->first_edge; e; e=e->next) {
-    igraph_vector_push_back(&edges, e->tail->id);
-    igraph_vector_push_back(&edges, e->head->id);
-    if (edge_weights_p) {
-      igraph_vector_push_back(edge_weights_p, e->weight);
-    }
-  }
-  igraph_t igraph;
-  igraph_create(&igraph, &edges, 0, IGRAPH_DIRECTED);
-  igraph_vector_destroy(&edges);
-
- return igraph;
-}
+// igraph_t convert_to_igraph(graph_t *graph, igraph_vector_t *edge_weights_p, igraph_strvector_t *node_names_p, igraph_vector_t *node_times_p) {
+//
+//   if (node_names_p) {
+//     igraph_strvector_init(node_names_p, graph->next_vertex_index);
+//     for(vertex_t *v=graph->first_vertex; v; v=v->next) {
+//       igraph_strvector_set(node_names_p, v->id, v->name.c_str());
+//     }
+//   }
+//
+//   if (node_times_p) {
+//     igraph_vector_init(node_times_p, graph->next_vertex_index);
+//     for(vertex_t *v=graph->first_vertex; v; v=v->next) {
+//       igraph_vector_set(node_times_p, v->id, v->time);
+//     }
+//   }
+//
+//   igraph_vector_t edges;
+//   igraph_vector_init(&edges,0);
+//   if (edge_weights_p) {
+//     igraph_vector_init(edge_weights_p,0);
+//   }
+//
+//   for(edge_t *e=graph->first_edge; e; e=e->next) {
+//     igraph_vector_push_back(&edges, e->tail->id);
+//     igraph_vector_push_back(&edges, e->head->id);
+//     if (edge_weights_p) {
+//       igraph_vector_push_back(edge_weights_p, e->weight);
+//     }
+//   }
+//   igraph_t igraph;
+//   igraph_create(&igraph, &edges, 0, IGRAPH_DIRECTED);
+//   igraph_vector_destroy(&edges);
+//
+//  return igraph;
+// }
 
 /**
  * Free a graph

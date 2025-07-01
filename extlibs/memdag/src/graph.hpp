@@ -1,7 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 #include <assert.h>
-#include <igraph/igraph.h>
+// #include <igraph/igraph.h>
 #include <string>
 #include "vector"
 #include <variant>
@@ -16,7 +16,7 @@
 /** @name Useful macros */
 ///@{
 #define max_memdag(x,y) (((x)>(y))?(x):(y))
-//#define min(x,y) (((x)<(y))?(x):(y))
+//#define min(x,y) (((x)<(y))?(x):(y))f
 #define sign(x) ((x < 0) ? -1 : ((x > 0) ? 1 : 0) )
 #define MIN_PROCESSING_TIME 0.001
 ///@}
@@ -202,7 +202,7 @@ graph_t  *read_dot_graph(const char *filename, const char *memory_label, const c
 void      print_graph_to_dot_file(graph_t *graph, FILE *output);
 void print_graph_to_cout(graph_t *graph);
 void print_graph_to_cout_full(graph_t *graph);
-igraph_t  convert_to_igraph(graph_t *graph, igraph_vector_t *edge_weights_p, igraph_strvector_t *node_names_p, igraph_vector_t *vertex_times_p);
+// igraph_t  convert_to_igraph(graph_t *graph, igraph_vector_t *edge_weights_p, igraph_strvector_t *node_names_p, igraph_vector_t *vertex_times_p);
 int check_if_path_exists(vertex_t *origin, vertex_t *destination);
 
 /* From graph-algorithms.c: */

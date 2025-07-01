@@ -44,28 +44,19 @@ if (FONDA_BUILD_MEMDAG)
 
     message(STATUS "GraphViz include dirs: ${GraphViz_INCLUDE_DIRS}")
 
-    find_path(IGRAPH_INCLUDE_DIRS NAMES igraph/igraph.h
-            HINTS "/usr/local/include"
-            "/usr/local/include/igraph"
-            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/include")
-    find_library(IGRAPH_LIBRARIES igraph
-            HINTS
-            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/lib"
-            "$ENV{LD_LIBRARY_PATH}"
-            "$ENV{DYLD_LIBRARY_PATH}")
-
     set(MEMDAG_SOURCE_DIR ${PROJECT_SOURCE_DIR}/extlibs/memdag/src/)
     add_library(memdag ${PROJECT_SOURCE_DIR}/extlibs/memdag/src/memdag.cpp)
-    target_sources(memdag PUBLIC ${MEMDAG_SOURCE_DIR}/seq-schedules-for-restrict.cpp
+    target_sources(memdag PUBLIC
+#            ${MEMDAG_SOURCE_DIR}/seq-schedules-for-restrict.cpp
             ${MEMDAG_SOURCE_DIR}/sp-ization.cpp
-            ${MEMDAG_SOURCE_DIR}/edge-selection-heuristics-for-restrict.cpp
+#            ${MEMDAG_SOURCE_DIR}/edge-selection-heuristics-for-restrict.cpp
             ${MEMDAG_SOURCE_DIR}/graph-algorithms.cpp
             ${MEMDAG_SOURCE_DIR}/tree.cpp
             ${MEMDAG_SOURCE_DIR}/fifo.cpp
             ${MEMDAG_SOURCE_DIR}/heap.cpp
             ${MEMDAG_SOURCE_DIR}/sp-recognition.cpp
             ${MEMDAG_SOURCE_DIR}/graph.cpp
-            ${MEMDAG_SOURCE_DIR}/maxmemory.cpp
+#            ${MEMDAG_SOURCE_DIR}/maxmemory.cpp
             ${MEMDAG_SOURCE_DIR}/sp-traversals.cpp
             ${MEMDAG_SOURCE_DIR}/tree-opt-sched.cpp
             ${MEMDAG_SOURCE_DIR}/tree-postorder-sched.cpp
