@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
     vector<Assignment*> assignments;
     cout << std::setprecision(15);
 
-    double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.algoNumber == 0, options.deviation, true /* usePreemptiveWrites */);
+    double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.algoNumber == 0, options.deviationModel, true /* usePreemptiveWrites */);
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;

@@ -28,7 +28,13 @@ struct Options {
     // Scale task's memory to fit the machine
     bool scaleToFit = false; // Default to not scaling to fit
 
-    double deviation = 10.0; // Default deviation value (percentage, e.g., 10%)
+    // Deviation models:
+    // 1 - normal deviation function around historical value with 10% deviation
+    // 2 - normal deviation function around historical value with 50% deviation
+    // 3 - no deviation
+    // 4 - everything x2 (times x2)
+    // 5 - 30% deviation
+    int deviationModel = 0; // Default deviation model
 };
 
 // List of options
@@ -43,7 +49,7 @@ static const struct option long_options[] = {
     { "path-prefix", required_argument, nullptr, 'p' },
     { "machines-file", required_argument, nullptr, 'f' },
     { "traces-file", required_argument, nullptr, 't' },
-    { "deviation", required_argument, nullptr, 'd' },
+    { "deviation-model", required_argument, nullptr, 'd' },
     { "scale-to-fit", no_argument, nullptr, 'S' },
     { "help", no_argument, nullptr, 'h' },
     { nullptr, 0, nullptr, 0 } // End of options
@@ -60,11 +66,11 @@ static const char* short_options = "" //
                                    "p:" // path-prefix
                                    "f:" // machines-file
                                    "t:" // traces-file
-                                   "v:" // deviation
+                                   "d:" // deviation
                                    "S" // scale-to-fit
                                    "h"; // help
 
-void printHelp(const char* program_name)
+inline void printHelp(const char* program_name)
 {
     std::cout << "Usage: " << program_name << " [options]\n"
               << "Options:\n"
@@ -78,12 +84,18 @@ void printHelp(const char* program_name)
               << "  -p, --path-prefix <prefix>           Set path prefix. Default: empty\n"
               << "  -f, --machines-file <file>           Set machines file. Default: input/machines.csv\n"
               << "  -t, --traces-file <file>             Set traces file. Default: input/traces.csv\n"
-              << "  -d, --deviation <variant>            Set standard deviation. Default: 10.0\n"
+              << "  -d, --deviation-model <variant>      Set standard deviation model. Required.\n"
+              << "                                         Options:\n"
+              << "                                           1. Normal 10%.\n"
+              << "                                           2. Normal 50%.\n"
+              << "                                           3. No deviation.\n"
+              << "                                           4. Everything x2.\n"
+              << "                                           5. Normal 30%.\n"
               << "  -S, --scale-to-fit                   Scale task's memory to fit the machine. Default: false\n"
               << "  -h, --help                           Show this help message and exit\n";
 }
 
-int algoNameToNumber(std::string algoName)
+inline int algoNameToNumber(std::string algoName)
 {
     std::transform(algoName.begin(), algoName.end(), algoName.begin(), ::tolower);
     algoName = trimQuotes(algoName);
@@ -111,7 +123,7 @@ void parseArg(const char* name, const char* arg, T& value, ParseFunction&& parse
     }
 }
 
-Options parseOptions(int argc, char* argv[])
+inline Options parseOptions(int argc, char* argv[])
 {
     Options options;
     int option_index = 0;
@@ -149,8 +161,8 @@ Options parseOptions(int argc, char* argv[])
             options.machinesFile = optarg;
             options.machinesFile = trimQuotes(options.machinesFile);
             break;
-        case 'v':
-            parseArg("deviation", optarg, options.deviation, [](const char* arg) { return std::stod(arg); });
+        case 'd':
+            parseArg("deviation-model", optarg, options.deviationModel, [](const char* arg) { return std::stoi(arg); });
             break;
         case 'S':
             options.scaleToFit = true;
@@ -176,7 +188,7 @@ Options parseOptions(int argc, char* argv[])
     // Check if mandatory options are set
     print_error(options.workflowName.empty(), "Workflow name is required.");
     print_error(options.inputSize <= 0, "Input size must be a positive integer.");
-    print_error(options.deviation < 0, "Deviation variant must be a non-negative number.");
+    print_error(options.deviationModel < 1 || options.deviationModel > 5, "Deviation model must be between 1 and 5.");
 
     return options;
 }
