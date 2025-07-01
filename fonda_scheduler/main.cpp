@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
     auto start = std::chrono::system_clock::now();
 
     fonda::Options options = fonda::parseOptions(argc, argv);
+    cout << "algo_nr " << options.algoNumber << " " << options.workflowName << " " << "input_size " << options.inputSize << " ";
 
     // 1000000, 100, 1, 0.001
     csv2::Reader<csv2::delimiter<','>,
