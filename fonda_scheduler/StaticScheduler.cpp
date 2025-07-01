@@ -19,7 +19,7 @@ double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t* v
     return Res;
 }
 
-double new_heuristic(graph_t* graph, int algoNum, bool isHeft)
+double medih(graph_t* graph, int algoNum, bool isHeft)
 {
     algoNum = isHeft ? 1 : algoNum;
     if (isHeft) {

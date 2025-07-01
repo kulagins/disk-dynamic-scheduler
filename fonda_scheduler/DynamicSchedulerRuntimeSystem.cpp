@@ -12,7 +12,7 @@ bool usePreemptiveWrites;
 
 string lastEventName;
 
-double new_heuristic_dynamic(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int deviationNumber, bool upw)
+double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int deviationNumber, bool upw)
 {
     double resMakespan = -1;
     cluster = cluster1;

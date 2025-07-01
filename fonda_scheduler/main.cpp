@@ -55,7 +55,8 @@ int main(int argc, char* argv[])
         csv;
 
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows;
-    string tracesFileName = options.dotPrefix + "input/traces.csv";
+    // QUESTION: why not an option? R: made an option
+    string tracesFileName = options.pathPrefix + "input/traces.csv";
     if (csv.mmap(tracesFileName)) {
         for (const auto row : csv) {
             std::vector<std::string> row_data;
@@ -85,18 +86,21 @@ int main(int argc, char* argv[])
         }
     }
 
-    imaginedCluster = Fonda::buildClusterFromCsv(options.dotPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
+    // Theoretical perfect (static schedule)
+    imaginedCluster = Fonda::buildClusterFromCsv(options.pathPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
 
-    actualCluster = Fonda::buildClusterFromCsv(options.dotPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
+    // With deviations
+    actualCluster = Fonda::buildClusterFromCsv(options.pathPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
 
     double biggestMem = imaginedCluster->getMemBiggestFreeProcessor()->getMemorySize();
 
+    // QUESTION: Why not reading directly from the options.workflowName?
     string filename;
     if (options.workflowName.rfind("/home", 0) == 0 || options.workflowName.rfind("/work", 0) == 0) {
         filename = options.workflowName.substr(0, options.workflowName.find("//") + 1) + options.workflowName.substr(options.workflowName.find("//") + 2, options.workflowName.size());
 
     } else {
-        filename = options.dotPrefix + "input/";
+        filename = options.pathPrefix + "input/";
         // string suffix = "00";
         //  bool isGenerated = workflowName.substr(workflowName.size() - suffix.size()) == suffix;
         // if (isGenerated) {
@@ -116,6 +120,7 @@ int main(int argc, char* argv[])
     currentAlgoNum = options.algoNumber;
     unsigned long i1 = options.workflowName.find("//");
     options.workflowName = i1 == string::npos ? options.workflowName : options.workflowName.substr(i1 + 2, options.workflowName.size());
+    // remove the size from name: atacseq_2000 -> atacseq
     unsigned long n4 = options.workflowName.find('_');
     options.workflowName = options.workflowName.substr(0, n4);
 
@@ -123,49 +128,57 @@ int main(int argc, char* argv[])
     Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, options.workflowName, options.inputSize, imaginedCluster, 1, 10);
     // print_graph_to_cout(graphMemTopology);
 
-    vertex_t* pv = graphMemTopology->first_vertex;
-    while (pv != nullptr) {
-        if (peakMemoryRequirementOfVertex(pv) > pv->memoryRequirement) {
-            pv->memoryRequirement = peakMemoryRequirementOfVertex(pv) + 1000;
-            // cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
-        }
-        if (outMemoryRequirement(pv) > biggestMem) {
-            // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-
-            for (int i = 0; i < pv->out_degree; i++) {
-                pv->out_edges[i]->weight /= 4;
+    // QUESTION: What is this?
+    if (options.scaleToFit) {
+        // move while loop into a function -> scaleToFit option
+        vertex_t* pv = graphMemTopology->first_vertex;
+        while (pv != nullptr) {
+            const auto MEMORY_EPSILON = 1000;
+            const auto MEMORY_DIVISION_FACTOR = 4;
+            if (peakMemoryRequirementOfVertex(pv) > pv->memoryRequirement) {
+                pv->memoryRequirement = peakMemoryRequirementOfVertex(pv) + MEMORY_EPSILON;
+                // cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
             }
-            double d = inMemoryRequirement(pv);
-            double requirement = outMemoryRequirement(pv);
             if (outMemoryRequirement(pv) > biggestMem) {
-
                 // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                for (int i = 0; i < pv->out_degree; i++) {
-                    pv->out_edges[i]->weight /= 4;
-                }
-                if (outMemoryRequirement(pv) > biggestMem) {
-                    return 0;
-                }
-            }
-        }
 
-        if (inMemoryRequirement(pv) > biggestMem) {
-            // cout<<"WILL BE INVALID "<< inMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-            for (int i = 0; i < pv->in_degree; i++) {
-                pv->in_edges[i]->weight /= 4;
+                for (int i = 0; i < pv->out_degree; i++) {
+                    pv->out_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
+                    // throw an error
+                }
+                double d = inMemoryRequirement(pv);
+                double requirement = outMemoryRequirement(pv);
+                if (outMemoryRequirement(pv) > biggestMem) {
+
+                    // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                    for (int i = 0; i < pv->out_degree; i++) {
+                        pv->out_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
+                        // throw an error
+                    }
+                    if (outMemoryRequirement(pv) > biggestMem) {
+                        return 0;
+                    }
+                }
             }
 
             if (inMemoryRequirement(pv) > biggestMem) {
-                // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                // cout<<"WILL BE INVALID "<< inMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
                 for (int i = 0; i < pv->in_degree; i++) {
-                    pv->in_edges[i]->weight /= 4;
+                    pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
                 }
+
                 if (inMemoryRequirement(pv) > biggestMem) {
-                    return 0;
+                    // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                    for (int i = 0; i < pv->in_degree; i++) {
+                        pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
+                    }
+                    if (inMemoryRequirement(pv) > biggestMem) {
+                        return 0;
+                    }
                 }
             }
+            pv = pv->next;
         }
-        pv = pv->next;
     }
     //  cout<<endl;
     // cluster->printProcessors();
@@ -178,31 +191,24 @@ int main(int argc, char* argv[])
     vector<Assignment*> assignments;
     cout << std::setprecision(15);
 
-    cluster = Fonda::buildClusterFromCsv(options.dotPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
-    assert(cluster->getProcessors().at(0)->getMemorySize() == actualCluster->getProcessors().at(0)->getMemorySize());
-    assert(cluster->getProcessors().at(1)->getMemorySize() == actualCluster->getProcessors().at(1)->getMemorySize());
-    assert(cluster->getProcessors().at(2)->getMemorySize() == actualCluster->getProcessors().at(2)->getMemorySize());
-    assert(cluster->getProcessors().at(3)->getMemorySize() == actualCluster->getProcessors().at(3)->getMemorySize());
-
-    double d = new_heuristic_dynamic(graphMemTopology, cluster, options.algoNumber, options.isBaseline, options.deviationVariant, options.usePreemptiveWrites);
+    double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.algoNumber == 0, options.deviation, true /* usePreemptiveWrites */);
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
     cout << "makespan_1 " << d << "\t";
 
-    delete cluster;
-    cluster = Fonda::buildClusterFromCsv(options.dotPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
+    delete actualCluster;
+    actualCluster = Fonda::buildClusterFromCsv(options.pathPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
 
     clearGraph(graphMemTopology);
     start = std::chrono::system_clock::now();
-    d = new_heuristic(graphMemTopology, options.algoNumber, options.isBaseline);
+    d = medih(graphMemTopology, options.algoNumber, options.algoNumber == 0);
     end = std::chrono::system_clock::now();
     elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
     cout << "makespan_2 " << d << endl;
 
     delete graphMemTopology;
-    delete cluster;
     delete imaginedCluster;
     delete actualCluster;
 }

@@ -10,18 +10,25 @@
 
 namespace fonda {
 struct Options {
-    int memoryMultiplicator = 1 << 30; // Default to 1 GiB
-    int speedMultiplicator = 1 << 10; // Default to 1024
-    double readWritePenalty;
-    double offloadPenalty;
-    bool isBaseline;
-    std::string workflowName;
-    long inputSize;
-    int algoNumber;
-    std::string dotPrefix;
-    std::string machinesFile;
-    int deviationVariant;
-    bool usePreemptiveWrites;
+    double memoryMultiplicator = static_cast<double>(1 << 30); // Default to 1 GiB
+    double speedMultiplicator = 100.0; // Default to 100.0
+    double readWritePenalty = 1.0; // Default read/write penalty
+    double offloadPenalty = 1e5; // Default offload penalty
+
+    // Select algorithm: HEFT (0), HEFT-BL (1), HEFT-BLC (2), HEFT-MM (3)
+    int algoNumber = 0; // Default to HEFT (0)
+
+    std::string workflowName = ""; // Default empty workflow name
+    long inputSize = 0; // Default input size
+
+    std::string pathPrefix = "./"; // Default prefix for dot files
+    std::string machinesFile = "input/machines.csv"; // Default machines file
+    std::string tracesFile = "input/traces.csv"; // Default traces file
+
+    // Scale task's memory to fit the machine
+    bool scaleToFit = false; // Default to not scaling to fit
+
+    double deviation = 10.0; // Default deviation value (percentage, e.g., 10%)
 };
 
 // List of options
@@ -32,12 +39,12 @@ static const struct option long_options[] = {
     { "offload-penalty", required_argument, nullptr, 'o' },
     { "workflow-name", required_argument, nullptr, 'w' },
     { "input-size", required_argument, nullptr, 'i' },
-    { "algo-number", required_argument, nullptr, 'a' },
-    { "is-baseline", no_argument, nullptr, 'b' },
-    { "dot-prefix", required_argument, nullptr, 'd' },
+    { "algorithm", required_argument, nullptr, 'a' },
+    { "path-prefix", required_argument, nullptr, 'p' },
     { "machines-file", required_argument, nullptr, 'f' },
-    { "deviation-variant", required_argument, nullptr, 'v' },
-    { "use-preemptive-writes", no_argument, nullptr, 'p' },
+    { "traces-file", required_argument, nullptr, 't' },
+    { "deviation", required_argument, nullptr, 'd' },
+    { "scale-to-fit", no_argument, nullptr, 'S' },
     { "help", no_argument, nullptr, 'h' },
     { nullptr, 0, nullptr, 0 } // End of options
 };
@@ -49,32 +56,48 @@ static const char* short_options = "" //
                                    "o:" // offload-penalty
                                    "w:" // workflow-name
                                    "i:" // input-size
-                                   "a:" // algo-number
-                                   "b" // is-baseline
-                                   "d:" // dot-prefix
+                                   "a:" // algorithm
+                                   "p:" // path-prefix
                                    "f:" // machines-file
-                                   "v:" // deviation-variant
-                                   "p" // use-preemptive-writes
-                                   "h" // help
-    ;
+                                   "t:" // traces-file
+                                   "v:" // deviation
+                                   "S" // scale-to-fit
+                                   "h"; // help
 
 void printHelp(const char* program_name)
 {
     std::cout << "Usage: " << program_name << " [options]\n"
               << "Options:\n"
-              << "  -m, --memory-multiplicator <value>   Set memory multiplicator (default: 1073741824)\n"
-              << "  -s, --speed-multiplicator <value>    Set speed multiplicator (default: 1024)\n"
-              << "  -r, --read-write-penalty <value>     Set read/write penalty\n"
-              << "  -o, --offload-penalty <value>        Set offload penalty\n"
-              << "  -w, --workflow-name <name>           Set workflow name\n"
-              << "  -i, --input-size <size>              Set input size\n"
-              << "  -a, --algo-number <number>           Set algorithm number\n"
-              << "  -b, --is-baseline                    Use baseline algorithm\n"
-              << "  -d, --dot-prefix <prefix>            Set dot prefix\n"
-              << "  -f, --machines-file <file>           Set machines file\n"
-              << "  -v, --deviation-variant <variant>    Set deviation variant\n"
-              << "  -p, --use-preemptive-writes          Use preemptive writes\n"
+              << "  -m, --memory-multiplicator <value>   Set memory multiplicator. Default: 1073741824\n"
+              << "  -s, --speed-multiplicator <value>    Set speed multiplicator. Default: 100.0\n"
+              << "  -r, --read-write-penalty <value>     Set read/write penalty. Default: 1.0\n"
+              << "  -o, --offload-penalty <value>        Set offload penalty. Default: 1.0\n"
+              << "  -w, --workflow-name <name>           Set workflow name. Required\n"
+              << "  -i, --input-size <size>              Set input size. Required\n"
+              << "  -a, --algorithm <number>             Set algorithm. Default: heft. Options: heft, heft-bl, heft-blc, heft-mm\n"
+              << "  -p, --path-prefix <prefix>           Set path prefix. Default: empty\n"
+              << "  -f, --machines-file <file>           Set machines file. Default: input/machines.csv\n"
+              << "  -t, --traces-file <file>             Set traces file. Default: input/traces.csv\n"
+              << "  -d, --deviation <variant>            Set standard deviation. Default: 10.0\n"
+              << "  -S, --scale-to-fit                   Scale task's memory to fit the machine. Default: false\n"
               << "  -h, --help                           Show this help message and exit\n";
+}
+
+int algoNameToNumber(std::string algoName)
+{
+    std::transform(algoName.begin(), algoName.end(), algoName.begin(), ::tolower);
+    algoName = trimQuotes(algoName);
+    if (algoName == "heft") {
+        return 0; // HEFT
+    } else if (algoName == "heft-bl") {
+        return 1; // HEFT-BL
+    } else if (algoName == "heft-blc") {
+        return 2; // HEFT-BLC
+    } else if (algoName == "heft-mm") {
+        return 3; // HEFT-MM
+    } else {
+        throw std::invalid_argument("Unknown algorithm name: " + algoName);
+    }
 }
 
 template <typename T, typename ParseFunction>
@@ -116,22 +139,21 @@ Options parseOptions(int argc, char* argv[])
             parseArg("input-size", optarg, options.inputSize, [](const char* arg) { return std::stol(arg); });
             break;
         case 'a':
-            parseArg("algo-number", optarg, options.algoNumber, [](const char* arg) { return std::stoi(arg); });
+            parseArg("algorithm", optarg, options.algoNumber, [](const char* arg) { return algoNameToNumber(arg); });
             break;
-        case 'b':
-            options.isBaseline = true;
-            break;
-        case 'd':
-            options.dotPrefix = optarg;
+        case 'p':
+            options.pathPrefix = optarg;
+            options.pathPrefix = trimQuotes(options.pathPrefix);
             break;
         case 'f':
             options.machinesFile = optarg;
+            options.machinesFile = trimQuotes(options.machinesFile);
             break;
         case 'v':
-            parseArg("deviation-variant", optarg, options.deviationVariant, [](const char* arg) { return std::stoi(arg); });
+            parseArg("deviation", optarg, options.deviation, [](const char* arg) { return std::stod(arg); });
             break;
-        case 'p':
-            options.usePreemptiveWrites = true;
+        case 'S':
+            options.scaleToFit = true;
             break;
         case 'h':
             printHelp(argv[0]);
@@ -142,6 +164,19 @@ Options parseOptions(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
     }
+
+    const auto print_error = [&](const bool error_condition, const char* message) {
+        if (error_condition) {
+            std::cerr << "Error: " << message << '\n';
+            printHelp(argv[0]);
+            exit(EXIT_FAILURE);
+        }
+    };
+
+    // Check if mandatory options are set
+    print_error(options.workflowName.empty(), "Workflow name is required.");
+    print_error(options.inputSize <= 0, "Input size must be a positive integer.");
+    print_error(options.deviation < 0, "Deviation variant must be a non-negative number.");
 
     return options;
 }
