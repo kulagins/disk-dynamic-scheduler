@@ -13,9 +13,8 @@
 #include "fonda_scheduler/SchedulerHeader.hpp"
 #include "fonda_scheduler/io/graphWeightsBuilder.hpp"
 #include "fonda_scheduler/options.hpp"
+#include "fonda_scheduler/utils.hpp"
 #include "memdag/src/graph.hpp"
-
-int currentAlgoNum = 0;
 
 /*
  *
@@ -48,44 +47,7 @@ int main(int argc, char* argv[])
     fonda::Options options = fonda::parseOptions(argc, argv);
     cout << "algo_nr " << options.algoNumber << " " << options.workflowName << " " << "input_size " << options.inputSize << " ";
 
-    // 1000000, 100, 1, 0.001
-    csv2::Reader<csv2::delimiter<','>,
-        csv2::quote_character<'"'>,
-        csv2::first_row_is_header<true>,
-        csv2::trim_policy::trim_whitespace>
-        csv;
-
-    std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows;
-    // QUESTION: why not an option? R: made an option
-    string tracesFileName = options.pathPrefix + "input/traces.csv";
-    if (csv.mmap(tracesFileName)) {
-        for (const auto row : csv) {
-            std::vector<std::string> row_data;
-            std::string task_name, workflow_name, inputSizeInRow;
-
-            int col_idx = 0;
-            for (const auto& cell : row) {
-                std::string cell_value;
-                cell.read_value(cell_value);
-                row_data.push_back(cell_value);
-
-                if (col_idx == 0) {
-                    workflow_name = cell_value;
-                }
-                if (col_idx == 1) {
-                    inputSizeInRow = cell_value;
-                }
-
-                if (col_idx == 2) {
-                    task_name = cell_value;
-                }
-                ++col_idx;
-            }
-
-            // Store row in the map under the workflow name
-            workflow_rows[workflow_name.append(" ").append(task_name).append(" ").append(inputSizeInRow)].push_back(row_data);
-        }
-    }
+    const auto workflow_rows = fonda_scheduler::loadTracesFile(options.pathPrefix + options.tracesFile);
 
     // Theoretical perfect (static schedule)
     imaginedCluster = Fonda::buildClusterFromCsv(options.pathPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
@@ -93,13 +55,12 @@ int main(int argc, char* argv[])
     // With deviations
     actualCluster = Fonda::buildClusterFromCsv(options.pathPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
 
-    double biggestMem = imaginedCluster->getMemBiggestFreeProcessor()->getMemorySize();
+    const double biggestMem = imaginedCluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     // QUESTION: Why not reading directly from the options.workflowName?
     string filename;
     if (options.workflowName.rfind("/home", 0) == 0 || options.workflowName.rfind("/work", 0) == 0) {
         filename = options.workflowName.substr(0, options.workflowName.find("//") + 1) + options.workflowName.substr(options.workflowName.find("//") + 2, options.workflowName.size());
-
     } else {
         filename = options.pathPrefix + "input/";
         // string suffix = "00";
@@ -118,7 +79,6 @@ int main(int argc, char* argv[])
     graph_t* graphMemTopology = read_dot_graph(filename.c_str(), NULL, NULL, NULL);
     checkForZeroMemories(graphMemTopology);
 
-    currentAlgoNum = options.algoNumber;
     unsigned long i1 = options.workflowName.find("//");
     options.workflowName = i1 == string::npos ? options.workflowName : options.workflowName.substr(i1 + 2, options.workflowName.size());
     // remove the size from name: atacseq_2000 -> atacseq
@@ -129,57 +89,8 @@ int main(int argc, char* argv[])
     Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, options.workflowName, options.inputSize, imaginedCluster, 1, 10);
     // print_graph_to_cout(graphMemTopology);
 
-    // QUESTION: What is this?
     if (options.scaleToFit) {
-        // move while loop into a function -> scaleToFit option
-        vertex_t* pv = graphMemTopology->first_vertex;
-        while (pv != nullptr) {
-            const auto MEMORY_EPSILON = 1000;
-            const auto MEMORY_DIVISION_FACTOR = 4;
-            if (peakMemoryRequirementOfVertex(pv) > pv->memoryRequirement) {
-                pv->memoryRequirement = peakMemoryRequirementOfVertex(pv) + MEMORY_EPSILON;
-                // cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
-            }
-            if (outMemoryRequirement(pv) > biggestMem) {
-                // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-
-                for (int i = 0; i < pv->out_degree; i++) {
-                    pv->out_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
-                    // throw an error
-                }
-                double d = inMemoryRequirement(pv);
-                double requirement = outMemoryRequirement(pv);
-                if (outMemoryRequirement(pv) > biggestMem) {
-
-                    // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                    for (int i = 0; i < pv->out_degree; i++) {
-                        pv->out_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
-                        // throw an error
-                    }
-                    if (outMemoryRequirement(pv) > biggestMem) {
-                        return 0;
-                    }
-                }
-            }
-
-            if (inMemoryRequirement(pv) > biggestMem) {
-                // cout<<"WILL BE INVALID "<< inMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                for (int i = 0; i < pv->in_degree; i++) {
-                    pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
-                }
-
-                if (inMemoryRequirement(pv) > biggestMem) {
-                    // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                    for (int i = 0; i < pv->in_degree; i++) {
-                        pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
-                    }
-                    if (inMemoryRequirement(pv) > biggestMem) {
-                        return 0;
-                    }
-                }
-            }
-            pv = pv->next;
-        }
+        fonda_scheduler::scaleToFit(graphMemTopology, biggestMem);
     }
     //  cout<<endl;
     // cluster->printProcessors();
@@ -188,7 +99,6 @@ int main(int argc, char* argv[])
     std::chrono::duration<double> elapsed_seconds = end - start;
     // std::cout << " duration_of_prep " << elapsed_seconds.count()<<" ";// << endl;
 
-    start = std::chrono::system_clock::now();
     vector<Assignment*> assignments;
     cout << std::setprecision(15);
 
