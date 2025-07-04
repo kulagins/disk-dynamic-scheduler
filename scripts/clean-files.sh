@@ -36,3 +36,6 @@ for dir in "$parent_dir"/*; do
                 fi
     fi
 done
+
+ mkdir -p merged
+cp *merged* merged/

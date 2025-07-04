@@ -9,22 +9,20 @@ fi
 cd "$1" || exit
 pwd
 
-sed -i '/^\.\/build/d' *.txt
-sed -i '/^\.\/build/d' *.txt
-sed -i ':a;N;$!ba;s/\n\(WILL BE INVALID.*\)/ \1/' *.txt
+sed -i 's/\t/ /g' *.txt
+sed -i 's/![^ ]* //' *.txt
+sed -i 's/  / /g' *.txt
 
+sed -i ':a;N;$!ba;s/[[:space:]]*\n[[:space:]]*\(duration_of_algorithm\)/ \1/g' *.txt
+sed -Ei 's/.*(algo_nr)/\1/' *.txt
 
-sed -i 's/^new, algo [0-9]\+ //' *.txt
-sed -i 's/WILL BE INVALID.*/invalid/' *.txt
-#sed -i '1i workflow_name duration_of_prep #eviction duration_of_algorithm makespan' *.txt
-#sed -i 's/^\(\S\+\) \1/\1/' *.txt
-sed -i 's/ Invalid assignment.*/invalid/' *.txt
-sed -i 's/\([0-9]\)\(invalid\)/\1 \2/g' *.txt
-sed -i 's/ duration_of_prep//g' *.txt
-sed -i 's/ #eviction//g' *.txt
+sed -i 's/ input_size//g' *.txt
+sed -i 's/ makespan_1//g' *.txt
+sed -i 's/ makespan_2//g' *.txt
 sed -i 's/ duration_of_algorithm//g' *.txt
-sed -i 's/ makespan//g' *.txt
-sed -i 's/workflow_name//g' *.txt
-sed -i '1i workflow_name duration_of_prep #eviction duration_of_algorithm makespan' *.txt
-sed -i '/^\s*$/d; /^\s*\S\+\s*$/d' *.txt
+sed -i 's/ ms perceived//g' *.txt
+sed -i 's/algo_nr //g' *.txt
+
+
+sed -i '1i algo_nr wf_name inp_size dur_alg1 ms_1 ms_perc dur_alg2 ms_2' *.txt
 sed -i 's/  \+/ /g' *.txt
