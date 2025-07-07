@@ -42,9 +42,7 @@ inline auto loadTracesFile(const std::string& tracesFileName)
         csv2::trim_policy::trim_whitespace>
         csv;
 
-    const auto success = csv.mmap(tracesFileName);
-
-    if (!success) {
+    if (!csv.mmap(tracesFileName)) {
         throw std::runtime_error("Failed to open traces file: " + tracesFileName);
     }
 
@@ -79,7 +77,7 @@ inline auto loadTracesFile(const std::string& tracesFileName)
     return workflow_rows;
 }
 
-inline void scaleToFit(graph_t* graphMemTopology, double biggestMem)
+inline void scaleToFit(const graph_t* graphMemTopology, double biggestMem)
 {
     static constexpr auto MEMORY_EPSILON = 1000;
     static constexpr auto MEMORY_DIVISION_FACTOR = 4;
@@ -103,8 +101,8 @@ inline void scaleToFit(graph_t* graphMemTopology, double biggestMem)
             pv->memoryRequirement = peakMemoryRequirementOfVertex(pv) + MEMORY_EPSILON;
         }
 
-        scaleMemory(outMemoryRequirement, pv->out_degree, [&](int j) { return pv->out_edges[j]; }, "Out");
-        scaleMemory(inMemoryRequirement, pv->in_degree, [&](int j) { return pv->in_edges[j]; }, "In");
+        scaleMemory(outMemoryRequirement, pv->out_degree, [&](const int j) { return pv->out_edges[j]; }, "Out");
+        scaleMemory(inMemoryRequirement, pv->in_degree, [&](const int j) { return pv->in_edges[j]; }, "In");
 
         pv = pv->next;
     }
