@@ -184,7 +184,7 @@ public:
 
     void fireWriteFinish();
 
-    void removeOurselfFromSuccessors(Event* us);
+    void removeOurselfFromSuccessors(const Event* us);
 
     static void propagateChainInPlanning(const std::shared_ptr<Event>& event, double add, std::unordered_set<Event*>& visited)
     {

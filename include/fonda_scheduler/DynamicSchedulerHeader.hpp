@@ -26,7 +26,7 @@ std::vector<std::shared_ptr<Event>> bestTentativeAssignment(vertex_t* vertex, st
     std::shared_ptr<Processor>& bestProcessorToAssign, double notEarlierThan);
 std::pair<std::shared_ptr<Event>, std::shared_ptr<Event>> scheduleARead(const vertex_t* v, std::shared_ptr<Event>& ourEvent, std::vector<std::shared_ptr<Event>>& createdEvents, double startTimeOfTask,
     std::shared_ptr<Processor>& ourModifiedProc, edge*& incomingEdge, double& atThisTime);
-std::shared_ptr<Processor> findPredecessorsProcessor(edge_t* incomingEdge, std::vector<std::shared_ptr<Processor>>& modifiedProcs);
+std::shared_ptr<Processor> findPredecessorsProcessor(const edge_t* incomingEdge, std::vector<std::shared_ptr<Processor>>& modifiedProcs);
 
 std::vector<std::shared_ptr<Event>> evictFilesUntilThisFits(std::shared_ptr<Processor> thisProc, edge_t* edgeToFit);
 void scheduleWriteAndRead(const vertex_t* v, std::shared_ptr<Event> ourEvent, std::vector<std::shared_ptr<Event>>& createdEvents, double startTimeOfTask,
@@ -40,7 +40,7 @@ std::set<edge_t*, bool (*)(edge_t*, edge_t*)>::iterator
 scheduleWriteForEdge(std::shared_ptr<Processor>& thisProc, edge_t* edgeToEvict,
     std::pair<std::shared_ptr<Event>, std::shared_ptr<Event>>& writeEvents, bool onlyPreemptive = false);
 void buildPendingMemoriesAfter(std::shared_ptr<Processor>& ourModifiedProc, vertex_t* ourVertex);
-void transferAfterMemoriesToBefore(std::shared_ptr<Processor>& ourModifiedProc);
+void transferAfterMemoriesToBefore(const std::shared_ptr<Processor>& ourModifiedProc);
 bool dealWithPredecessors(std::shared_ptr<Event> us);
 void checkBestEvents(std::vector<std::shared_ptr<Event>>& bestEvents);
 double assessWritingOfEdge(edge_t* edge, std::shared_ptr<Processor> proc);

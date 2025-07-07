@@ -285,7 +285,7 @@ public:
         return nextIt; // Return the next iterator, which is safe
     }
 
-    void addEvent(std::shared_ptr<Event> event);
+    void addEvent(const std::shared_ptr<Event>& event);
 
     // std::unordered_map<string, std::weak_ptr<Event>>  getEvents(){
     //     return this->eventsOnProc;
@@ -333,9 +333,9 @@ public:
         return nullptr;
     }
 
-    void setLastWriteEvent(std::shared_ptr<Event> lwe);
-    void setLastReadEvent(std::shared_ptr<Event> lwe);
-    void setLastComputeEvent(std::shared_ptr<Event> lwe);
+    void setLastWriteEvent(const std::shared_ptr<Event>& lwe);
+    void setLastReadEvent(const std::shared_ptr<Event>& lwe);
+    void setLastComputeEvent(const std::shared_ptr<Event>& lwe);
 
     std::weak_ptr<Event> getLastWriteEvent()
     {
@@ -353,9 +353,9 @@ public:
     double getReadyTimeRead();
     double getReadyTimeCompute();
 
-    double getExpectedOrActualReadyTimeWrite();
-    double getExpectedOrActualReadyTimeRead();
-    double getExpectedOrActualReadyTimeCompute();
+    double getExpectedOrActualReadyTimeWrite() const;
+    double getExpectedOrActualReadyTimeRead() const;
+    double getExpectedOrActualReadyTimeCompute() const;
 
     void setReadyTimeWrite(double rtw)
     {
