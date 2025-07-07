@@ -46,8 +46,6 @@ void printInlineDebug(const std::string& str);
 
 void checkForZeroMemories(graph_t* graph);
 
-std::string trimQuotes(const std::string& str);
-
 ////void completeRecomputationOfSchedule(Http::ResponseWriter &resp, const json &bodyjson, double timestamp, vertex_t * vertexThatHasAProblem);
 void removeSourceAndTarget(graph_t* graph, std::vector<std::pair<vertex_t*, double>>& ranks);
 

@@ -5,6 +5,33 @@
 
 namespace fonda_scheduler {
 
+inline std::string trimQuotes(const std::string& str)
+{
+    if (str.empty()) {
+        return str; // Return the empty string if input is empty
+    }
+
+    std::string result = str, prevResult;
+    do {
+        prevResult = result;
+        size_t start = 0;
+        size_t end = prevResult.length() - 1;
+
+        // Check for leading quote
+        if (prevResult[start] == '"' || prevResult[start] == '\\' || prevResult[start] == ' ') {
+            start++;
+        }
+
+        // Check for trailing quote
+        if (prevResult[end] == '"' || prevResult[end] == '\\' || prevResult[end] == ' ') {
+            end--;
+        }
+
+        result = prevResult.substr(start, end - start + 1);
+    } while (result != prevResult);
+    return result;
+}
+
 inline auto loadTracesFile(const std::string& tracesFileName)
 {
     csv2::Reader<csv2::delimiter<','>,
@@ -80,6 +107,7 @@ inline void scaleToFit(graph_t* graphMemTopology, double biggestMem)
         pv = pv->next;
     }
 }
+
 }
 
 #endif // UTILS_HPP
