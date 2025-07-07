@@ -1,6 +1,0 @@
-[submodule "extlibs/Lotaru-traces"]
-	path = extlibs/Lotaru-traces
-	url = https://github.com/CRC-FONDA/Lotaru-traces
-[submodule "extlibs/googletest"]
-	path = extlibs/googletest
-	url = https://github.com/google/googletest.git

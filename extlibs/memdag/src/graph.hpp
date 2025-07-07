@@ -147,7 +147,7 @@ typedef struct edge {
   ///\endcond} edge_t;
 
     bool operator==(const edge& other) const {
-        //std::cout <<"comparing "<<tail->name<<" -> "<<head->name<< " to "<< other.tail->name<<" -> "<<other.head->name<<std::endl;
+        //std::cout <<"comparing "<<tail->name<<" -> "<<head->name<< " to "<< other.tail->name<<" -> "<<other.head->name<<'\n';
         return tail->name == other.tail->name &&
                head->name == other.head->name &&
                weight == other.weight;

@@ -737,7 +737,7 @@ vertex_t * findVertexById(graph_t* graph, int idToFind){
 }
 
 void print_edge(edge_t * v){
-    std::cout<< buildEdgeName(v)<<std::endl;//v->tail->name<<" -> "<<v->head->name<<", "<<v->weight<<std::endl;
+    std::cout<< buildEdgeName(v)<<'\n';//v->tail->name<<" -> "<<v->head->name<<", "<<v->weight<<'\n';
 }
 
 double inMemoryRequirement(const vertex_t * v){
@@ -765,11 +765,11 @@ double peakMemoryRequirementOfVertex(const vertex_t * v) {
 
     if (sumIn > maxMemReq) {
         maxMemReq = sumIn;
-        //std::cout<<"Incoming over mi on "<<v->name<<std::endl;
+        //std::cout<<"Incoming over mi on "<<v->name<<'\n';
     }
     if (sumOut > maxMemReq) {
         maxMemReq = sumOut;
-        //std::cout<<"Outgoing over mi on "<<v->name<<std::endl;
+        //std::cout<<"Outgoing over mi on "<<v->name<<'\n';
 }
     return maxMemReq;
 }

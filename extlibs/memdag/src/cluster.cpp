@@ -74,7 +74,7 @@ Processor::delocateToDisk(edge_t *edge, bool shouldUseImaginary, double afterWhe
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
-        std::cout << "not fnd1 " << buildEdgeName(edge) << std::endl;
+        std::cout << "not fnd1 " << buildEdgeName(edge) << '\n';
     }
 
     delocateFromThisProcessorToDisk(edge, this->id, shouldUseImaginary, afterWhen);
@@ -88,7 +88,7 @@ Processor::delocateToNowhere(edge_t *edge, bool shouldUseImaginary, double after
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
-        std::cout << "not fnd1 " << buildEdgeName(edge) << std::endl;
+        std::cout << "not fnd1 " << buildEdgeName(edge) << '\n';
     }
 
     delocateFromThisProcessorToNowhere(edge, this->id, shouldUseImaginary, afterWhen);

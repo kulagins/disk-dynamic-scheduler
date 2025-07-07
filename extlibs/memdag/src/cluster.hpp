@@ -35,9 +35,9 @@ protected:
 public:
     static auto comparePendingMemories(edge_t* a, edge_t* b) -> bool
     {
-        // std::cout << "Comparing: " << a << " vs " << b << std::endl;
+        // std::cout << "Comparing: " << a << " vs " << b << '\n';
         if (!a || !b) {
-            std::cout << "a or b invalid in comparison on memories" << std::endl;
+            std::cout << "a or b invalid in comparison on memories" << '\n';
             return false; // Handle null pointers safely
         }
         if (a->weight == b->weight) {
@@ -425,7 +425,7 @@ public:
             for (const auto& item : value->getPendingMemories()) {
                 std::cout << buildEdgeName(item) << ", ";
             }
-            std::cout << std::endl;
+            std::cout << '\n';
         }
     }
 
