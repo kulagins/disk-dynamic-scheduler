@@ -52,52 +52,31 @@ inline auto loadTracesFile(const std::string& tracesFileName)
 
 inline void scaleToFit(graph_t* graphMemTopology, double biggestMem)
 {
+    static constexpr auto MEMORY_EPSILON = 1000;
+    static constexpr auto MEMORY_DIVISION_FACTOR = 4;
+    static constexpr auto N_TRIALS = 2;
+
     vertex_t* pv = graphMemTopology->first_vertex;
+
+    auto scaleMemory = [&](auto memReqFunc, auto edgeCount, auto edgeAccessor, const char* direction) {
+        for (int i = 0; i < N_TRIALS && memReqFunc(pv) > biggestMem; i++) {
+            for (int j = 0; j < edgeCount; j++) {
+                edgeAccessor(j)->weight /= MEMORY_DIVISION_FACTOR;
+            }
+        }
+        if (memReqFunc(pv) > biggestMem) {
+            throw std::runtime_error(std::string("(") + direction + ") Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster.");
+        }
+    };
+
     while (pv != nullptr) {
-        const auto MEMORY_EPSILON = 1000;
-        const auto MEMORY_DIVISION_FACTOR = 4;
         if (peakMemoryRequirementOfVertex(pv) > pv->memoryRequirement) {
             pv->memoryRequirement = peakMemoryRequirementOfVertex(pv) + MEMORY_EPSILON;
-            // cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
-        }
-        if (outMemoryRequirement(pv) > biggestMem) {
-            // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-
-            for (int i = 0; i < pv->out_degree; i++) {
-                pv->out_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
-                // throw an error
-            }
-            double d = inMemoryRequirement(pv);
-            double requirement = outMemoryRequirement(pv);
-            if (outMemoryRequirement(pv) > biggestMem) {
-
-                // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                for (int i = 0; i < pv->out_degree; i++) {
-                    pv->out_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
-                    // throw an error
-                }
-                if (outMemoryRequirement(pv) > biggestMem) {
-                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster.");
-                }
-            }
         }
 
-        if (inMemoryRequirement(pv) > biggestMem) {
-            // cout<<"WILL BE INVALID "<< inMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-            for (int i = 0; i < pv->in_degree; i++) {
-                pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
-            }
+        scaleMemory(outMemoryRequirement, pv->out_degree, [&](int j) { return pv->out_edges[j]; }, "Out");
+        scaleMemory(inMemoryRequirement, pv->in_degree, [&](int j) { return pv->in_edges[j]; }, "In");
 
-            if (inMemoryRequirement(pv) > biggestMem) {
-                // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                for (int i = 0; i < pv->in_degree; i++) {
-                    pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
-                }
-                if (inMemoryRequirement(pv) > biggestMem) {
-                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster.");
-                }
-            }
-        }
         pv = pv->next;
     }
 }
