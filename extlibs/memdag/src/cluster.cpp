@@ -1,11 +1,9 @@
 #include "cluster.hpp"
 #include <numeric>
 
-using namespace std;
+std::shared_ptr<Processor> Cluster::getMemBiggestFreeProcessor() {
 
-shared_ptr<Processor> Cluster::getMemBiggestFreeProcessor() {
-
-    shared_ptr<Processor> largestProcessor = nullptr;
+    std::shared_ptr<Processor> largestProcessor = nullptr;
     double largestMemory = 0;
 
     for (auto &[id, processor]: processors) {
@@ -19,9 +17,9 @@ shared_ptr<Processor> Cluster::getMemBiggestFreeProcessor() {
 
 }
 
-shared_ptr<Processor> Cluster::getFastestProcessorFitting(double memReq) {
+std::shared_ptr<Processor> Cluster::getFastestProcessorFitting(double memReq) {
 
-    shared_ptr<Processor> bestProcessor = nullptr;
+    std::shared_ptr<Processor> bestProcessor = nullptr;
 
     size_t fastestSpeed = 0;
 
@@ -37,9 +35,9 @@ shared_ptr<Processor> Cluster::getFastestProcessorFitting(double memReq) {
 
 }
 
-shared_ptr<Processor> Cluster::getFastestFreeProcessor() {
+std::shared_ptr<Processor> Cluster::getFastestFreeProcessor() {
 
-    shared_ptr<Processor> fastestProcessor = nullptr;
+    std::shared_ptr<Processor> fastestProcessor = nullptr;
     size_t bestSpeed = 0;
 
     for (auto &[id, processor]: processors) {
@@ -76,7 +74,7 @@ Processor::delocateToDisk(edge_t *edge, bool shouldUseImaginary, double afterWhe
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
-        cout << "not fnd1 " << buildEdgeName(edge) << endl;
+        std::cout << "not fnd1 " << buildEdgeName(edge) << std::endl;
     }
 
     delocateFromThisProcessorToDisk(edge, this->id, shouldUseImaginary, afterWhen);
@@ -90,7 +88,7 @@ Processor::delocateToNowhere(edge_t *edge, bool shouldUseImaginary, double after
 
     auto it = this->pendingMemories.find(edge); // Find the element by key
     if (it == this->pendingMemories.end()) {
-        cout << "not fnd1 " << buildEdgeName(edge) << endl;
+        std::cout << "not fnd1 " << buildEdgeName(edge) << std::endl;
     }
 
     delocateFromThisProcessorToNowhere(edge, this->id, shouldUseImaginary, afterWhen);
@@ -150,7 +148,7 @@ int Processor::getAssignedTaskId() const {
     return assignedTask->id;
 }
 
-void Processor::setPendingMemories(set<edge_t *, std::function<bool(edge_t *, edge_t *)>> &newSet) {
+void Processor::setPendingMemories(std::set<edge_t *, std::function<bool(edge_t *, edge_t *)>> &newSet) {
     //  this->pendingMemories = pendingMemories;
     this->pendingMemories.swap(newSet);
 }
@@ -174,7 +172,7 @@ void Processor::setAfterAvailableMemory(double d) {
     this->afterAvailableMemory = d;
 }
 
-void Processor::setAfterPendingMemories(set<edge_t *, std::function<bool(edge_t *, edge_t *)>> &memories) {
+void Processor::setAfterPendingMemories(std::set<edge_t *, std::function<bool(edge_t *, edge_t *)>> &memories) {
     // this->afterPendingMemories = memories;
     this->afterPendingMemories.swap(memories);
 }

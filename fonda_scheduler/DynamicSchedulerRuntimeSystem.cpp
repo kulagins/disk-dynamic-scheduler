@@ -10,7 +10,7 @@ ReadyQueue readyQueue;
 int devationVariant;
 bool usePreemptiveWrites;
 
-string lastEventName;
+std::string lastEventName;
 
 double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int deviationNumber, bool upw)
 {
@@ -52,13 +52,13 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
         break;
     }
     case 3: {
-        vector<std::pair<vertex_t*, double>> ranks = calculateMMBottomUpRank(graph);
+        std::vector<std::pair<vertex_t*, double>> ranks = calculateMMBottomUpRank(graph);
         std::for_each(ranks.begin(), ranks.end(), [](std::pair<vertex_t*, double> pair) {
             pair.first->rank = pair.second + dist(gen);
         });
     } break;
     default:
-        throw runtime_error("unknon algorithm");
+        throw std::runtime_error("unknon algorithm");
     }
 
     if (findVertexByName(graph, "GRAPH_SOURCE") != nullptr) {
@@ -69,9 +69,9 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
     while (vertex != nullptr) {
         if (vertex->in_degree == 0) {
             //  cout << "starting task " << vertex->name << endl;
-            vector<shared_ptr<Processor>> bestModifiedProcs;
-            shared_ptr<Processor> bestProcessorToAssign;
-            vector<shared_ptr<Event>> newEvents = bestTentativeAssignment(vertex, bestModifiedProcs, bestProcessorToAssign, 0);
+            std::vector<std::shared_ptr<Processor>> bestModifiedProcs;
+            std::shared_ptr<Processor> bestProcessorToAssign;
+            std::vector<std::shared_ptr<Event>> newEvents = bestTentativeAssignment(vertex, bestModifiedProcs, bestProcessorToAssign, 0);
 
             for (auto& item : newEvents) {
                 events.insert(item);
@@ -84,7 +84,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
     int cntr = 0;
     while (!events.empty()) {
         cntr++;
-        shared_ptr<Event> firstEvent = events.getEarliest();
+        std::shared_ptr<Event> firstEvent = events.getEarliest();
         bool removed = events.remove(firstEvent->id);
         assert(removed == true);
 
@@ -120,11 +120,11 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
         if (removed || !firstEvent->isDone) {
             //  cout<<"finally event "<<firstEvent->id<<endl;
             firstEvent->fire();
-            resMakespan = max(resMakespan, firstEvent->getActualTimeFire());
+            resMakespan = std::max(resMakespan, firstEvent->getActualTimeFire());
             lastEventName = firstEvent->id;
             auto ptr = events.findByEventId(firstEvent->id);
         } else {
-            cout << "nthng " << endl;
+            std::cout << "nthng " << std::endl;
             return -1;
         }
         //        assert(ptr == nullptr);
@@ -136,7 +136,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
 
 void Event::fireTaskStart()
 {
-    string thisid = this->id;
+    std::string thisid = this->id;
     // cout << " firing task start for " << thisid << " at " << this->actualTimeFire << " on proc " << this->processor->id << endl;
 
     //   cout<<this->task->name<<" "<<this->actualTimeFire<<" "<<events.find(this->task->name+"-f")->getActualTimeFire()<<" on "<<this->processor->id<<endl;
@@ -154,7 +154,7 @@ void Event::fireTaskStart()
         this->task->status = Status::Running;
         auto ourFinishEvent = events.findByEventId(this->task->name + "-f");
         if (ourFinishEvent == nullptr) {
-            throw runtime_error("NOt found finish event to " + this->task->name);
+            throw std::runtime_error("NOt found finish event to " + this->task->name);
         }
         double durationTask = ourFinishEvent->getExpectedTimeFire() - this->getExpectedTimeFire();
         assert(durationTask > 0);
@@ -167,7 +167,7 @@ void Event::fireTaskStart()
         for (auto successor = successors.begin(); successor != successors.end();) {
             // cout << " from " << (*successor)->id << "'s predecessors" << endl;
             if ((*successor)->task == nullptr) {
-                throw runtime_error("edge-based event depends on task start " + this->id);
+                throw std::runtime_error("edge-based event depends on task start " + this->id);
             }
             successor++;
         }
@@ -179,9 +179,9 @@ void Event::fireTaskStart()
 
         for (int i = 0; i < this->task->in_degree; i++) {
             edge_t* inEdge = this->task->in_edges[i];
-            const string& edgeName = buildEdgeName(inEdge);
-            shared_ptr<Event> startWrite = events.findByEventId(edgeName + "-w-s");
-            shared_ptr<Event> finishWrite = events.findByEventId(buildEdgeName(inEdge) + "-w-f");
+            const std::string& edgeName = buildEdgeName(inEdge);
+            std::shared_ptr<Event> startWrite = events.findByEventId(edgeName + "-w-s");
+            std::shared_ptr<Event> finishWrite = events.findByEventId(buildEdgeName(inEdge) + "-w-f");
             if (startWrite != nullptr) {
                 events.remove(startWrite->id);
                 events.remove(finishWrite->id);
@@ -190,7 +190,7 @@ void Event::fireTaskStart()
                 startWrite->isDone = true;
                 finishWrite->isDone = true;
 
-                unordered_set<Event*> visited;
+                std::unordered_set<Event*> visited;
                 propagateChainInPlanning(finishWrite,
                     startWrite->getActualTimeFire() - finishWrite->getActualTimeFire(), visited);
             } else {
@@ -234,7 +234,7 @@ void Event::fireTaskFinish()
 
         assert(this->processor->getAvailableMemory() <= this->processor->getMemorySize());
 
-        string thisId = this->id;
+        std::string thisId = this->id;
 
         for (int i = 0; i < thisTask->out_degree; i++) {
             locateToThisProcessorFromNowhere(thisTask->out_edges[i], this->processor->id, false,
@@ -251,7 +251,7 @@ void Event::fireTaskFinish()
                 }
             }
 
-            std::vector<shared_ptr<Event>> pred, succ;
+            std::vector<std::shared_ptr<Event>> pred, succ;
 
             if (isReady && childTask->status != Status::Scheduled) {
                 // cout<<"inserting into ready "<<childTask->name<<endl;
@@ -278,10 +278,10 @@ void Event::fireTaskFinish()
 
         while ((!foundSomeTaskForOurProcessor || existsIdleProcessor) && !readyQueue.readyTasks.empty()) {
             vertex_t* mostReadyVertex = *readyQueue.readyTasks.begin();
-            vector<shared_ptr<Processor>> bestModifiedProcs;
-            shared_ptr<Processor> bestProcessorToAssign;
+            std::vector<std::shared_ptr<Processor>> bestModifiedProcs;
+            std::shared_ptr<Processor> bestProcessorToAssign;
             // cout<<"assigning vertex "<<mostReadyVertex->name<<" ";
-            vector<shared_ptr<Event>> newEvents = bestTentativeAssignment(mostReadyVertex, bestModifiedProcs, bestProcessorToAssign,
+            std::vector<std::shared_ptr<Event>> newEvents = bestTentativeAssignment(mostReadyVertex, bestModifiedProcs, bestProcessorToAssign,
                 this->actualTimeFire);
 
             mostReadyVertex->status = Status::Scheduled;
@@ -324,21 +324,21 @@ void Event::fireTaskFinish()
     }
 }
 
-shared_ptr<Processor> findPredecessorsProcessor(edge_t* incomingEdge, vector<shared_ptr<Processor>>& modifiedProcs)
+std::shared_ptr<Processor> findPredecessorsProcessor(edge_t* incomingEdge, std::vector<std::shared_ptr<Processor>>& modifiedProcs)
 {
     vertex_t* predecessor = incomingEdge->tail;
     auto predecessorsProcessorsId = predecessor->assignedProcessorId;
     // assert(isLocatedOnThisProcessor(incomingEdge, predecessorsProcessorsId));
-    shared_ptr<Processor> addedProc;
+    std::shared_ptr<Processor> addedProc;
     auto it = // modifiedProcs.size()==1?
               //   modifiedProcs.begin():
         std::find_if(modifiedProcs.begin(), modifiedProcs.end(),
-            [predecessorsProcessorsId](const shared_ptr<Processor>& p) {
+            [predecessorsProcessorsId](const std::shared_ptr<Processor>& p) {
                 return p->id == predecessorsProcessorsId;
             });
 
     if (it == modifiedProcs.end()) {
-        addedProc = make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
+        addedProc = std::make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
         // cout << "adding modified proc " << addedProc->id << endl;
         modifiedProcs.emplace_back(addedProc);
         // checkIfPendingMemoryCorrect(addedProc);
@@ -369,9 +369,9 @@ void Event::fireReadStart()
 
         this->isDone = true;
 
-        shared_ptr<Event> finishRead = events.findByEventId(buildEdgeName(this->edge) + "-r-f");
+        std::shared_ptr<Event> finishRead = events.findByEventId(buildEdgeName(this->edge) + "-r-f");
         if (finishRead == nullptr) {
-            throw runtime_error("NO read finish found for " + this->id);
+            throw std::runtime_error("NO read finish found for " + this->id);
         } else {
             events.update(buildEdgeName(this->edge) + "-w-f", expectedTimeFireFinish);
         }
@@ -384,7 +384,7 @@ void Event::fireReadFinish()
     //  cout << "firing read finish for " << this->id << " at " << this->getActualTimeFire() << " on "
     //      << this->processor->id << endl;
 
-    shared_ptr<Event> startRead = events.findByEventId(buildEdgeName(this->edge) + "-r-s");
+    std::shared_ptr<Event> startRead = events.findByEventId(buildEdgeName(this->edge) + "-r-s");
 
     auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
@@ -427,16 +427,16 @@ void Event::fireWriteStart()
         assert(factor > 0);
         double actualTimeFireFinish = this->actualTimeFire + durationOfWrite;
         this->isDone = true;
-        shared_ptr<Event> finishWrite = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
+        std::shared_ptr<Event> finishWrite = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
         if (finishWrite == nullptr) {
-            throw runtime_error("NO write finish found for " + this->id);
+            throw std::runtime_error("NO write finish found for " + this->id);
         } else {
 
             events.update(buildEdgeName(this->edge) + "-w-f", actualTimeFireFinish);
             assert(!finishWrite->checkCycleFromEvent());
         }
 
-        string thisid = buildEdgeName(this->edge);
+        std::string thisid = buildEdgeName(this->edge);
         auto edgeInWritingQueue = std::find(this->processor->writingQueue.begin(), this->processor->writingQueue.end(),
             this->edge);
         if (edgeInWritingQueue != this->processor->writingQueue.end()) {
@@ -472,7 +472,7 @@ void Event::fireWriteFinish()
             this->processor->writingQueue.erase(
                 positionInWriteQ);
         } else {
-            cout << "";
+            std::cout << "";
         }
 
         this->isDone = true;
@@ -483,7 +483,7 @@ void Event::fireWriteFinish()
 
                 double presumedLength = assessWritingOfEdge(edgeToWriteJustInCase, this->processor);
                 double startOfNextWrite = std::numeric_limits<double>::max();
-                const set<std::shared_ptr<Event>, CompareByTimestamp> eventsOnThisProc = events.findByProcessorId(
+                const std::set<std::shared_ptr<Event>, CompareByTimestamp> eventsOnThisProc = events.findByProcessorId(
                     this->processor->id);
                 assert((*eventsOnThisProc.begin())->getActualTimeFire() <= (*eventsOnThisProc.rbegin())->getActualTimeFire());
 
@@ -501,14 +501,14 @@ void Event::fireWriteFinish()
                     // cout << "scheduling extra write for " << buildEdgeName(edgeToWriteJustInCase) << endl;
                     assert(events.findByEventId(buildEdgeName(edgeToWriteJustInCase) + "-w-s") == nullptr);
                     assert(events.findByEventId(buildEdgeName(edgeToWriteJustInCase) + "-w-f") == nullptr);
-                    std::pair<shared_ptr<Event>, shared_ptr<Event>> writeEvents;
+                    std::pair<std::shared_ptr<Event>, std::shared_ptr<Event>> writeEvents;
                     auto iterator = scheduleWriteForEdge(this->processor, edgeToWriteJustInCase, writeEvents, true);
                     events.insert(writeEvents.first);
                     events.insert(writeEvents.second);
                     assert(isLocatedOnThisProcessor(edgeToWriteJustInCase, this->processor->id, false));
                     this->processor->writingQueue.erase(this->processor->writingQueue.begin());
                     if (buildEdgeName(edgeToWriteJustInCase) == "preseq_00000155-multiqc_00000149") {
-                        cout << endl;
+                        std::cout << std::endl;
                     }
                     // for (const auto &item: this->processor->writingQueue){
                     //    cout<<buildEdgeName(item)<<endl;
@@ -617,7 +617,7 @@ void Processor::addEvent(std::shared_ptr<Event> event)
     } */
 }
 
-bool dealWithPredecessors(shared_ptr<Event> us)
+bool dealWithPredecessors(std::shared_ptr<Event> us)
 {
     if (!us->getPredecessors().empty()) {
 
@@ -642,7 +642,7 @@ bool dealWithPredecessors(shared_ptr<Event> us)
     return us->getPredecessors().empty();
 }
 
-void transferAfterMemoriesToBefore(shared_ptr<Processor>& ourModifiedProc)
+void transferAfterMemoriesToBefore(std::shared_ptr<Processor>& ourModifiedProc)
 {
     ourModifiedProc->resetPendingMemories();
     ourModifiedProc->setAvailableMemory(ourModifiedProc->getMemorySize());
@@ -670,7 +670,7 @@ double applyDeviationTo(double& in)
         case 5:
             result = 1.3;
         default:
-            throw runtime_error("unknown deviation variant");
+            throw std::runtime_error("unknown deviation variant");
         }
 
         in = result;
@@ -696,12 +696,12 @@ double applyDeviationTo(double& in)
         stddev = in * 0.3;
         break;
     default:
-        throw runtime_error("unknown deviation variant");
+        throw std::runtime_error("unknown deviation variant");
     }
 
     std::normal_distribution<double> dist(in, stddev);
     result = dist(gen);
-    result = max(result, 1.0);
+    result = std::max(result, 1.0);
     if (devationVariant == 4) {
         result *= 2;
     }
@@ -710,19 +710,19 @@ double applyDeviationTo(double& in)
     return factor;
 }
 
-void Processor::setLastWriteEvent(shared_ptr<Event> lwe)
+void Processor::setLastWriteEvent(std::shared_ptr<Event> lwe)
 {
     this->lastWriteEvent = lwe;
     this->readyTimeWrite = lwe->getActualTimeFire();
 }
 
-void Processor::setLastReadEvent(shared_ptr<Event> lre)
+void Processor::setLastReadEvent(std::shared_ptr<Event> lre)
 {
     this->lastReadEvent = lre;
     this->readyTimeRead = lre->getActualTimeFire();
 }
 
-void Processor::setLastComputeEvent(shared_ptr<Event> lce)
+void Processor::setLastComputeEvent(std::shared_ptr<Event> lce)
 {
     this->lastComputeEvent = lce;
     this->readyTimeCompute = lce->getActualTimeFire();

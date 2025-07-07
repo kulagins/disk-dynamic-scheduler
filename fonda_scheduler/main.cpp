@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     auto start = std::chrono::system_clock::now();
 
     fonda::Options options = fonda::parseOptions(argc, argv);
-    cout << "algo_nr " << options.algoNumber << " " << options.workflowName << " " << "input_size " << options.inputSize << " ";
+    std::cout << "algo_nr " << options.algoNumber << " " << options.workflowName << " " << "input_size " << options.inputSize << " ";
 
     const auto workflow_rows = fonda_scheduler::loadTracesFile(options.pathPrefix + options.tracesFile);
 
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     const double biggestMem = imaginedCluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     // QUESTION: Why not reading directly from the options.workflowName?
-    string filename;
+    std::string filename;
     if (options.workflowName.rfind("/home", 0) == 0 || options.workflowName.rfind("/work", 0) == 0) {
         filename = options.workflowName.substr(0, options.workflowName.find("//") + 1) + options.workflowName.substr(options.workflowName.find("//") + 2, options.workflowName.size());
     } else {
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     checkForZeroMemories(graphMemTopology);
 
     unsigned long i1 = options.workflowName.find("//");
-    options.workflowName = i1 == string::npos ? options.workflowName : options.workflowName.substr(i1 + 2, options.workflowName.size());
+    options.workflowName = i1 == std::string::npos ? options.workflowName : options.workflowName.substr(i1 + 2, options.workflowName.size());
     // remove the size from name: atacseq_2000 -> atacseq
     unsigned long n4 = options.workflowName.find('_');
     options.workflowName = options.workflowName.substr(0, n4);
@@ -99,14 +99,13 @@ int main(int argc, char* argv[])
     std::chrono::duration<double> elapsed_seconds = end - start;
     // std::cout << " duration_of_prep " << elapsed_seconds.count()<<" ";// << endl;
 
-    vector<Assignment*> assignments;
-    cout << std::setprecision(15);
+    std::cout << std::setprecision(15);
 
     double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.algoNumber == 0, options.deviationModel, true /* usePreemptiveWrites */);
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
-    cout << "makespan_1 " << d << "\t";
+    std::cout << "makespan_1 " << d << "\t";
 
     delete actualCluster;
     actualCluster = Fonda::buildClusterFromCsv(options.pathPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
@@ -117,7 +116,7 @@ int main(int argc, char* argv[])
     end = std::chrono::system_clock::now();
     elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
-    cout << "makespan_2 " << d << endl;
+    std::cout << "makespan_2 " << d << std::endl;
 
     delete graphMemTopology;
     delete imaginedCluster;

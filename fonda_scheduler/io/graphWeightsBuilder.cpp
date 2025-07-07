@@ -10,7 +10,7 @@
 
 namespace Fonda {
 
-Cluster* buildClusterFromCsv(const string& file, int memoryMultiplicator, double readWritePenalty, double offloadPenalty, int speedMultiplicator)
+Cluster* buildClusterFromCsv(const std::string& file, int memoryMultiplicator, double readWritePenalty, double offloadPenalty, int speedMultiplicator)
 {
     csv2::Reader<csv2::delimiter<','>,
         csv2::quote_character<'"'>,
@@ -23,7 +23,7 @@ Cluster* buildClusterFromCsv(const string& file, int memoryMultiplicator, double
         int id = 0;
         for (const auto row : csv) {
             std::vector<std::string> row_data;
-            shared_ptr<Processor> p = make_shared<Processor>();
+            std::shared_ptr<Processor> p = std::make_shared<Processor>();
 
             int rl = row.length();
             if (rl > 0) {
@@ -77,7 +77,7 @@ Cluster* buildClusterFromCsv(const string& file, int memoryMultiplicator, double
 
 void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows,
-    const string& workflow_name, long inputSize, Cluster* cluster,
+    const std::string& workflow_name, long inputSize, Cluster* cluster,
     int memShorteningDivision, double ioShorteningCoef)
 {
 
@@ -86,10 +86,10 @@ void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
     for (vertex_t* v = graphMemTopology->first_vertex; v; v = v->next) {
         v->bottom_level = -1;
         v->factorForRealExecution = 1;
-        string lowercase_name = v->name;
+        std::string lowercase_name = v->name;
         std::regex pattern("_\\d+");
         lowercase_name = std::regex_replace(lowercase_name, pattern, "");
-        string workflow_name1 = std::regex_replace(workflow_name, pattern, "");
+        std::string workflow_name1 = std::regex_replace(workflow_name, pattern, "");
         transform(lowercase_name.begin(),
             lowercase_name.end(),
             lowercase_name.begin(),
@@ -98,13 +98,13 @@ void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
                     c);
             });
 
-        string nameToSearch = workflow_name1.append(" ").append(lowercase_name).append(" ").append(to_string(inputSize));
+        std::string nameToSearch = workflow_name1.append(" ").append(lowercase_name).append(" ").append(std::to_string(inputSize));
         if (workflow_rows.find(nameToSearch) != workflow_rows.end()) {
             double avgMem = 0, avgTime = 0, avgwchar = 0, avgtinps = 0;
 
             for (const auto& row : workflow_rows[nameToSearch]) {
                 int col_idx = 0;
-                string proc_name;
+                std::string proc_name;
                 for (const auto& cell : row) {
 
                     if (col_idx == 3) {
@@ -131,7 +131,7 @@ void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
                 }
             }
             if (workflow_rows[nameToSearch].empty()) {
-                cout << "<<<<<" << endl;
+                std::cout << "<<<<<" << std::endl;
             }
             double numOfMsrs = workflow_rows[nameToSearch].size();
             avgMem /= numOfMsrs;
@@ -144,10 +144,10 @@ void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
             v->wchar = avgwchar; // avgwchar==0? 1: avgwchar;
             v->taskinputsize = avgtinps; // avgtinps==0? 1: avgtinps;
 
-            minMem = min(minMem, avgMem);
-            minTime = min(minTime, avgTime);
-            minWchar = min(minWchar, avgwchar);
-            mintt = min(mintt, avgtinps);
+            minMem = std::min(minMem, avgMem);
+            minTime = std::min(minTime, avgTime);
+            minWchar = std::min(minWchar, avgwchar);
+            mintt = std::min(mintt, avgtinps);
         } else {
             // cout<<"Nothing found for "<<v->name<<endl;
         }
