@@ -53,18 +53,18 @@ void Cluster::printAssignment()
     for (const auto& item : this->getProcessors()) {
         if (item.second->isBusy) {
             counter++;
-            std::cout << "Processor" << counter << "." << std::endl;
-            std::cout << "\tMem: " << item.second->getMemorySize() << ", Proc: " << item.second->getProcessorSpeed() << std::endl;
+            std::cout << "Processor" << counter << "." << '\n';
+            std::cout << "\tMem: " << item.second->getMemorySize() << ", Proc: " << item.second->getProcessorSpeed() << '\n';
 
             vertex_t* assignedVertex = item.second->getAssignedTask();
             if (assignedVertex == NULL)
-                std::cout << "No assignment." << std::endl;
+                std::cout << "No assignment." << '\n';
             else {
-                std::cout << "Assigned subtree, id " << assignedVertex->id << ", leader " << -1 << ", memReq " << assignedVertex->memoryRequirement << std::endl;
+                std::cout << "Assigned subtree, id " << assignedVertex->id << ", leader " << -1 << ", memReq " << assignedVertex->memoryRequirement << '\n';
                 for (vertex_t* u = assignedVertex->subgraph->source; u; u = next_vertex_in_topological_order(assignedVertex->subgraph, u)) {
                     std::cout << u->name << ", ";
                 }
-                std::cout << std::endl;
+                std::cout << '\n';
             }
         }
     }
@@ -73,7 +73,7 @@ void Cluster::printAssignment()
 void printDebug(const std::string& str)
 {
     if (Debug) {
-        std::cout << str << std::endl;
+        std::cout << str << '\n';
     }
 }
 void printInlineDebug(const std::string& str)
@@ -218,7 +218,7 @@ void locateToThisProcessorFromDisk(edge_t* edge, int id, bool imaginary, double 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     //  cout<<"locating to proc "<<id <<" edge "; print_edge(edge);
     if (!isLocatedOnDisk(edge, imaginary)) {
-        std::cout << "NOT located on disk yet! Write&Read? " << buildEdgeName(edge) << std::endl;
+        std::cout << "NOT located on disk yet! Write&Read? " << buildEdgeName(edge) << '\n';
     }
     // assert(isLocatedOnDisk(edge));
     auto locationOnDisk = std::find_if(locations.begin(), locations.end(),

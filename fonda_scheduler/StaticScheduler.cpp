@@ -92,11 +92,11 @@ double medih(graph_t* graph, int algoNum, bool isHeft)
             for (const auto& item : imaginedCluster->getProcessors()) {
                 if (item.second->getPendingMemories().size() != actualCluster->getProcessorById(item.second->id)->getPendingMemories().size()) {
                     for (const auto& item2 : item.second->getPendingMemories()) {
-                        std::cout << buildEdgeName(item2) << std::endl;
+                        std::cout << buildEdgeName(item2) << '\n';
                     }
-                    std::cout << "----------------" << std::endl;
+                    std::cout << "----------------" << '\n';
                     for (const auto& item2 : actualCluster->getProcessorById(item.second->id)->getPendingMemories()) {
-                        std::cout << buildEdgeName(item2) << std::endl;
+                        std::cout << buildEdgeName(item2) << '\n';
                     }
                     assert(item.second->getPendingMemories().size() == actualCluster->getProcessorById(item.second->id)->getPendingMemories().size());
                 }
@@ -262,7 +262,7 @@ void tentativeAssignment(vertex_t* v, bool real, SchedulingResult& result)
 
         double minTTF = std::min(timeToFinishNoEvicted, std::min(timeToFinishBiggestEvicted, timeToFinishAllEvicted));
         if (minTTF == std::numeric_limits<double>::max()) {
-            std::cout << "minTTF inf" << std::endl;
+            std::cout << "minTTF inf" << '\n';
             result.finishTime = std::numeric_limits<double>::max();
             return;
         }
@@ -369,7 +369,7 @@ void tentativeAssignmentHEFT(vertex_t* v, bool real, SchedulingResult& result, S
             }
         }
         if (stillNeedsToBeEvictedToRun > 0) {
-            std::cout << buildEdgeName(*resultCorrect.processorOfAssignment->getPendingMemories().begin()) << std::endl;
+            std::cout << buildEdgeName(*resultCorrect.processorOfAssignment->getPendingMemories().begin()) << '\n';
             throw std::runtime_error("stillNeedsToBeEvictedToRun > 0");
         }
         assert(stillNeedsToBeEvictedToRun <= 0);
@@ -394,7 +394,7 @@ void tentativeAssignmentHEFT(vertex_t* v, bool real, SchedulingResult& result, S
         assert(resultCorrect.finishTime > resultCorrect.startTime);
 
         if (result.finishTime == std::numeric_limits<double>::max()) {
-            std::cout << "perceivedFinishTime inf" << std::endl;
+            std::cout << "perceivedFinishTime inf" << '\n';
             resultCorrect.finishTime = std::numeric_limits<double>::max();
             return;
         }
@@ -715,7 +715,7 @@ graph_t* convertToNonMemRepresentation(graph_t* withMemories, std::map<int, int>
             if (outVtxOfCopiedInVtxOfEdge == nullptr) {
                 print_graph_to_cout(noNodeMemories);
                 outVtxOfCopiedInVtxOfEdge = findVertexByName(noNodeMemories, expectedName);
-                std::cout << "expected: " << expectedName << std::endl;
+                std::cout << "expected: " << expectedName << '\n';
                 throw std::invalid_argument(" no vertex found for expected name.");
             }
             edge_t* e_new = new_edge(noNodeMemories, outVtxOfCopiedInVtxOfEdge, invtx, inEdgeOriginal->weight, nullptr);

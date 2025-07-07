@@ -171,7 +171,7 @@ inline Options parseOptions(int argc, char* argv[])
             printHelp(argv[0]);
             exit(EXIT_SUCCESS);
         default:
-            std::cerr << "Unknown option: " << c << std::endl;
+            std::cerr << "Unknown option: " << c << '\n';
             printHelp(argv[0]);
             exit(EXIT_FAILURE);
         }

@@ -10,6 +10,20 @@
 
 namespace Fonda {
 
+enum MACHINE_COLUMNS {
+    // machine,amount,cpu,memory,storage,cpu_events,linpack,ram_score,read_iops,write_iops
+    MACHINE_NAME = 0,
+    PROCESSOR_AMOUNT = 1,
+    PROCESSOR_SPEED = 2,
+    MEMORY_AMOUNT = 3,
+    STORAGE_SIZE = 4,
+    CPU_EVENTS = 5,
+    LINPACK = 6,
+    RAM_SCORE = 7,
+    READ_IOPS = 8,
+    WRITE_IOPS = 9,
+};
+
 Cluster* buildClusterFromCsv(const std::string& file, int memoryMultiplicator, double readWritePenalty, double offloadPenalty, int speedMultiplicator)
 {
     csv2::Reader<csv2::delimiter<','>,
@@ -18,53 +32,58 @@ Cluster* buildClusterFromCsv(const std::string& file, int memoryMultiplicator, d
         csv2::trim_policy::trim_whitespace>
         csv;
 
-    Cluster* cluster = new Cluster();
+    auto* cluster = new Cluster();
     if (csv.mmap(file)) {
         int id = 0;
         for (const auto row : csv) {
             std::vector<std::string> row_data;
             std::shared_ptr<Processor> p = std::make_shared<Processor>();
 
-            int rl = row.length();
-            if (rl > 0) {
+            if (row.length() > 0) {
                 p->id = id;
                 cluster->addProcessor(p);
                 id++;
             }
 
-            int proc_multiplier = 0;
+            int proc_count = 0;
             int cell_cntr = 0;
             for (const auto& cell : row) {
                 std::string cell_value;
                 cell.read_value(cell_value);
                 row_data.push_back(cell_value);
 
-                if (cell_cntr == 0) {
+                switch (cell_cntr) {
+                case MACHINE_NAME:
                     p->name = cell_value;
-                }
-                if (cell_cntr == 1) {
-                    proc_multiplier = stoi(cell_value);
-                }
-                if (cell_cntr == 2) {
+                    break;
+                case PROCESSOR_AMOUNT:
+                    proc_count = stoi(cell_value);
+                    break;
+                case PROCESSOR_SPEED:
                     p->setProcessorSpeed(stod(cell_value) * speedMultiplicator);
-                }
-                if (cell_cntr == 3) {
+                    break;
+                case MEMORY_AMOUNT:
                     p->setMemorySize(stod(cell_value) * memoryMultiplicator);
                     p->setAvailableMemory(p->getMemorySize());
                     p->setAfterAvailableMemory(p->getMemorySize());
-                }
-                if (cell_cntr == 8) {
+                    break;
+                case READ_IOPS:
                     p->readSpeedDisk = stod(cell_value) * readWritePenalty;
-                }
-                if (cell_cntr == 9) {
+                    break;
+                case WRITE_IOPS:
                     p->writeSpeedDisk = stod(cell_value) * readWritePenalty;
                     p->memoryOffloadingPenalty = stod(cell_value) * offloadPenalty;
+                    break;
+                default:
+                    // Nothing to do
+                    // TODO read/write iops
+                    break;
                 }
-                // TODO read/write iops
                 ++cell_cntr;
             }
-            for (int i = 1; i < proc_multiplier; i++) {
-                auto p1 = make_shared<Processor>(*p);
+
+            for (int i = 1; i < proc_count; i++) {
+                auto p1 = std::make_shared<Processor>(*p);
                 p1->id = id;
                 id++;
                 cluster->addProcessor(p1);
@@ -74,6 +93,14 @@ Cluster* buildClusterFromCsv(const std::string& file, int memoryMultiplicator, d
 
     return cluster;
 }
+
+enum WORKFLOW_COLUMNS {
+    PROC_NAME = 3,
+    PROC_SPEED_SCALE = 4,
+    AVG_MEMORY = 5,
+    AVG_WCHAR = 6,
+    AVG_TINPS = 7,
+};
 
 void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows,
@@ -99,58 +126,64 @@ void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
             });
 
         std::string nameToSearch = workflow_name1.append(" ").append(lowercase_name).append(" ").append(std::to_string(inputSize));
-        if (workflow_rows.find(nameToSearch) != workflow_rows.end()) {
-            double avgMem = 0, avgTime = 0, avgwchar = 0, avgtinps = 0;
 
-            for (const auto& row : workflow_rows[nameToSearch]) {
-                int col_idx = 0;
-                std::string proc_name;
-                for (const auto& cell : row) {
-
-                    if (col_idx == 3) {
-                        proc_name = cell;
-                    }
-                    if (col_idx == 4) {
-                        // time
-                        double procSpeed = cluster->getOneProcessorByName(proc_name)->getProcessorSpeed();
-                        avgTime += stod(cell) * procSpeed;
-                    }
-                    if (col_idx == 5) {
-                        // memory
-                        avgMem += stod(cell) / memShorteningDivision;
-                    }
-                    if (col_idx == 6) {
-                        // memory
-                        avgwchar += stod(cell) / (memShorteningDivision * ioShorteningCoef);
-                    }
-                    if (col_idx == 7) {
-                        // memory
-                        avgtinps += stod(cell) / (memShorteningDivision * ioShorteningCoef);
-                    }
-                    col_idx++;
-                }
-            }
-            if (workflow_rows[nameToSearch].empty()) {
-                std::cout << "<<<<<" << std::endl;
-            }
-            double numOfMsrs = workflow_rows[nameToSearch].size();
-            avgMem /= numOfMsrs;
-            avgTime /= numOfMsrs;
-            avgwchar /= numOfMsrs;
-            avgtinps /= numOfMsrs;
-
-            v->time = avgTime; // avgTime==0? 1: avgTime;
-            v->memoryRequirement = avgMem; // avgMem==0? 1: avgMem;
-            v->wchar = avgwchar; // avgwchar==0? 1: avgwchar;
-            v->taskinputsize = avgtinps; // avgtinps==0? 1: avgtinps;
-
-            minMem = std::min(minMem, avgMem);
-            minTime = std::min(minTime, avgTime);
-            minWchar = std::min(minWchar, avgwchar);
-            mintt = std::min(mintt, avgtinps);
-        } else {
-            // cout<<"Nothing found for "<<v->name<<endl;
+        if (workflow_rows.find(nameToSearch) == workflow_rows.end()) {
+            continue;
         }
+
+        double avgMem = 0;
+        double avgTime = 0;
+        double avgwchar = 0;
+        double avgtinps = 0;
+
+        for (const auto& row : workflow_rows[nameToSearch]) {
+            int col_idx = 0;
+            std::string proc_name;
+            for (const auto& cell : row) {
+                switch (col_idx) {
+                case PROC_NAME:
+                    proc_name = cell;
+                    break;
+                case PROC_SPEED_SCALE:
+                    avgTime += stod(cell) * cluster->getOneProcessorByName(proc_name)->getProcessorSpeed();
+                    break;
+                case AVG_MEMORY:
+                    avgMem += stod(cell) / memShorteningDivision;
+                    break;
+                case AVG_WCHAR:
+                    avgwchar += stod(cell) / (memShorteningDivision * ioShorteningCoef);
+                    break;
+                case AVG_TINPS:
+                    avgtinps += stod(cell) / (memShorteningDivision * ioShorteningCoef);
+                    break;
+                default:
+                    // Nothing to do
+                    break;
+                }
+
+                col_idx++;
+            }
+        }
+
+        if (workflow_rows[nameToSearch].empty()) {
+            std::cout << "<<<<<" << '\n';
+        }
+
+        const auto numOfMsrs = static_cast<double>(workflow_rows[nameToSearch].size());
+        avgMem /= numOfMsrs;
+        avgTime /= numOfMsrs;
+        avgwchar /= numOfMsrs;
+        avgtinps /= numOfMsrs;
+
+        v->time = avgTime; // avgTime==0? 1: avgTime;
+        v->memoryRequirement = avgMem; // avgMem==0? 1: avgMem;
+        v->wchar = avgwchar; // avgwchar==0? 1: avgwchar;
+        v->taskinputsize = avgtinps; // avgtinps==0? 1: avgtinps;
+
+        minMem = std::min(minMem, avgMem);
+        minTime = std::min(minTime, avgTime);
+        minWchar = std::min(minWchar, avgwchar);
+        mintt = std::min(mintt, avgtinps);
     }
 
     for (vertex_t* v = graphMemTopology->first_vertex; v; v = v->next) {
@@ -166,9 +199,8 @@ void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
 
 void retrieveEdgeWeights(graph_t* graphMemTopology)
 {
-
     vertex_t* vertex = graphMemTopology->first_vertex;
-    while (vertex != NULL) {
+    while (vertex != nullptr) {
         double totalOutput = 1;
         for (int j = 0; j < vertex->in_degree; j++) {
             edge* incomingEdge = vertex->in_edges[j];

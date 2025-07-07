@@ -336,7 +336,7 @@ tentativeAssignment(vertex_t* vertex, std::shared_ptr<Processor> ourModifiedProc
     if (eventStartTask->getExpectedTimeFire() >= eventFinishTask->getExpectedTimeFire()) {
         std::cout << " BAD START/FINSH TIME TASK " << eventStartTask->getExpectedTimeFire() << " "
                   << eventFinishTask->getExpectedTimeFire()
-                  << "FOR TASK " << vertex->name << " vertex time  " << vertex->time << std::endl;
+                  << "FOR TASK " << vertex->name << " vertex time  " << vertex->time << '\n';
     }
     assert(vertex->time == 0 || vertex->time / ourModifiedProc->getProcessorSpeed() < 0.001 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
     assert(eventStartTask->getExpectedTimeFire() == eventStartTask->getActualTimeFire());
@@ -350,7 +350,7 @@ tentativeAssignment(vertex_t* vertex, std::shared_ptr<Processor> ourModifiedProc
     if (eventStartTask->getExpectedTimeFire() >= eventFinishTask->getExpectedTimeFire()) {
         std::cout << " BAD START/FINSH TIME TASK " << eventStartTask->getExpectedTimeFire() << " "
                   << eventFinishTask->getExpectedTimeFire()
-                  << "FOR TASK " << vertex->name << " vertex time  " << vertex->time << " duarion " << vertex->time / ourModifiedProc->getProcessorSpeed() << std::endl;
+                  << "FOR TASK " << vertex->name << " vertex time  " << vertex->time << " duarion " << vertex->time / ourModifiedProc->getProcessorSpeed() << '\n';
     }
     assert(vertex->time == 0 || vertex->time / ourModifiedProc->getProcessorSpeed() < 0.001 || eventStartTask->getExpectedTimeFire() < eventFinishTask->getExpectedTimeFire());
 
@@ -523,7 +523,7 @@ void organizeAReadAndPredecessorWrite(const vertex_t* v, edge* incomingEdge, std
         if (isLocatedOnDisk(incomingEdge, false) || incomingEdge->tail->name == "GRAPH_SOURCE") {
         } else {
             std::cout << "no event finish write - AND THE FILE IS NOT ON DISK " << buildEdgeName(incomingEdge)
-                 << std::endl;
+                 << '\n';
         }
     }
 }
@@ -599,7 +599,7 @@ scheduleARead(const vertex_t* v, std::shared_ptr<Event>& ourEvent, std::vector<s
                 }
             }
         } else {
-            std::cout << "no event finish predecessor - AND THE TAIL IS NOT FINISHED" << std::endl;
+            std::cout << "no event finish predecessor - AND THE TAIL IS NOT FINISHED" << '\n';
         }
     }
 
@@ -630,9 +630,9 @@ scheduleARead(const vertex_t* v, std::shared_ptr<Event>& ourEvent, std::vector<s
                  << eventFinishRead->getExpectedTimeFire()
                  << " START AT " << eventStartRead->getExpectedTimeFire() << " planned finish  at "
                  << estimatedTimeOfFinishRead << " duration of edge "
-                 << incomingEdge->weight / ourModifiedProc->readSpeedDisk << std::endl;
+                 << incomingEdge->weight / ourModifiedProc->readSpeedDisk << '\n';
             std::cout << "was finihs moved? "
-                 << (eventFinishRead->getExpectedTimeFire() == estimatedTimeOfFinishRead ? "no" : "yes") << std::endl;
+                 << (eventFinishRead->getExpectedTimeFire() == estimatedTimeOfFinishRead ? "no" : "yes") << '\n';
         }
         assert(eventFinishRead->getExpectedTimeFire() > eventStartRead->getExpectedTimeFire());
     }
@@ -858,7 +858,7 @@ void buildPendingMemoriesAfter(std::shared_ptr<Processor>& ourModifiedProc, vert
         try {
             ourModifiedProc->addPendingMemoryAfter(item);
         } catch (...) {
-            std::cout << "memor temporaroly wrong!" << std::endl;
+            std::cout << "memor temporaroly wrong!" << '\n';
             wasMemWrong = true;
         }
     }
@@ -894,7 +894,7 @@ double assessWritingOfEdge(edge_t* edge, std::shared_ptr<Processor> proc)
 void checkBestEvents(std::vector<std::shared_ptr<Event>>& bestEvents)
 {
     for (auto& item : bestEvents) {
-        std::cout << item->id << " at " << item->getExpectedTimeFire() << ", " << std::endl;
+        std::cout << item->id << " at " << item->getExpectedTimeFire() << ", " << '\n';
         assert(item->getExpectedTimeFire() == item->getActualTimeFire());
         bool hasCycle = item->checkCycleFromEvent();
         assert(!hasCycle);
@@ -919,11 +919,11 @@ void checkBestEvents(std::vector<std::shared_ptr<Event>>& bestEvents)
             if (itReadStart != bestEvents.end()) {
                 auto actualLength = item->getExpectedTimeFire() - (*itReadStart)->getExpectedTimeFire();
                 assert(abs(actualLength - item->edge->weight / item->processor->readSpeedDisk) < 0.00001);
-                std::cout << "ys" << std::endl;
+                std::cout << "ys" << '\n';
             } else {
                 throw std::runtime_error("no pair found ofr " + item->id);
             }
         }
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }

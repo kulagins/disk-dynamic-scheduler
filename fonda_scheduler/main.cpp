@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
     end = std::chrono::system_clock::now();
     elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
-    std::cout << "makespan_2 " << d << std::endl;
+    std::cout << "makespan_2 " << d << '\n';
 
     delete graphMemTopology;
     delete imaginedCluster;

@@ -304,7 +304,7 @@ public:
         bool checkPredecessors)
     {
         if (recStack.find(event->id) != recStack.end()) {
-            std::cout << "Cycle detected at event: " << event->id << std::endl;
+            std::cout << "Cycle detected at event: " << event->id << '\n';
             return true; // Cycle detected!
         }
 
@@ -511,7 +511,7 @@ public:
             // auto it = eventSet.insert(event);
             auto [it, inserted] = eventSet.insert(event);
             if (!inserted) {
-                std::cout << "Event " << event->id << " was NOT inserted. Conflicted with: " << (*it)->id << std::endl;
+                std::cout << "Event " << event->id << " was NOT inserted. Conflicted with: " << (*it)->id << '\n';
             }
             eventByIdMap[event->id] = it;
             eventsByProcessorIdMap[event->processor->id].insert(*it);
@@ -561,7 +561,7 @@ public:
                     eventsByProcessorIdMap[event->processor->id].insert(event);
                     return true;
                 } else {
-                    std::cerr << "Failed to reinsert updated event: " << id << std::endl;
+                    std::cerr << "Failed to reinsert updated event: " << id << '\n';
                 }
             }
         }
@@ -591,7 +591,7 @@ public:
 
             return true;
         }
-        std::cout << "not removed" << std::endl;
+        std::cout << "not removed" << '\n';
         return false;
     }
 
@@ -607,16 +607,16 @@ public:
     // Print all events (for debugging)
     void printAll(int until = -1) const
     {
-        std::cout << std::endl;
+        std::cout << '\n';
         int cntr = 0;
         for (const auto& event : eventSet) {
             // if(until!=-1 && cntr<until)
-            std::cout << "\tID: " << event->id << " at " << event->getActualTimeFire() << std::endl; // ",\t";
+            std::cout << "\tID: " << event->id << " at " << event->getActualTimeFire() << '\n'; // ",\t";
             cntr++;
         }
-        std::cout << std::endl
+        std::cout << '\n'
                   << "-------";
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 
     bool empty()
@@ -637,7 +637,7 @@ public:
         // Print the current middle node
         for (int i = 0; i < depth; ++i)
             std::cout << "\t"; // Indentation
-        std::cout << (*middle)->id << std::endl;
+        std::cout << (*middle)->id << '\n';
 
         // Print left subtree
         printHelper(begin, middle, depth + 1);
@@ -713,7 +713,7 @@ public:
                         it_event = eventSet.find(event);
                         if (std::distance(eventSet.begin(), it_pred) > std::distance(eventSet.begin(), it_event)) {
                             //     throw runtime_error(error);
-                            std::cout << error << std::endl;
+                            std::cout << error << '\n';
                             return;
                         }
                     }

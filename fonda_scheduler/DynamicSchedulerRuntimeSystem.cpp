@@ -124,7 +124,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
             lastEventName = firstEvent->id;
             auto ptr = events.findByEventId(firstEvent->id);
         } else {
-            std::cout << "nthng " << std::endl;
+            std::cout << "nthng " << '\n';
             return -1;
         }
         //        assert(ptr == nullptr);
@@ -508,7 +508,7 @@ void Event::fireWriteFinish()
                     assert(isLocatedOnThisProcessor(edgeToWriteJustInCase, this->processor->id, false));
                     this->processor->writingQueue.erase(this->processor->writingQueue.begin());
                     if (buildEdgeName(edgeToWriteJustInCase) == "preseq_00000155-multiqc_00000149") {
-                        std::cout << std::endl;
+                        std::cout << '\n';
                     }
                     // for (const auto &item: this->processor->writingQueue){
                     //    cout<<buildEdgeName(item)<<endl;
@@ -553,7 +553,7 @@ void Event::removeOurselfFromSuccessors(Event* us)
         for (const auto &pred: s->predecessors) {
             std::cout << pred->id << " ";
         }
-        std::cout << std::endl;
+        std::cout << '\n';
     } */
 }
 
