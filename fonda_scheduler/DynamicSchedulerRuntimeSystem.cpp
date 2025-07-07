@@ -1,8 +1,9 @@
+#include <queue>
+#include <random>
 
 #include "fonda_scheduler/DynamicSchedulerHeader.hpp"
 #include "fonda_scheduler/SchedulerHeader.hpp"
-#include <queue>
-#include <random>
+#include "fonda_scheduler/algorithms.hpp"
 
 Cluster* cluster;
 EventManager events;
@@ -12,23 +13,22 @@ bool usePreemptiveWrites;
 
 std::string lastEventName;
 
-double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int deviationNumber, bool upw)
+double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, const int deviationNumber, bool upw)
 {
     double resMakespan = -1;
     cluster = cluster1;
-    algoNum = isHeft ? 1 : algoNum;
     enforce_single_source_and_target_with_minimal_weights(graph);
     compute_bottom_and_top_levels(graph);
     devationVariant = deviationNumber;
     usePreemptiveWrites = upw;
 
-    static thread_local std::mt19937 gen(std::random_device {}());
-    static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
+    static std::mt19937 gen(std::random_device {}());
+    static std::uniform_real_distribution<double> dist(0.0, 1);
 
-    vertex_t* vertex = graph->first_vertex;
     switch (algoNum) {
-    case 1: {
-        vertex = graph->first_vertex;
+    case fonda_scheduler::HEFT:
+    case fonda_scheduler::HEFT_BL: {
+        vertex_t* vertex = graph->first_vertex;
 
         while (vertex != nullptr) {
             double rank = calculateSimpleBottomUpRank(vertex);
@@ -38,10 +38,8 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
         }
         break;
     }
-    case 2: {
+    case fonda_scheduler::HEFT_BLC: {
         vertex_t* vertex = graph->first_vertex;
-        static thread_local std::mt19937 gen(std::random_device {}());
-        static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
 
         while (vertex != nullptr) {
             double rank = calculateBLCBottomUpRank(vertex);
@@ -51,21 +49,23 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
         }
         break;
     }
-    case 3: {
+    case fonda_scheduler::HEFT_MM: {
         std::vector<std::pair<vertex_t*, double>> ranks = calculateMMBottomUpRank(graph);
-        std::for_each(ranks.begin(), ranks.end(), [](std::pair<vertex_t*, double> pair) {
+        std::for_each(ranks.begin(), ranks.end(), [](const std::pair<vertex_t*, double>& pair) {
             pair.first->rank = pair.second + dist(gen);
         });
-    } break;
+        break;
+    }
     default:
-        throw std::runtime_error("unknon algorithm");
+        throw std::runtime_error("unknown algorithm");
     }
 
     if (findVertexByName(graph, "GRAPH_SOURCE") != nullptr) {
         remove_vertex(graph, findVertexByName(graph, "GRAPH_SOURCE"));
         remove_vertex(graph, findVertexByName(graph, "GRAPH_TARGET"));
     }
-    vertex = graph->first_vertex;
+
+    vertex_t* vertex = graph->first_vertex;
     while (vertex != nullptr) {
         if (vertex->in_degree == 0) {
             //  cout << "starting task " << vertex->name << endl;
@@ -81,6 +81,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
         }
         vertex = vertex->next;
     }
+
     int cntr = 0;
     while (!events.empty()) {
         cntr++;
@@ -131,6 +132,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
 
         //  cout<<"events now "; events.printAll();
     }
+
     return resMakespan;
 }
 

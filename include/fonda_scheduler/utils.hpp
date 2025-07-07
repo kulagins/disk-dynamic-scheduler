@@ -3,6 +3,8 @@
 
 #include "graph.hpp"
 
+#include "csv/single_include/csv2/csv2.hpp"
+
 namespace fonda_scheduler {
 
 inline std::string trimQuotes(const std::string& str)
