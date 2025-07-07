@@ -13,7 +13,7 @@ std::vector<std::shared_ptr<Event>> bestTentativeAssignment(vertex_t* vertex, st
     for (auto& [id, processor] : cluster->getProcessors()) {
         double finTime = -1, startTime = -1, reallyUsedMem = 0;
         int resultingEvictionVariant = -1;
-        auto ourModifiedProc = make_shared<Processor>(*processor);
+        auto ourModifiedProc = std::make_shared<Processor>(*processor);
         //  cout<<"adding our proc "<<ourModifiedProc->id<<endl;
         std::vector<std::shared_ptr<Event>> newEvents = {};
         // checkIfPendingMemoryCorrect(ourModifiedProc);

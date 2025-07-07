@@ -24,7 +24,7 @@ enum MACHINE_COLUMNS {
     WRITE_IOPS = 9,
 };
 
-Cluster* buildClusterFromCsv(const std::string& file, int memoryMultiplicator, double readWritePenalty, double offloadPenalty, int speedMultiplicator)
+Cluster* buildClusterFromCsv(const std::string& file, const int memoryMultiplicator, const double readWritePenalty, const double offloadPenalty, const int speedMultiplicator)
 {
     csv2::Reader<csv2::delimiter<','>,
         csv2::quote_character<'"'>,
@@ -36,8 +36,7 @@ Cluster* buildClusterFromCsv(const std::string& file, int memoryMultiplicator, d
     if (csv.mmap(file)) {
         int id = 0;
         for (const auto row : csv) {
-            std::vector<std::string> row_data;
-            std::shared_ptr<Processor> p = std::make_shared<Processor>();
+            auto p = std::make_shared<Processor>();
 
             if (row.length() > 0) {
                 p->id = id;
@@ -50,7 +49,6 @@ Cluster* buildClusterFromCsv(const std::string& file, int memoryMultiplicator, d
             for (const auto& cell : row) {
                 std::string cell_value;
                 cell.read_value(cell_value);
-                row_data.push_back(cell_value);
 
                 switch (cell_cntr) {
                 case MACHINE_NAME:
@@ -117,13 +115,10 @@ void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
         std::regex pattern("_\\d+");
         lowercase_name = std::regex_replace(lowercase_name, pattern, "");
         std::string workflow_name1 = std::regex_replace(workflow_name, pattern, "");
-        transform(lowercase_name.begin(),
+        std::transform(lowercase_name.begin(),
             lowercase_name.end(),
             lowercase_name.begin(),
-            [](unsigned char c) {
-                return tolower(
-                    c);
-            });
+            tolower);
 
         std::string nameToSearch = workflow_name1.append(" ").append(lowercase_name).append(" ").append(std::to_string(inputSize));
 
@@ -197,19 +192,19 @@ void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
     retrieveEdgeWeights(graphMemTopology);
 }
 
-void retrieveEdgeWeights(graph_t* graphMemTopology)
+void retrieveEdgeWeights(const graph_t* graphMemTopology)
 {
-    vertex_t* vertex = graphMemTopology->first_vertex;
+    const vertex_t* vertex = graphMemTopology->first_vertex;
     while (vertex != nullptr) {
         double totalOutput = 1;
         for (int j = 0; j < vertex->in_degree; j++) {
-            edge* incomingEdge = vertex->in_edges[j];
-            vertex_t* predecessor = incomingEdge->tail;
+            const edge* incomingEdge = vertex->in_edges[j];
+            const vertex_t* predecessor = incomingEdge->tail;
             totalOutput += predecessor->wchar;
         }
         for (int j = 0; j < vertex->in_degree; j++) {
             edge* incomingEdge = vertex->in_edges[j];
-            vertex_t* predecessor = incomingEdge->tail;
+            const vertex_t* predecessor = incomingEdge->tail;
             incomingEdge->weight = (predecessor->wchar / totalOutput) * vertex->taskinputsize;
             incomingEdge->factorForRealExecution = 1;
         }

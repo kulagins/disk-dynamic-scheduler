@@ -618,7 +618,7 @@ void processIncomingEdges(const vertex_t* v, bool realAsNotImaginary, bool realA
 
                 if (it == modifiedProcs.end()) {
                     Cluster* cluster = realAsNotImaginary ? actualCluster : imaginedCluster;
-                    addedProc = make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
+                    addedProc = std::make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
                     // cout<<"adding modified proc "<<addedProc->id<<endl;
                     modifiedProcs.emplace_back(addedProc);
                     checkIfPendingMemoryCorrect(addedProc);
