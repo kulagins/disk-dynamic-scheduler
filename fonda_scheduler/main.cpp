@@ -108,7 +108,7 @@ int main(const int argc, char* argv[])
 
     clearGraph(graphMemTopology);
     start = std::chrono::system_clock::now();
-    d = medih(graphMemTopology, options.algoNumber, options.algoNumber == 0);
+    d = medih(graphMemTopology, options.algoNumber);
     end = std::chrono::system_clock::now();
     elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;

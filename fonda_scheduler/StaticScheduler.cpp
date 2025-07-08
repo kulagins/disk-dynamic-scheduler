@@ -1,4 +1,6 @@
 #include "fonda_scheduler/SchedulerHeader.hpp"
+#include "fonda_scheduler/algorithms.hpp"
+#include "fonda_scheduler/options.hpp"
 
 #include <iterator>
 
@@ -19,9 +21,9 @@ double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t* v
     return Res;
 }
 
-double medih(graph_t* graph, int algoNum, bool isHeft)
+double medih(graph_t* graph, int algoNum)
 {
-    algoNum = isHeft ? 1 : algoNum;
+    const bool isHeft = (algoNum == fonda_scheduler::ALGORITHMS::HEFT);
     if (isHeft) {
         imaginedCluster->mayBecomeInvalid();
     }
@@ -137,23 +139,25 @@ void bestTentativeAssignment(const bool isHeft, vertex_t* vertex, SchedulingResu
         }
         //  cout<<"tentative ft on "<<processor->id<<" is "<<tentativeResult.finishTime <<(tentativeResult.resultingVar>1? "overflow!":"")<<endl;
 
-        if (!isHeft)
+        if (!isHeft) {
             checkIfPendingMemoryCorrect(tentativeResult.processorOfAssignment);
-        // cout<<"start "<<startTime<<" end "<<finTime<<endl;
-        if (tentativeResult.startTime != 0) {
-            //  cout<<"not actual "<<finTime<<" vs "<<actualFinishTime<<" on "<<processor->id<<endl;
         }
-        if (result.finishTime > tentativeResult.finishTime
+        // cout<<"start "<<startTime<<" end "<<finTime<<endl;
+        // if (tentativeResult.startTime != 0) {
+        //     cout<<"not actual "<<finTime<<" vs "<<actualFinishTime<<" on "<<processor->id<<endl;
+        // }
+
+        if (tentativeResult.finishTime < result.finishTime
             || (result.finishTime == tentativeResult.finishTime && result.processorOfAssignment && tentativeResult.processorOfAssignment->getMemorySize() > result.processorOfAssignment->getMemorySize())) {
             assert(!tentativeResult.modifiedProcs.empty());
             result = tentativeResult;
             if (isHeft) {
                 correctResultForHeftOnly = correctTentativeResultForHeftOnly;
-                if (result.startTime != correctTentativeResultForHeftOnly.startTime) {
-                    // resultnumberWithEvictedCases++;
-                    // throw runtime_error("numberWithEvictedCases++;");
-                    //  cout << "increase numWithEvictged in HEFT" << endl;
-                }
+                // if (result.startTime != correctTentativeResultForHeftOnly.startTime) {
+                //     resultnumberWithEvictedCases++;
+                //     throw runtime_error("numberWithEvictedCases++;");
+                //      cout << "increase numWithEvictged in HEFT" << endl;
+                // }
                 result.resultingVar = 1;
             }
         }
@@ -447,7 +451,7 @@ void evictAccordingToBestDecision(int& numberWithEvictedCases, SchedulingResult&
             // cout << buildEdgeName(nextEdge) << endl;
             if (nextEdge->head->name != pVertex->name) {
 
-                auto findEdgeInChanges1 = std::find_if(
+                const auto findEdgeInChanges1 = std::find_if(
                     bestSchedulingResult.edgesToChangeStatus.begin(),
                     bestSchedulingResult.edgesToChangeStatus.end(), [nextEdge](const EdgeChange& e) {
                         return nextEdge == e.edge;
@@ -834,11 +838,12 @@ std::vector<std::pair<vertex_t*, double>> buildRanksWalkOver(graph_t* graph)
     return ranks;
 }
 
-std::vector<std::pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, const int bottomLevelVariant)
+std::vector<std::pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, const int algoNum)
 {
     std::vector<std::pair<vertex_t*, double>> ranks;
-    switch (bottomLevelVariant) {
-    case 1: {
+    switch (algoNum) {
+    case fonda_scheduler::ALGORITHMS::HEFT:
+    case fonda_scheduler::ALGORITHMS::HEFT_BL: {
         vertex_t* vertex = graph->first_vertex;
         while (vertex != nullptr) {
             double rank = calculateSimpleBottomUpRank(vertex);
@@ -847,7 +852,7 @@ std::vector<std::pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, 
         }
         break;
     }
-    case 2: {
+    case fonda_scheduler::ALGORITHMS::HEFT_BLC: {
         vertex_t* vertex = graph->first_vertex;
         while (vertex != nullptr) {
             double rank = calculateBLCBottomUpRank(vertex);
@@ -856,11 +861,11 @@ std::vector<std::pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, 
         }
         break;
     }
-    case 3:
+    case fonda_scheduler::ALGORITHMS::HEFT_MM:
         ranks = calculateMMBottomUpRank(graph);
         break;
     default:
-        throw std::runtime_error("unknon algorithm");
+        throw std::runtime_error("unknown algorithm");
     }
     return ranks;
 }
