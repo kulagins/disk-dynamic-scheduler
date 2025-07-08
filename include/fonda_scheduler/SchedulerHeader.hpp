@@ -51,9 +51,9 @@ public:
 
 double calculateSimpleBottomUpRank(vertex_t* task);
 
-double calculateBLCBottomUpRank(vertex_t* task);
+double calculateBLCBottomUpRank(const vertex_t* task);
 
-std::vector<std::pair<vertex_t*, double>> calculateMMBottomUpRank(graph_t* graph);
+std::vector<std::pair<vertex_t*, double>> calculateMMBottomUpRank(graph_t* graphWMems);
 
 double medih(graph_t* graph, int algoNum, bool isHeft);
 
@@ -67,7 +67,7 @@ void tentativeAssignmentHEFT(vertex_t* v, bool real, SchedulingResult& result, S
 
 graph_t* convertToNonMemRepresentation(graph_t* withMemories, std::map<int, int>& noMemToWithMem);
 
-void processIncomingEdges(const vertex_t* v, bool realAsNotImaginary, bool realAsRealRuntimes, bool isHeft, std::shared_ptr<Processor>& ourDesiredProc,
+void processIncomingEdges(const vertex_t* v, bool realAsNotImaginary, bool realAsRealRuntimes, bool isHeft, const std::shared_ptr<Processor>& ourModifiedProc,
     std::vector<std::shared_ptr<Processor>>& modifiedProcs,
     double& earliestStartingTimeToComputeVertex);
 
@@ -77,9 +77,9 @@ bool hasDuplicates(const std::vector<std::shared_ptr<Processor>>& vec);
 
 void bestTentativeAssignment(bool isHeft, vertex_t* vertex, SchedulingResult& result, SchedulingResult& correctResultForHeftOnly);
 
-void realSurplusOfOutgoingEdges(const vertex_t* v, std::shared_ptr<Processor>& ourModifiedProc, double& sumOut);
+void realSurplusOfOutgoingEdges(const vertex_t* v, const std::shared_ptr<Processor>& ourModifiedProc, double& sumOut);
 
-void evictAccordingToBestDecision(int& numberWithEvictedCases, SchedulingResult& bestSchedulingResult, vertex_t* pVertex, bool isHeft, bool real);
+void evictAccordingToBestDecision(int& numberWithEvictedCases, SchedulingResult& bestSchedulingResult, const vertex_t* pVertex, bool isHeft, bool real);
 
 void putChangeOnCluster(vertex_t* vertex, SchedulingResult& schedulingResult, Cluster* cluster, int& numberWithEvictedCases, bool real, bool isHeft = false);
 
