@@ -97,7 +97,10 @@ int main(const int argc, char* argv[])
 
     std::cout << std::setprecision(15);
 
+    start = std::chrono::system_clock::now();
     double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.deviationModel, true /* usePreemptiveWrites */);
+    end = std::chrono::system_clock::now();
+    elapsed_seconds = end - start;
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
