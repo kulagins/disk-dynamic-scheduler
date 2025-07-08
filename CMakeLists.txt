@@ -28,8 +28,8 @@ set(FONDA_INSTALL_PKGCONFIG_DIR "lib/pkgconfig"
 set(FONDA_CXX_STANDARD "17"
         CACHE STRING "CXX Version to compile with. Currently fixed to 17")
 
-set(FONDA_CXX_FLAGS "-O3 -fpermissive") #-pg -O0 -fsanitize=undefined -O3  -fsanitize=address -O0 -pg -g
-set(FONDA_LINK_FLAGS "") #-fsanitize=undefined
+#set(FONDA_CXX_FLAGS "-O3 -fpermissive") #-pg -O0 -fsanitize=undefined -O3  -fsanitize=address -O0 -pg -g
+#set(FONDA_LINK_FLAGS "") #-fsanitize=undefined
 
 if (DEFINED ENV{CONDA_PREFIX})
     set(FONDA_SEARCH_PREFIX "$ENV{CONDA_PREFIX}")
@@ -66,10 +66,7 @@ if (FONDA_BUILD_MEMDAG)
     target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS} ${GraphViz_INCLUDE_DIRS} extlibs/csv/single_include)
     target_link_libraries(memdag PRIVATE ${IGRAPH_LIBRARIES} PkgConfig::GraphViz)
 
-    set_target_properties(memdag PROPERTIES
-            CXX_STANDARD ${FONDA_CXX_STANDARD}
-            COMPILE_FLAGS "${FONDA_CXX_FLAGS}"
-            LINK_FLAGS "${FONDA_LINK_FLAGS}")
+    set_target_properties(memdag PROPERTIES CXX_STANDARD ${FONDA_CXX_STANDARD})
 
 endif ()
 

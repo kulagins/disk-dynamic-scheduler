@@ -22,7 +22,7 @@ graph_t *new_graph(void) {
 
 ///\cond HIDDEN_SYMBOLS
 vertex_t *new_vertex_with_id(graph_t *graph, int id, const std::string name, double time, void *data) {
-  vertex_t *new_vertex = (vertex_t*) calloc(1,sizeof(vertex_t));
+  auto* new_vertex = new vertex_t;
   new_vertex->name = name;
   new_vertex->data = data;
   new_vertex->time = time;
