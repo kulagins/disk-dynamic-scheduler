@@ -77,7 +77,7 @@ inline void scaleToFit(graph_t* graphMemTopology, double biggestMem)
                     // throw an error
                 }
                 if (outMemoryRequirement(pv) > biggestMem) {
-                    return 0;
+                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster.");
                 }
             }
         }
