@@ -102,7 +102,10 @@ int main(int argc, char* argv[])
     vector<Assignment*> assignments;
     cout << std::setprecision(15);
 
+    start = std::chrono::system_clock::now();
     double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.algoNumber == 0, options.deviationModel, true /* usePreemptiveWrites */);
+    end = std::chrono::system_clock::now();
+    elapsed_seconds = end - start;
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
