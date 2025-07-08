@@ -417,9 +417,8 @@ void evictAccordingToBestDecision(int& numberWithEvictedCases, SchedulingResult&
     switch (bestSchedulingResult.resultingVar) {
     case 1:
         break;
-    case 2:
+    case 2: {
         //    cout<<"best with 1 kick"<<endl;
-
         assert(edgeToKick != nullptr);
         assert(bestSchedulingResult.edgesToChangeStatus.size() == 1);
 
@@ -438,6 +437,7 @@ void evictAccordingToBestDecision(int& numberWithEvictedCases, SchedulingResult&
         numberWithEvictedCases++;
         checkIfPendingMemoryCorrect(bestSchedulingResult.processorOfAssignment);
         break;
+    }
     case 3:
         // cout<<"best with all kick"<<endl;
         assert(bestSchedulingResult.edgesToChangeStatus.size() > 1);
