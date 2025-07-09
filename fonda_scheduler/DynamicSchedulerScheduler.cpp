@@ -365,7 +365,7 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
     const int ind = v->in_degree;
     // if(ind>0){
     for (int p = 0; p < ind; p++) {
-        edge* incomingEdge = v->in_edges[p];
+        edge* incomingEdge = v->in_edges.at(p);
         std::shared_ptr<Event> eventStartFromQueue = events.findByEventId(
             buildEdgeName(incomingEdge) + "-w-s");
         std::shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-f");
@@ -848,16 +848,16 @@ void buildPendingMemoriesAfter(const std::shared_ptr<Processor>& ourModifiedProc
     //  assert(ourModifiedProc->getAfterAvailableMemory() >= 0);
     // cout << "after adding " << endl;
     for (int j = 0; j < ourVertex->in_degree; j++) {
-        if (ourModifiedProc->getAfterPendingMemories().find(ourVertex->in_edges[j]) == ourModifiedProc->getAfterPendingMemories().end()) {
+        if (ourModifiedProc->getAfterPendingMemories().find(ourVertex->in_edges.at(j)) == ourModifiedProc->getAfterPendingMemories().end()) {
             //  cout << "edge " << buildEdgeName(ourVertex->in_edges[j]) << " not found in after pending mems on proc "
             //      << ourModifiedProc->id << endl;
         } else {
-            ourModifiedProc->removePendingMemoryAfter(ourVertex->in_edges[j]);
+            ourModifiedProc->removePendingMemoryAfter(ourVertex->in_edges.at(j));
         }
     }
     for (int j = 0; j < ourVertex->out_degree; j++) {
-        ourModifiedProc->addPendingMemoryAfter(ourVertex->out_edges[j]);
-        assert(ourVertex->time == 0 || ourModifiedProc->getAfterPendingMemories().find(ourVertex->out_edges[j]) != ourModifiedProc->getAfterPendingMemories().end());
+        ourModifiedProc->addPendingMemoryAfter(ourVertex->out_edges.at(j));
+        assert(ourVertex->time == 0 || ourModifiedProc->getAfterPendingMemories().find(ourVertex->out_edges.at(j)) != ourModifiedProc->getAfterPendingMemories().end());
     }
     // ourModifiedProc->setAfterAvailableMemory(
     //        min( ourModifiedProc->getMemorySize(),

@@ -12,7 +12,7 @@ double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t* v
     assert(!pj->getIsKeptValid() || pj->getAvailableMemory() >= 0);
     double Res = pj->getAvailableMemory() - peakMemoryRequirementOfVertex(v);
     for (int i = 0; i < v->in_degree; i++) {
-        const auto inEdge = v->in_edges[i];
+        const auto inEdge = v->in_edges.at(i);
         if (pj->getPendingMemories().find(inEdge) != pj->getPendingMemories().end()) {
             // incoming edge occupied memory
             Res += inEdge->weight;
@@ -556,7 +556,7 @@ void putChangeOnCluster(vertex_t* vertex, SchedulingResult& schedulingResult, Cl
 void realSurplusOfOutgoingEdges(const vertex_t* v, const std::shared_ptr<Processor>& ourModifiedProc, double& sumOut)
 {
     for (int i = 0; i < v->in_degree; i++) {
-        auto inEdge = v->in_edges[i];
+        auto inEdge = v->in_edges.at(i);
         if (isLocatedOnThisProcessor(inEdge, ourModifiedProc->id, false)) {
             //     cout<<"in is located here "; print_edge(v->in_edges[i]);
             auto pendingOfProc = ourModifiedProc->getPendingMemories();
@@ -580,7 +580,7 @@ void processIncomingEdges(const vertex_t* v, const bool realAsNotImaginary, cons
     const bool shouldUseImaginary = isHeft & !realAsNotImaginary;
     earliestStartingTimeToComputeVertex = ourModifiedProc->getReadyTimeCompute();
     for (int j = 0; j < v->in_degree; j++) {
-        edge* incomingEdge = v->in_edges[j];
+        edge* incomingEdge = v->in_edges.at(j);
         const vertex_t* predecessor = incomingEdge->tail;
 
         const double edgeWeightToUse = realAsRealRuntimes ? incomingEdge->weight * incomingEdge->factorForRealExecution
@@ -751,8 +751,8 @@ double calculateBLCBottomUpRank(const vertex_t* task)
 
     double maxCost = 0.0;
     for (int j = 0; j < task->out_degree; j++) {
-        const double communicationCost = task->out_edges[j]->weight;
-        const double successorCost = calculateBLCBottomUpRank(task->out_edges[j]->head);
+        const double communicationCost = task->out_edges.at(j)->weight;
+        const double successorCost = calculateBLCBottomUpRank(task->out_edges.at(j)->head);
         double cost = communicationCost + successorCost;
         maxCost = std::max(maxCost, cost);
     }
@@ -760,7 +760,7 @@ double calculateBLCBottomUpRank(const vertex_t* task)
 
     double maxInputCost = 0.0;
     for (int j = 0; j < task->in_degree; j++) {
-        double communicationCost = task->in_edges[j]->weight;
+        double communicationCost = task->in_edges.at(j)->weight;
         maxInputCost = std::max(maxInputCost, communicationCost);
     }
     const double retur = simpleBl + maxInputCost;

@@ -180,7 +180,7 @@ void Event::fireTaskStart()
     events.update(ourFinishEvent->id, d);
 
     for (int i = 0; i < this->task->in_degree; i++) {
-        edge_t* inEdge = this->task->in_edges[i];
+        edge_t* inEdge = this->task->in_edges.at(i);
         const std::string& edgeName = buildEdgeName(inEdge);
         std::shared_ptr<Event> startWrite = events.findByEventId(edgeName + "-w-s");
         std::shared_ptr<Event> finishWrite = events.findByEventId(buildEdgeName(inEdge) + "-w-f");
@@ -243,16 +243,16 @@ void Event::fireTaskFinish()
     std::string thisId = this->id;
 
     for (int i = 0; i < thisTask->out_degree; i++) {
-        locateToThisProcessorFromNowhere(thisTask->out_edges[i], this->processor->id, false,
+        locateToThisProcessorFromNowhere(thisTask->out_edges.at(i), this->processor->id, false,
             this->getActualTimeFire());
     }
 
     for (int i = 0; i < thisTask->out_degree; i++) {
-        vertex_t* childTask = thisTask->out_edges[i]->head;
+        vertex_t* childTask = thisTask->out_edges.at(i)->head;
         // cout << "deal with child " << childTask->name << endl;
         bool isReady = true;
         for (int j = 0; j < childTask->in_degree; j++) {
-            if (childTask->in_edges[j]->tail->status == Status::Unscheduled) {
+            if (childTask->in_edges.at(j)->tail->status == Status::Unscheduled) {
                 isReady = false;
             }
         }
@@ -265,7 +265,7 @@ void Event::fireTaskFinish()
         }
 
         if (usePreemptiveWrites) {
-            cluster->getProcessorById(this->processor->id)->writingQueue.emplace_back(thisTask->out_edges[i]);
+            cluster->getProcessorById(this->processor->id)->writingQueue.emplace_back(thisTask->out_edges.at(i));
         }
     }
 
