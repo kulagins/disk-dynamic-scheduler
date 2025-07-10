@@ -47,6 +47,8 @@ enum Status { Unscheduled,
 extern bool Debug;
 
 struct graph_t;
+struct edge_t;
+
 struct vertex_t {
     /* basic vertex information */
     int id;
@@ -60,12 +62,12 @@ struct vertex_t {
     double taskinputsize = 0;
 
     /* graph structure around the vertex */
-    struct vertex_t* next = nullptr;
-    struct vertex_t* prev = nullptr;
+    vertex_t* next = nullptr;
+    vertex_t* prev = nullptr;
     int in_degree = 0;
     int out_degree = 0;
-    std::unordered_map<int, struct edge*> in_edges;
-    std::unordered_map<int, struct edge*> out_edges;
+    std::unordered_map<int, edge_t*> in_edges;
+    std::unordered_map<int, edge_t*> out_edges;
 
     ///\cond HIDDEN_SYMBOLS
     /* other data used for graph algorithms */
@@ -135,15 +137,15 @@ struct Location {
     }
 };
 
-typedef struct edge {
+struct edge_t {
     /* basic edge information */
     double weight = 0.0;
 
     /* graph structure */
     struct vertex_t* tail = nullptr;
     struct vertex_t* head = nullptr;
-    struct edge* next = nullptr;
-    struct edge* prev = nullptr;
+    edge_t* next = nullptr;
+    edge_t* prev = nullptr;
     edge_status_t status;
     /* user data */
     void* data = nullptr;
@@ -155,13 +157,12 @@ typedef struct edge {
     std::vector<Location> imaginedLocations;
     ///\endcond} edge_t;
 
-    bool operator==(const edge& other) const
+    bool operator==(const edge_t& other) const
     {
         // std::cout <<"comparing "<<tail->name<<" -> "<<head->name<< " to "<< other.tail->name<<" -> "<<other.head->name<<'\n';
         return tail->name == other.tail->name && head->name == other.head->name && weight == other.weight;
     }
-
-} edge_t;
+};
 
 /**
  * Type of a graph
@@ -204,7 +205,7 @@ struct graph_t {
 
 /* From graph.c: */
 graph_t* new_graph(void);
-vertex_t* new_vertex(graph_t* graph, const std::string name, double time, void* data);
+vertex_t* new_vertex(graph_t* graph, const std::string& name, double time, void* data);
 vertex_t* new_vertex2Weights(graph_t* graph, const std::string name, double time, double memRequirement, void* data);
 edge_t* new_edge(graph_t* graph, vertex_t* tail, vertex_t* head, double weight, void* data);
 void remove_vertex(graph_t* graph, vertex_t* v);

@@ -365,7 +365,7 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
     const int ind = v->in_degree;
     // if(ind>0){
     for (int p = 0; p < ind; p++) {
-        edge* incomingEdge = v->in_edges.at(p);
+        edge_t* incomingEdge = v->in_edges.at(p);
         std::shared_ptr<Event> eventStartFromQueue = events.findByEventId(
             buildEdgeName(incomingEdge) + "-w-s");
         std::shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-f");
@@ -491,7 +491,7 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
     return 0;
 }
 
-void organizeAReadAndPredecessorWrite(const vertex_t* v, edge* incomingEdge, const std::shared_ptr<Event>& ourEvent,
+void organizeAReadAndPredecessorWrite(const vertex_t* v, edge_t* incomingEdge, const std::shared_ptr<Event>& ourEvent,
     const std::shared_ptr<Processor>& ourModifiedProc,
     std::vector<std::shared_ptr<Event>>& createdEvents, const double afterWhen)
 {
@@ -517,7 +517,7 @@ void organizeAReadAndPredecessorWrite(const vertex_t* v, edge* incomingEdge, con
 std::pair<std::shared_ptr<Event>, std::shared_ptr<Event>>
 scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::vector<std::shared_ptr<Event>>& createdEvents,
     const double startTimeOfTask,
-    const std::shared_ptr<Processor>& ourModifiedProc, edge*& incomingEdge, double& atThisTime)
+    const std::shared_ptr<Processor>& ourModifiedProc, edge_t* incomingEdge, double& atThisTime)
 {
     assert(events.findByEventId(buildEdgeName(incomingEdge) + "-r-s") == nullptr);
     assert(events.findByEventId(buildEdgeName(incomingEdge) + "-r-f") == nullptr);
@@ -740,7 +740,7 @@ scheduleWriteForEdge(const std::shared_ptr<Processor>& thisProc, edge_t* edgeToE
 
 void scheduleWriteAndRead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::vector<std::shared_ptr<Event>>& createdEvents,
     const double startTimeOfTask,
-    const std::shared_ptr<Processor>& ourModifiedProc, edge*& incomingEdge,
+    const std::shared_ptr<Processor>& ourModifiedProc, edge_t* incomingEdge,
     std::vector<std::shared_ptr<Processor>>& modifiedProcs)
 {
     // cout << "scehdule write and read for " << buildEdgeName(incomingEdge) << endl;

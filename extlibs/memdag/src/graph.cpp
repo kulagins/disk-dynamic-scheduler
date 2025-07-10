@@ -62,7 +62,7 @@ vertex_t* new_vertex_with_id(graph_t* graph, int id, const std::string name, dou
  * Note that the name of the vertex is duplicated, so that \p name can be safely freed.
  */
 
-vertex_t* new_vertex(graph_t* graph, const std::string name, double time, void* data)
+vertex_t* new_vertex(graph_t* graph, const std::string& name, double time, void* data)
 {
     vertex_t* new_vertex = new_vertex_with_id(graph, -1, name, time, data);
     return new_vertex;

@@ -505,7 +505,7 @@ void putChangeOnCluster(vertex_t* vertex, SchedulingResult& schedulingResult, Cl
     vertex->assignedProcessorId = schedulingResult.processorOfAssignment->id;
 
     for (int j = 0; j < vertex->in_degree; j++) {
-        edge* ine = vertex->in_edges[j];
+        edge_t* ine = vertex->in_edges[j];
 
         const int onWhichProcessor = whatProcessorIsLocatedOn(ine, shouldUseImaginary);
         assert(onWhichProcessor == -1 || onWhichProcessor == schedulingResult.processorOfAssignment->id || cluster->getProcessorById(onWhichProcessor)->getPendingMemories().find(ine) == cluster->getProcessorById(onWhichProcessor)->getPendingMemories().end());
@@ -580,7 +580,7 @@ void processIncomingEdges(const vertex_t* v, const bool realAsNotImaginary, cons
     const bool shouldUseImaginary = isHeft & !realAsNotImaginary;
     earliestStartingTimeToComputeVertex = ourModifiedProc->getReadyTimeCompute();
     for (int j = 0; j < v->in_degree; j++) {
-        edge* incomingEdge = v->in_edges.at(j);
+        edge_t* incomingEdge = v->in_edges.at(j);
         const vertex_t* predecessor = incomingEdge->tail;
 
         const double edgeWeightToUse = realAsRealRuntimes ? incomingEdge->weight * incomingEdge->factorForRealExecution
@@ -705,7 +705,7 @@ graph_t* convertToNonMemRepresentation(graph_t* withMemories, std::map<int, int>
         noNodeMemories->target = outvtx;
 
         for (int i = 0; i < vertex->in_degree; i++) {
-            const edge* inEdgeOriginal = vertex->in_edges[i];
+            const edge_t* inEdgeOriginal = vertex->in_edges[i];
             const std::string expectedName = inEdgeOriginal->tail->name + "-out";
             vertex_t* outVtxOfCopiedInVtxOfEdge = findVertexByName(noNodeMemories, expectedName);
 
