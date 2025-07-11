@@ -71,9 +71,9 @@ std::vector<std::shared_ptr<Event>> bestTentativeAssignment(vertex_t* vertex, st
         event->processor = cluster->getProcessorById(event->processor->id);
     }
 
-    for (int j = 0; j < vertex->in_edges.size(); j++) {
+    for (const auto & in_edge : vertex->in_edges) {
         assert( // vertex->in_edges[j]->tail->makespan==-1 ||
-            bestFinishTime > vertex->in_edges[j]->tail->makespan);
+            bestFinishTime > in_edge->tail->makespan);
     }
 
     // cout << "resulting var " << resultingVar<<" on "<<bestProcessorToAssign->id << endl;
@@ -81,7 +81,7 @@ std::vector<std::shared_ptr<Event>> bestTentativeAssignment(vertex_t* vertex, st
 }
 
 std::vector<std::shared_ptr<Processor>>
-tentativeAssignment(vertex_t* vertex, std::shared_ptr<Processor> ourModifiedProc,
+tentativeAssignment(vertex_t* vertex, const std::shared_ptr<Processor>& ourModifiedProc,
     double& finTime, double& startTime, int& resultingVar, std::vector<std::shared_ptr<Event>>& newEvents,
     double& actuallyUsedMemory, double notEarlierThan)
 {
@@ -362,9 +362,8 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
     // cout<<"processing, avail mem "<<ourModifiedProc->getAvailableMemory()<<endl;
 
     double howMuchWasLoaded = ourModifiedProc->getAvailableMemory();
-    const int ind = v->in_edges.size();
     // if(ind>0){
-    for (int p = 0; p < ind; p++) {
+    for (int p = 0; p < v->in_edges.size(); p++) {
         edge_t* incomingEdge = v->in_edges.at(p);
         std::shared_ptr<Event> eventStartFromQueue = events.findByEventId(
             buildEdgeName(incomingEdge) + "-w-s");
@@ -847,12 +846,12 @@ void buildPendingMemoriesAfter(const std::shared_ptr<Processor>& ourModifiedProc
     }
     //  assert(ourModifiedProc->getAfterAvailableMemory() >= 0);
     // cout << "after adding " << endl;
-    for (int j = 0; j < ourVertex->in_edges.size(); j++) {
-        if (ourModifiedProc->getAfterPendingMemories().find(ourVertex->in_edges.at(j)) == ourModifiedProc->getAfterPendingMemories().end()) {
+    for (auto in_edge : ourVertex->in_edges) {
+        if (ourModifiedProc->getAfterPendingMemories().find(in_edge) == ourModifiedProc->getAfterPendingMemories().end()) {
             //  cout << "edge " << buildEdgeName(ourVertex->in_edges[j]) << " not found in after pending mems on proc "
             //      << ourModifiedProc->id << endl;
         } else {
-            ourModifiedProc->removePendingMemoryAfter(ourVertex->in_edges.at(j));
+            ourModifiedProc->removePendingMemoryAfter(in_edge);
         }
     }
     for (int j = 0; j < ourVertex->out_edges.size(); j++) {

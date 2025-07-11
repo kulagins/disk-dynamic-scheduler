@@ -67,7 +67,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
 
     vertex_t* vertex = graph->first_vertex;
     while (vertex != nullptr) {
-        if (vertex->in_edges.size() == 0) {
+        if (vertex->in_edges.empty()) {
             //  cout << "starting task " << vertex->name << endl;
             std::vector<std::shared_ptr<Processor>> bestModifiedProcs;
             std::shared_ptr<Processor> bestProcessorToAssign;
@@ -179,8 +179,7 @@ void Event::fireTaskStart()
     // ourFinishEvent->setActualTimeFire(d);
     events.update(ourFinishEvent->id, d);
 
-    for (int i = 0; i < this->task->in_edges.size(); i++) {
-        edge_t* inEdge = this->task->in_edges.at(i);
+    for (auto inEdge : this->task->in_edges) {
         const std::string& edgeName = buildEdgeName(inEdge);
         std::shared_ptr<Event> startWrite = events.findByEventId(edgeName + "-w-s");
         std::shared_ptr<Event> finishWrite = events.findByEventId(buildEdgeName(inEdge) + "-w-f");
@@ -221,7 +220,7 @@ void Event::fireTaskFinish()
     //  cout << "firing task Finish for " << this->id << " at " << this->getActualTimeFire() << endl;
     //  cout<<this->actualTimeFire<<" on "<<this->processor->id<<endl;
 
-    auto canRun = dealWithPredecessors(shared_from_this());
+    const auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         //     cout << "BAD because #preds " << this->predecessors.size() << " esp " << (*this->predecessors.begin())->id
         //       << endl;
@@ -242,17 +241,17 @@ void Event::fireTaskFinish()
 
     std::string thisId = this->id;
 
-    for (int i = 0; i < thisTask->out_edges.size(); i++) {
-        locateToThisProcessorFromNowhere(thisTask->out_edges.at(i), this->processor->id, false,
+    for (const auto out_edge : thisTask->out_edges) {
+        locateToThisProcessorFromNowhere(out_edge, this->processor->id, false,
             this->getActualTimeFire());
     }
 
-    for (int i = 0; i < thisTask->out_edges.size(); i++) {
-        vertex_t* childTask = thisTask->out_edges.at(i)->head;
+    for (auto out_edge : thisTask->out_edges) {
+        vertex_t* childTask = out_edge->head;
         // cout << "deal with child " << childTask->name << endl;
         bool isReady = true;
-        for (int j = 0; j < childTask->in_edges.size(); j++) {
-            if (childTask->in_edges.at(j)->tail->status == Status::Unscheduled) {
+        for (const auto & in_edge : childTask->in_edges) {
+            if (in_edge->tail->status == Status::Unscheduled) {
                 isReady = false;
             }
         }
@@ -265,7 +264,7 @@ void Event::fireTaskFinish()
         }
 
         if (usePreemptiveWrites) {
-            cluster->getProcessorById(this->processor->id)->writingQueue.emplace_back(thisTask->out_edges.at(i));
+            cluster->getProcessorById(this->processor->id)->writingQueue.emplace_back(out_edge);
         }
     }
 
@@ -350,7 +349,7 @@ void Event::fireReadStart()
 {
     // cout << "firing read start for " << this->id << " at " << this->actualTimeFire << endl;
     // assert(finishRead->getActualTimeFire()> this->getActualTimeFire());
-    auto canRun = dealWithPredecessors(shared_from_this());
+    const auto canRun = dealWithPredecessors(shared_from_this());
 
     if (!canRun) {
         //  cout << "BAD because #preds " << this->predecessors.size() << " esp " << (*this->predecessors.begin())->id
@@ -386,7 +385,7 @@ void Event::fireReadFinish()
 
     std::shared_ptr<Event> startRead = events.findByEventId(buildEdgeName(this->edge) + "-r-s");
 
-    auto canRun = dealWithPredecessors(shared_from_this());
+    const auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         //  cout << "BAD because #preds " << this->predecessors.size() << " esp " << (*this->predecessors.begin())->id
         //    << endl;
@@ -396,7 +395,7 @@ void Event::fireReadFinish()
         removeOurselfFromSuccessors(this);
         assert(cluster->getProcessorById(this->processor->id).use_count() == this->processor.use_count());
         if (!isLocatedOnDisk(this->edge, false)) {
-            auto ptr = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
+            const auto ptr = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
             assert(ptr != nullptr);
             auto ptr1 = events.findByEventId(buildEdgeName(this->edge) + "-r-s");
             assert(ptr->getActualTimeFire() < this->getActualTimeFire());
@@ -410,7 +409,7 @@ void Event::fireWriteStart()
 {
     // cout << "firing write start for " << this->id << " at " << this->getActualTimeFire() << endl;
 
-    auto canRun = dealWithPredecessors(shared_from_this());
+    const auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         //   cout << "BAD because #preds " << this->predecessors.size() << " esp " << (*this->predecessors.begin())->id
         //        << endl;
@@ -430,7 +429,7 @@ void Event::fireWriteStart()
 
     const double actualTimeFireFinish = this->actualTimeFire + durationOfWrite;
     this->isDone = true;
-    std::shared_ptr<Event> finishWrite = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
+    const std::shared_ptr<Event> finishWrite = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
 
     if (finishWrite == nullptr) {
         throw std::runtime_error("NO write finish found for " + this->id);
@@ -453,7 +452,7 @@ void Event::fireWriteFinish()
     //  cout << "firing write finish for " << this->id << " at " << this->getActualTimeFire() << " on "
     //      << this->processor->id << endl;
 
-    auto canRun = dealWithPredecessors(shared_from_this());
+    const auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         // cout << "BAD because #preds " << this->predecessors.size() << " esp " << (*this->predecessors.begin())->id
         //     << endl;
@@ -619,7 +618,7 @@ void Processor::addEvent(const std::shared_ptr<Event>& event)
     } */
 }
 
-bool dealWithPredecessors(std::shared_ptr<Event> us)
+bool dealWithPredecessors(const std::shared_ptr<Event>& us)
 {
     if (!us->getPredecessors().empty()) {
 
@@ -735,7 +734,7 @@ double Processor::getReadyTimeRead()
 
 double Processor::getExpectedOrActualReadyTimeCompute() const
 {
-    if (auto lastEvent = this->lastComputeEvent.lock()) {
+    if (const auto lastEvent = this->lastComputeEvent.lock()) {
         return lastEvent->isDone ? lastEvent->getActualTimeFire() : lastEvent->getExpectedTimeFire();
     }
     return this->readyTimeCompute;
@@ -743,7 +742,7 @@ double Processor::getExpectedOrActualReadyTimeCompute() const
 
 double Processor::getExpectedOrActualReadyTimeWrite() const
 {
-    if (auto lastEvent = this->lastWriteEvent.lock()) {
+    if (const auto lastEvent = this->lastWriteEvent.lock()) {
         return lastEvent->isDone ? lastEvent->getActualTimeFire() : lastEvent->getExpectedTimeFire();
     }
     return this->readyTimeWrite;

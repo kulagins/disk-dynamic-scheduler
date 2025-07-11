@@ -1,6 +1,5 @@
 
 #include <iostream>
-#include <iterator>
 #include <sstream>
 
 #include "../extlibs/csv/single_include/csv2/csv2.hpp"
@@ -100,10 +99,10 @@ enum WORKFLOW_COLUMNS {
     AVG_TINPS = 7,
 };
 
-void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
+void fillGraphWeightsFromExternalSource(const graph_t* graphMemTopology,
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows,
-    const std::string& workflow_name, long inputSize, Cluster* cluster,
-    int memShorteningDivision, double ioShorteningCoef)
+    const std::string& workflow_name, const long inputSize, Cluster* cluster,
+    const int memShorteningDivision, const double ioShorteningCoef)
 {
 
     double minMem = std::numeric_limits<double>::max(), minTime = std::numeric_limits<double>::max(), minWchar = std::numeric_limits<double>::max(),
@@ -197,8 +196,7 @@ void retrieveEdgeWeights(const graph_t* graphMemTopology)
     const vertex_t* vertex = graphMemTopology->first_vertex;
     while (vertex != nullptr) {
         double totalOutput = 1;
-        for (int j = 0; j < vertex->in_edges.size(); j++) {
-            const edge_t* incomingEdge = vertex->in_edges.at(j);
+        for (const auto incomingEdge : vertex->in_edges) {
             const vertex_t* predecessor = incomingEdge->tail;
             totalOutput += predecessor->wchar;
         }

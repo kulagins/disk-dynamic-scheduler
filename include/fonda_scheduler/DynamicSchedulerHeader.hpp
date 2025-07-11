@@ -17,7 +17,7 @@ double dynMedih(graph_t* graph, Cluster* cluster, int algoNum, int deviationNumb
 
 double applyDeviationTo(double& in);
 std::vector<std::shared_ptr<Processor>>
-tentativeAssignment(vertex_t* vertex, std::shared_ptr<Processor> ourModifiedProc,
+tentativeAssignment(vertex_t* vertex, const std::shared_ptr<Processor>& ourModifiedProc,
     double& finTime, double& startTime, int& resultingVar, std::vector<std::shared_ptr<Event>>& newEvents,
     double& actuallyUsedMemory, double notEarlierThan = -1);
 std::vector<std::shared_ptr<Event>> bestTentativeAssignment(vertex_t* vertex, std::vector<std::shared_ptr<Processor>>& bestModifiedProcs,
@@ -39,7 +39,7 @@ scheduleWriteForEdge(const std::shared_ptr<Processor>& thisProc, edge_t* edgeToE
     std::pair<std::shared_ptr<Event>, std::shared_ptr<Event>>& writeEvents, bool onlyPreemptive = false);
 void buildPendingMemoriesAfter(const std::shared_ptr<Processor>& ourModifiedProc, const vertex_t* ourVertex);
 void transferAfterMemoriesToBefore(const std::shared_ptr<Processor>& ourModifiedProc);
-bool dealWithPredecessors(std::shared_ptr<Event> us);
+bool dealWithPredecessors(const std::shared_ptr<Event>& us);
 void checkBestEvents(std::vector<std::shared_ptr<Event>>& bestEvents);
 double assessWritingOfEdge(const edge_t* edge, const std::shared_ptr<Processor>& proc);
 

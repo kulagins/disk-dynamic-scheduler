@@ -14,7 +14,7 @@
 #include "cluster.hpp"
 
 namespace Fonda {
-void fillGraphWeightsFromExternalSource(graph_t* graphMemTopology,
+void fillGraphWeightsFromExternalSource(const graph_t* graphMemTopology,
     std::unordered_map<std::string, std::vector<std::vector<std::string>>> workflow_rows,
     const std::string& workflow_name, long inputSize, Cluster* cluster,
     int memShorteningDivision, double ioShorteningCoef);

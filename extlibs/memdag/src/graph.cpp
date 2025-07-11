@@ -450,29 +450,13 @@ graph_t* read_dot_graph(const char* filename, const char* memory_label, const ch
     ///\endcond
 
     for (Agnode_t* ag_node = agfstnode(ag_graph); ag_node; ag_node = agnxtnode(ag_graph, ag_node)) {
-        double time;
-        double node_memory;
         char* name = agget(ag_node, (char*)"label");
-        if (timing_label) {
-            time = strtod(agget(ag_node, (char*)timing_label), nullptr);
-        } else {
-            time = 1.0;
-        }
+        const double time = timing_label ? strtod(agget(ag_node, (char*)timing_label), nullptr) : 1.0;
         vertex_t* someV = new_vertex(graph, name, time, nullptr);
         MY_NODE_IN_VERTEX(ag_node) = MY_NODE_OUT_VERTEX(ag_node) = someV;
         if (node_memory_label) {
-            node_memory = strtod(agget(ag_node, (char*)node_memory_label), nullptr);
-            /*  char *in_name = (char*) calloc(strlen(agnameof(ag_node))+3,sizeof(char));
-              char *out_name = (char*) calloc(strlen(agnameof(ag_node))+3,sizeof(char));
-              snprintf(in_name, strlen(agnameof(ag_node))+4, "%s_in",agnameof(ag_node));
-              snprintf(out_name, strlen(agnameof(ag_node))+5, "%s_out",agnameof(ag_node));
-              MY_NODE_IN_VERTEX(ag_node) = new_vertex(graph, in_name, time, nullptr);
-              MY_NODE_OUT_VERTEX(ag_node) = new_vertex(graph, out_name, 0.0, nullptr);
-              free(in_name);
-              free(out_name);
-              edge_t *e = new_edge(graph, MY_NODE_IN_VERTEX(ag_node), MY_NODE_OUT_VERTEX(ag_node), node_memory, nullptr);*/
+            const double node_memory = strtod(agget(ag_node, (char*)node_memory_label), nullptr);
             someV->memoryRequirement = node_memory;
-        } else {
         }
     }
 
@@ -533,7 +517,7 @@ void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
     int several_sources = 0;
     int several_targets = 0;
     for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-        if (v->in_edges.size() == 0) {
+        if (v->in_edges.empty()) {
             if (source == nullptr) { // If no current source, update
                 source = v;
             } else {
@@ -541,7 +525,7 @@ void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
                 several_sources = 1;
             }
         }
-        if (v->out_edges.size() == 0) {
+        if (v->out_edges.empty()) {
             if (target == nullptr) { // If no current target, update
                 target = v;
             } else { // If several targets, remember it
@@ -557,7 +541,7 @@ void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
     if (several_sources) {
         source = new_vertex(graph, "GRAPH_SOURCE" + suffix, 0.0, nullptr);
         for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-            if ((v->in_edges.size() == 0) && (v != source)) {
+            if (v->in_edges.empty() && (v != source)) {
                 new_edge(graph, source, v, 0, nullptr);
             }
         }
@@ -569,7 +553,7 @@ void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
     if (several_targets) {
         target = new_vertex(graph, "GRAPH_TARGET" + suffix, 0.0, nullptr);
         for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-            if ((v->out_edges.size() == 0) && (v != target)) {
+            if (v->out_edges.empty() && (v != target)) {
                 new_edge(graph, v, target, 0, nullptr);
             }
         }
@@ -588,7 +572,7 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const
     int several_sources = 0;
     int several_targets = 0;
     for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-        if (v->in_edges.size() == 0) {
+        if (v->in_edges.empty()) {
             if (source == nullptr) { // If no current source, update
                 source = v;
             } else {
@@ -596,7 +580,7 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const
                 several_sources = 1;
             }
         }
-        if (v->out_edges.size() == 0) {
+        if (v->out_edges.empty()) {
             if (target == nullptr) { // If no current target, update
                 target = v;
             } else { // If several targets, remember it
@@ -612,7 +596,7 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const
     if (several_sources) {
         source = new_vertex(graph, "GRAPH_SOURCE" + suffix, 1, nullptr);
         for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-            if ((v->in_edges.size() == 0) && (v != source)) {
+            if (v->in_edges.empty() && (v != source)) {
                 new_edge(graph, source, v, 1, nullptr);
             }
         }
@@ -624,7 +608,7 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const
     if (several_targets) {
         target = new_vertex(graph, "GRAPH_TARGET" + suffix, 0.1, nullptr);
         for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-            if ((v->out_edges.size() == 0) && (v != target)) {
+            if (v->out_edges.empty() && v != target) {
                 new_edge(graph, v, target, 0.1, nullptr);
             }
         }

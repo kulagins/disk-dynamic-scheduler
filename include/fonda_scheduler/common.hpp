@@ -49,14 +49,14 @@ void checkForZeroMemories(graph_t* graph);
 ////void completeRecomputationOfSchedule(Http::ResponseWriter &resp, const json &bodyjson, double timestamp, vertex_t * vertexThatHasAProblem);
 void removeSourceAndTarget(graph_t* graph, std::vector<std::pair<vertex_t*, double>>& ranks);
 
-void clearGraph(graph_t* graphMemTopology);
+void clearGraph(const graph_t* graphMemTopology);
 
 Cluster*
 prepareClusterWithChangesAtTimestamp(const nlohmann::json& bodyjson, double timestamp, std::vector<Assignment*>& tempAssignments);
 
 // void delayOneTask(Http::ResponseWriter &resp, const json &bodyjson, string &nameOfTaskWithProblem, double newStartTime,
 //                  Assignment *assignmOfProblem);
-void delayEverythingBy(std::vector<Assignment*>& assignments, Assignment* startingPoint, double delayTime);
+void delayEverythingBy(const std::vector<Assignment*>& assignments, const Assignment* startingPoint, double delayTime);
 
 void takeOverChangesFromRunningTasks(const nlohmann::json& bodyjson, graph_t* currentWorkflow, std::vector<Assignment*>& assignments);
 

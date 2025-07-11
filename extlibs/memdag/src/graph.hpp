@@ -250,10 +250,10 @@ void locateToDisk(edge_t* edge, bool imaginary, double afterWhen);
 Location& getLocationOnProcessor(edge_t* edge, int id, bool imaginary);
 Location& getLocationOnDisk(edge_t* edge, bool imaginary);
 
-std::string buildEdgeName(edge_t* edge);
+std::string buildEdgeName(const edge_t* edge);
 
-double getSumOut(vertex_t* v);
-double getSumIn(vertex_t* v);
+double getSumOut(const vertex_t* v);
+double getSumIn(const vertex_t* v);
 /** @name Macros to iterate over vertices*/
 ///@{
 #define first_vertex(graph) (graph->first_vertex)

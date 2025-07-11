@@ -9,10 +9,10 @@
 
 bool Debug;
 
-void delayEverythingBy(std::vector<Assignment*>& assignments, Assignment* startingPoint, double delayTime)
+void delayEverythingBy(const std::vector<Assignment*>& assignments, const Assignment* startingPoint, const double delayTime)
 {
 
-    for (auto& assignment : assignments) {
+    for (const auto& assignment : assignments) {
         if (assignment->startTime >= startingPoint->startTime) {
             assignment->startTime += delayTime;
             assignment->finishTime += delayTime;
@@ -23,14 +23,14 @@ void delayEverythingBy(std::vector<Assignment*>& assignments, Assignment* starti
 void Cluster::printAssignment()
 {
     int counter = 0;
-    for (const auto& item : this->getProcessors()) {
-        if (item.second->isBusy) {
+    for (const auto& [proc_id, processor] : this->getProcessors()) {
+        if (processor->isBusy) {
             counter++;
             std::cout << "Processor" << counter << "." << '\n';
-            std::cout << "\tMem: " << item.second->getMemorySize() << ", Proc: " << item.second->getProcessorSpeed() << '\n';
+            std::cout << "\tMem: " << processor->getMemorySize() << ", Proc: " << processor->getProcessorSpeed() << '\n';
 
-            vertex_t* assignedVertex = item.second->getAssignedTask();
-            if (assignedVertex == NULL)
+            const vertex_t* assignedVertex = processor->getAssignedTask();
+            if (assignedVertex == nullptr)
                 std::cout << "No assignment." << '\n';
             else {
                 std::cout << "Assigned subtree, id " << assignedVertex->id << ", leader " << -1 << ", memReq " << assignedVertex->memoryRequirement << '\n';
@@ -69,90 +69,90 @@ void removeSourceAndTarget(graph_t* graph, std::vector<std::pair<vertex_t*, doub
 {
 
     auto iterator = std::find_if(ranks.begin(), ranks.end(),
-        [](std::pair<vertex_t*, int> pair1) { return pair1.first->name == "GRAPH_SOURCE"; });
+        [](const std::pair<vertex_t*, int>& pair1) { return pair1.first->name == "GRAPH_SOURCE"; });
     if (iterator != ranks.end()) {
         ranks.erase(iterator);
     }
     iterator = find_if(ranks.begin(), ranks.end(),
-        [](std::pair<vertex_t*, int> pair1) { return pair1.first->name == "GRAPH_TARGET"; });
+        [](const std::pair<vertex_t*, int>& pair1) { return pair1.first->name == "GRAPH_TARGET"; });
     if (iterator != ranks.end()) {
         ranks.erase(iterator);
     }
 
-    vertex_t* startV = findVertexByName(graph, "GRAPH_SOURCE");
-    vertex_t* targetV = findVertexByName(graph, "GRAPH_TARGET");
+    const vertex_t* startV = findVertexByName(graph, "GRAPH_SOURCE");
+    const vertex_t* targetV = findVertexByName(graph, "GRAPH_TARGET");
     if (startV != nullptr)
         remove_vertex(graph, startV);
     if (targetV != nullptr)
         remove_vertex(graph, targetV);
 }
 
-bool isLocatedNowhere(edge_t* edge, bool imaginary)
+bool isLocatedNowhere(edge_t* edge, const bool imaginary)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
-    auto it = std::find_if(locations.begin(), locations.end(),
-        [](Location location) {
+    const auto it = std::find_if(locations.begin(), locations.end(),
+        [](const Location& location) {
             return location.locationType == LocationType::Nowhere;
         });
     return locations.empty() || it != locations.end();
 }
 
-bool isLocatedOnDisk(edge_t* edge, bool imaginary)
+bool isLocatedOnDisk(edge_t* edge, const bool imaginary)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     return std::find_if(locations.begin(), locations.end(),
-               [](Location location) {
+               [](const Location& location) {
                    return location.locationType == LocationType::OnDisk;
                })
         != locations.end();
 }
 
-bool isLocatedOnThisProcessor(edge_t* edge, int id, bool imaginary)
+bool isLocatedOnThisProcessor(edge_t* edge, int id, const bool imaginary)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     return std::find_if(locations.begin(), locations.end(),
-               [id](Location location) {
+               [id](const Location& location) {
                    return location.locationType == LocationType::OnProcessor && location.processorId == id;
                })
         != locations.end();
 }
 
-bool isLocatedOnAnyProcessor(edge_t* edge, bool imaginary)
+bool isLocatedOnAnyProcessor(edge_t* edge, const bool imaginary)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     return std::find_if(locations.begin(), locations.end(),
-               [](Location location) {
+               [](const Location& location) {
                    return location.locationType == LocationType::OnProcessor;
                })
         != locations.end();
 }
 
-int whatProcessorIsLocatedOn(edge_t* edge, bool imaginary)
+int whatProcessorIsLocatedOn(edge_t* edge, const bool imaginary)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
-    auto locationOnProcessor = std::find_if(locations.begin(), locations.end(),
-        [](Location location) {
+    const auto locationOnProcessor = std::find_if(locations.begin(), locations.end(),
+        [](const Location& location) {
             return location.locationType == LocationType::OnProcessor;
         });
     return (locationOnProcessor != locations.end()) ? locationOnProcessor->processorId.value() : -1;
 }
 
-std::string buildEdgeName(edge_t* edge)
+std::string buildEdgeName(const edge_t* edge)
 {
     return edge->tail->name + "-" + edge->head->name;
 }
 
-void delocateFromThisProcessorToDisk(edge_t* edge, int id, bool imaginary, double afterWhen)
+void delocateFromThisProcessorToDisk(edge_t* edge, int id, const bool imaginary, double afterWhen)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
-    auto locationOnThisProcessor = std::find_if(locations.begin(), locations.end(),
-        [id](Location location) {
+    const auto locationOnThisProcessor = std::find_if(locations.begin(), locations.end(),
+        [id](const Location& location) {
             return location.locationType == LocationType::OnProcessor && location.processorId == id;
         });
     // cout<<"delocating "; print_edge(edge);
@@ -169,12 +169,12 @@ void delocateFromThisProcessorToDisk(edge_t* edge, int id, bool imaginary, doubl
         locations.emplace_back(LocationType::OnDisk, std::nullopt, afterWhen);
 }
 
-void delocateFromThisProcessorToNowhere(edge_t* edge, int id, bool imaginary, double afterWhen)
+void delocateFromThisProcessorToNowhere(edge_t* edge, int id, const bool imaginary, double afterWhen)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
-    auto locationOnThisProcessor = std::find_if(locations.begin(), locations.end(),
-        [id](Location location) {
+    const auto locationOnThisProcessor = std::find_if(locations.begin(), locations.end(),
+        [id](const Location& location) {
             return location.locationType == LocationType::OnProcessor && location.processorId == id;
         });
     // cout<<"delocating "; print_edge(edge);
@@ -185,7 +185,7 @@ void delocateFromThisProcessorToNowhere(edge_t* edge, int id, bool imaginary, do
     locations.erase(locationOnThisProcessor);
 }
 
-void locateToThisProcessorFromDisk(edge_t* edge, int id, bool imaginary, double afterWhen)
+void locateToThisProcessorFromDisk(edge_t* edge, int id, const bool imaginary, double afterWhen)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
@@ -194,18 +194,15 @@ void locateToThisProcessorFromDisk(edge_t* edge, int id, bool imaginary, double 
         std::cout << "NOT located on disk yet! Write&Read? " << buildEdgeName(edge) << '\n';
     }
     // assert(isLocatedOnDisk(edge));
-    auto locationOnDisk = std::find_if(locations.begin(), locations.end(),
-        [](Location location) {
-            return location.locationType == LocationType::OnDisk;
-        });
     if (!isLocatedOnThisProcessor(edge, id, imaginary))
         locations.emplace_back(LocationType::OnProcessor, id, afterWhen);
 }
-Location& getLocationOnProcessor(edge_t* edge, int id, bool imaginary)
+
+Location& getLocationOnProcessor(edge_t* edge, int id, const bool imaginary)
 {
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     return *std::find_if(locations.begin(), locations.end(),
-        [id](Location& location) {
+        [id](const Location& location) {
             return location.locationType == LocationType::OnProcessor && location.processorId == id;
         });
 }
@@ -217,12 +214,12 @@ Location& getLocationOnProcessor(edge_t* edge, int id, bool imaginary)
                              return location.locationType == LocationType::OnDisk;
                          });
 } */
-Location& getLocationOnDisk(edge_t* edge, bool imaginary)
+Location& getLocationOnDisk(edge_t* edge, const bool imaginary)
 {
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
 
-    auto it = std::find_if(locations.begin(), locations.end(),
-        [](Location& location) { // Pass by reference ✅
+    const auto it = std::find_if(locations.begin(), locations.end(),
+        [](const Location& location) { // Pass by reference ✅
             return location.locationType == LocationType::OnDisk;
         });
 
@@ -233,7 +230,7 @@ Location& getLocationOnDisk(edge_t* edge, bool imaginary)
     return *it; // ✅ Safe: Returns reference to actual Location in vector
 }
 
-void locateToThisProcessorFromNowhere(edge_t* edge, int id, bool imaginary, double afterWhen)
+void locateToThisProcessorFromNowhere(edge_t* edge, int id, const bool imaginary, double afterWhen)
 {
 
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
@@ -241,28 +238,28 @@ void locateToThisProcessorFromNowhere(edge_t* edge, int id, bool imaginary, doub
     if (!isLocatedOnThisProcessor(edge, id, imaginary))
         locations.emplace_back(LocationType::OnProcessor, id, afterWhen);
 }
-void locateToDisk(edge_t* edge, bool imaginary, double afterWhen)
+void locateToDisk(edge_t* edge, const bool imaginary, double afterWhen)
 {
     std::vector<Location>& locations = imaginary ? edge->imaginedLocations : edge->locations;
     if (!isLocatedOnDisk(edge, imaginary))
         locations.emplace_back(LocationType::OnDisk, afterWhen);
 }
 
-double getSumOut(vertex_t* v)
+double getSumOut(const vertex_t* v)
 {
     double sumOut = 0;
-    for (int i = 0; i < v->out_edges.size(); i++) {
-        sumOut += v->out_edges[i]->weight;
+    for (auto & out_edge : v->out_edges) {
+        sumOut += out_edge->weight;
         //      cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
     }
     return sumOut;
 }
 
-double getSumIn(vertex_t* v)
+double getSumIn(const vertex_t* v)
 {
     double sumIn = 0;
-    for (int i = 0; i < v->in_edges.size(); i++) {
-        sumIn += v->in_edges[i]->weight;
+    for (auto & in_edge : v->in_edges) {
+        sumIn += in_edge->weight;
         //      cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
     }
     return sumIn;
@@ -334,7 +331,7 @@ void Processor::updateFrom(const Processor& other)
     }
 }
 
-void clearGraph(graph_t* graphMemTopology)
+void clearGraph(const graph_t* graphMemTopology)
 {
     vertex_t* vertex = graphMemTopology->first_vertex;
     while (vertex != nullptr) {

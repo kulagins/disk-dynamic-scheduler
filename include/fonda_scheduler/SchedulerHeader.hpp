@@ -57,13 +57,13 @@ std::vector<std::pair<vertex_t*, double>> calculateMMBottomUpRank(graph_t* graph
 
 double medih(graph_t* graph, int algoNum);
 
-std::vector<std::pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, int bottomLevelVariant);
+std::vector<std::pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, int algoNum);
 
 double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t* v, const std::shared_ptr<Processor>& pj);
 
 void tentativeAssignment(vertex_t* v, bool real, SchedulingResult& result);
 
-void tentativeAssignmentHEFT(vertex_t* v, bool real, SchedulingResult& result, SchedulingResult& resultCorrect);
+void tentativeAssignmentHEFT(const vertex_t* v, bool real, SchedulingResult& result, SchedulingResult& resultCorrect);
 
 graph_t* convertToNonMemRepresentation(graph_t* withMemories, std::map<int, int>& noMemToWithMem);
 
