@@ -1,19 +1,16 @@
 #ifndef GRAPH_H
 #define GRAPH_H
-#include <assert.h>
-// #include <igraph/igraph.h>
-#include "vector"
 
-#include <memory>
+#include <cassert>
+
 #include <optional>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <variant>
 #include <vector>
 
 /**
- * \file graph.h
+ * \file graph.hpp
  * \brief graph definition, management and algorithms
  */
 
@@ -40,7 +37,7 @@
 enum Status { Unscheduled,
     Scheduled,
     // Blocked,
-    //  Ready,
+    // Ready,
     Running,
     Finished
 };
@@ -105,9 +102,11 @@ struct vertex_t {
  *  with add_edges_to_cope_with_limited_memory())
  */
 
-typedef enum e_edge_status_t { ORIGINAL = 0,
+typedef enum e_edge_status_t {
+    ORIGINAL = 0,
     IN_CUT,
-    ADDED } edge_status_t;
+    ADDED
+} edge_status_t;
 
 /**
  * Edge type
@@ -130,7 +129,7 @@ struct Location {
     std::optional<int> processorId; // Holds processor ID if location is OnProcessor
     std::optional<double> afterWhen;
 
-    explicit Location(LocationType type, std::optional<int> procId = std::nullopt, std::optional<double> aftW = std::nullopt)
+    explicit Location(const LocationType type, const std::optional<int> procId = std::nullopt, const std::optional<double> aftW = std::nullopt)
         : locationType(type)
         , processorId(procId)
         , afterWhen(aftW)
@@ -205,24 +204,24 @@ struct graph_t {
 ///\endcond
 
 /* From graph.c: */
-graph_t* new_graph(void);
+graph_t* new_graph();
 vertex_t* new_vertex(graph_t* graph, const std::string& name, double time, void* data);
-vertex_t* new_vertex2Weights(graph_t* graph, const std::string name, double time, double memRequirement, void* data);
+vertex_t* new_vertex2Weights(graph_t* graph, const char* name, double time, double memRequirement, void* data);
 edge_t* new_edge(graph_t* graph, vertex_t* tail, vertex_t* head, double weight, void* data);
-void remove_vertex(graph_t* graph, vertex_t* v);
+void remove_vertex(graph_t* graph, const vertex_t* v);
 void remove_edge(graph_t* graph, edge_t* e);
-graph_t* copy_graph(graph_t* graph, int reverse_edges);
-void free_graph(graph_t* graph);
+graph_t* copy_graph(const graph_t* graph, int reverse_edges);
+void free_graph(const graph_t* graph);
 
 edge_t* find_edge(vertex_t* tail, vertex_t* head);
-void enforce_single_source_and_target(graph_t* graph, std::string suffix = "");
-void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, std::string suffix = "");
+void enforce_single_source_and_target(graph_t* graph, const std::string& suffix = "");
+void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const std::string& suffix = "");
 graph_t* read_dot_graph(const char* filename, const char* memory_label, const char* timing_label, const char* node_memory_label);
-void print_graph_to_dot_file(graph_t* graph, FILE* output);
-void print_graph_to_cout(graph_t* graph);
-void print_graph_to_cout_full(graph_t* graph);
+void print_graph_to_dot_file(const graph_t* graph, FILE* output);
+void print_graph_to_cout(const graph_t* graph);
+void print_graph_to_cout_full(const graph_t* graph);
 // igraph_t  convert_to_igraph(graph_t *graph, igraph_vector_t *edge_weights_p, igraph_strvector_t *node_names_p, igraph_vector_t *vertex_times_p);
-int check_if_path_exists(vertex_t* origin, vertex_t* destination);
+int check_if_path_exists(vertex_t* origin, const vertex_t* destination);
 
 /* From graph-algorithms.c: */
 double compute_peak_memory(graph_t* graph, vertex_t** schedule);
@@ -276,8 +275,8 @@ int add_edges_to_cope_with_limited_memory(graph_t* graph, double memory_bound, e
 
 /* Added for the scheduler */
 
-vertex_t* findVertexByName(graph_t* graph, std::string toFind);
-vertex_t* findVertexById(graph_t* graph, int idToFind);
+vertex_t* findVertexByName(const graph_t* graph, const std::string& toFind);
+vertex_t* findVertexById(const graph_t* graph, int idToFind);
 void print_edge(edge_t* v);
 double peakMemoryRequirementOfVertex(const vertex_t* v);
 double inMemoryRequirement(const vertex_t* v);
@@ -297,29 +296,29 @@ public:
         resultingMakespan = -1;
     }
 
-    Swap(vertex_t* f, vertex_t* s, double ms)
+    Swap(vertex_t* f, vertex_t* s, const double ms)
     {
         firstTask = f;
         secondTask = s;
         resultingMakespan = ms;
     }
 
-    void setMakespan(double ms)
+    void setMakespan(const double ms)
     {
         resultingMakespan = ms;
     }
 
-    vertex_t* getFirstTask()
+    [[nodiscard]] vertex_t* getFirstTask() const
     {
         return firstTask;
     }
 
-    double getMakespan()
+    [[nodiscard]] double getMakespan() const
     {
         return resultingMakespan;
     }
 
-    vertex_t* getSecondTask()
+    [[nodiscard]] vertex_t* getSecondTask() const
     {
         return secondTask;
     }

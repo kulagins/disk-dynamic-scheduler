@@ -6,6 +6,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <memory>
 #include <ostream>
 #include <stdio.h>
 #include <vector>

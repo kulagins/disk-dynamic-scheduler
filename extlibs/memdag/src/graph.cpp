@@ -1,13 +1,15 @@
-#include "graph.hpp"
-#include "fifo.hpp"
-#include <algorithm>
-#include <assert.h>
-#include <graphviz/cgraph.h>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdio>
 
-/** \file graph.c
+#include <algorithm>
+#include <iostream>
+
+#include <graphviz/cgraph.h>
+
+#include "fifo.hpp"
+#include "graph.hpp"
+
+/** \file graph.cpp
  * \brief Graph management for memdag
  */
 
@@ -16,13 +18,13 @@
  * Creates a new empty graph
  */
 
-graph_t* new_graph(void)
+graph_t* new_graph()
 {
     return new graph_t;
 }
 
 ///\cond HIDDEN_SYMBOLS
-vertex_t* new_vertex_with_id(graph_t* graph, int id, const std::string& name, double time, void* data)
+vertex_t* new_vertex_with_id(graph_t* graph, const int id, const std::string& name, const double time, void* data)
 {
     auto* new_vertex = new vertex_t;
     new_vertex->name = name;
@@ -62,13 +64,13 @@ vertex_t* new_vertex_with_id(graph_t* graph, int id, const std::string& name, do
  * Note that the name of the vertex is duplicated, so that \p name can be safely freed.
  */
 
-vertex_t* new_vertex(graph_t* graph, const std::string& name, double time, void* data)
+vertex_t* new_vertex(graph_t* graph, const std::string& name, const double time, void* data)
 {
     vertex_t* new_vertex = new_vertex_with_id(graph, -1, name, time, data);
     return new_vertex;
 }
 
-vertex_t* new_vertex2Weights(graph_t* graph, const char* name, double time, double memRequirement, void* data)
+vertex_t* new_vertex2Weights(graph_t* graph, const char* name, const double time, const double memRequirement, void* data)
 {
     vertex_t* new_vertex = new_vertex_with_id(graph, -1, name, time, data);
     new_vertex->memoryRequirement = memRequirement;
@@ -85,7 +87,7 @@ vertex_t* new_vertex2Weights(graph_t* graph, const char* name, double time, doub
 
 edge_t* new_edge(graph_t* graph, vertex_t* tail, vertex_t* head, const double weight, void* data)
 {
-    edge_t* new_edge = new edge_t;
+    auto new_edge = new edge_t;
     new_edge->weight = weight;
     new_edge->data = data;
     new_edge->tail = tail;
@@ -116,18 +118,18 @@ edge_t* new_edge(graph_t* graph, vertex_t* tail, vertex_t* head, const double we
  * Remove an existing vertex in a graph
  */
 
-void remove_vertex(graph_t* graph, vertex_t* v)
+void remove_vertex(graph_t* graph, const vertex_t* v)
 {
     if (graph->vertices_by_id[v->id] != v) {
         fprintf(stderr, "ERROR: attempt to remove vertex \"%s\" from another graph.\n", v->name.c_str());
         exit(1);
     }
-    std::unordered_set<edge_t*> edges_to_be_suppressed;
+    std::vector<edge_t*> edges_to_be_suppressed;
     for (auto* edge : v->in_edges) {
-        edges_to_be_suppressed.insert(edge);
+        edges_to_be_suppressed.emplace_back(edge);
     }
     for (auto* edge : v->out_edges) {
-        edges_to_be_suppressed.insert(edge);
+        edges_to_be_suppressed.emplace_back(edge);
     }
     // fifo_t* edges_to_be_suppressed = fifo_new();
     // // Remove edges associated to vertex
@@ -217,49 +219,49 @@ void remove_edge(graph_t* graph, edge_t* e)
  * Prints a graph as a dot file
  */
 
-void print_graph_to_dot_file(graph_t* graph, FILE* output)
+void print_graph_to_dot_file(const graph_t* graph, FILE* output)
 {
     fprintf(output, "DiGraph G {\n");
     //  for(vertex_t *v=first_vertex(graph); is_last_vertex(v); v=next_vertex(v)) {
-    for (vertex_t* v = graph->first_vertex; v; v = v->next) {
+    for (const vertex_t* v = graph->first_vertex; v; v = v->next) {
         fprintf(output, " %d [label=\"%s (%d) - %f\"];\n", v->id, v->name.c_str(), v->id, v->time);
     }
-    for (edge_t* e = graph->first_edge; e; e = e->next) {
+    for (const edge_t* e = graph->first_edge; e; e = e->next) {
         fprintf(output, " %d -> %d [label=\"%f\" path=\"%s -> %s\"%s];\n", e->tail->id, e->head->id, e->weight, e->tail->name.c_str(), e->head->name.c_str(), (e->status == IN_CUT) ? " color=\"red\"" : (e->status == ADDED) ? " color=\"blue\""
                                                                                                                                                                                                                               : "");
     }
     fprintf(output, "}\n");
 }
 
-void print_graph_to_cout(graph_t* graph)
+void print_graph_to_cout(const graph_t* graph)
 {
     printf("No leaders anymore \n");
     printf("DiGraph G {\n");
     //  for(vertex_t *v=first_vertex(graph); is_last_vertex(v); v=next_vertex(v)) {
-    for (vertex_t* v = graph->first_vertex; v; v = v->next) {
+    for (const vertex_t* v = graph->first_vertex; v; v = v->next) {
         printf(" %d [label=%s (%d), leader=%d time= %f memory= %f];\n", v->id, v->name.c_str(), v->id, -1, v->time, v->memoryRequirement);
     }
-    for (edge_t* e = graph->first_edge; e; e = e->next) {
+    for (const edge_t* e = graph->first_edge; e; e = e->next) {
         printf(" %d -> %d [weight=\"%f\" path=\"%s -> %s\"%s];\n", e->tail->id, e->head->id, e->weight, e->tail->name.c_str(), e->head->name.c_str(), (e->status == IN_CUT) ? " color=\"red\"" : (e->status == ADDED) ? " color=\"blue\""
                                                                                                                                                                                                                       : "");
     }
     printf("}\n");
 }
 
-void print_graph_to_cout_full(graph_t* graph)
+void print_graph_to_cout_full(const graph_t* graph)
 {
     printf("DiGraph G, full {\n");
     //  for(vertex_t *v=first_vertex(graph); is_last_vertex(v); v=next_vertex(v)) {
-    for (vertex_t* v = graph->first_vertex; v; v = v->next) {
+    for (const vertex_t* v = graph->first_vertex; v; v = v->next) {
         printf(" %d, leader %d [label=%s (%d) time= %f memory= %f];\n", v->id, -1, v->name.c_str(), v->id, v->time, v->memoryRequirement);
         if (v->subgraph != nullptr) {
-            for (vertex_t* v1 = v->subgraph->first_vertex; v1; v1 = v1->next) {
+            for (const vertex_t* v1 = v->subgraph->first_vertex; v1; v1 = v1->next) {
                 printf("\t %d [label=%s (%d) leader= %d time= %f memory= %f];\n", v1->id, v1->name.c_str(), v1->id, -1, v1->time, v1->memoryRequirement);
             }
         }
     }
 
-    for (edge_t* e = graph->first_edge; e; e = e->next) {
+    for (const edge_t* e = graph->first_edge; e; e = e->next) {
         printf(" %d -> %d [weight=\"%f\" path=\"%s -> %s\"%s];\n", e->tail->id, e->head->id, e->weight, e->tail->name.c_str(), e->head->name.c_str(), (e->status == IN_CUT) ? " color=\"red\"" : (e->status == ADDED) ? " color=\"blue\""
                                                                                                                                                                                                                       : "");
     }
@@ -270,10 +272,10 @@ void print_graph_to_cout_full(graph_t* graph)
  * Creates a copy of an existing graph
  */
 
-graph_t* copy_graph(graph_t* graph, int reverse_edges)
+graph_t* copy_graph(const graph_t* graph, const int reverse_edges)
 {
     graph_t* new_g = new_graph();
-    for (vertex_t* v = graph->first_vertex; v; v = v->next) {
+    for (const vertex_t* v = graph->first_vertex; v; v = v->next) {
         new_vertex_with_id(new_g, v->id, v->name, v->time, v->data);
         new_g->vertices_by_id[v->id]->memoryRequirement = v->memoryRequirement;
         // new_g->vertices_by_id[v->id]->leader = v->leader;
@@ -375,12 +377,11 @@ graph_t* copy_graph(graph_t* graph, int reverse_edges)
  *
  * Note: user data associated to nodes and/or edges is kept untouched.
  */
-void free_graph(graph_t* graph)
+void free_graph(const graph_t* graph)
 {
-    vertex_t* v = graph->first_vertex;
-    if (v) {
+    if (const vertex_t* v = graph->first_vertex) {
         do {
-            vertex_t* vv = v;
+            const vertex_t* vv = v;
             v = vv->next;
             // free(vv->name);
             // free(vv);
@@ -388,10 +389,9 @@ void free_graph(graph_t* graph)
         } while (v);
     }
 
-    edge_t* e = graph->first_edge;
-    if (e) {
+    if (const edge_t* e = graph->first_edge) {
         do {
-            edge_t* ee = e;
+            const edge_t* ee = e;
             e = ee->next;
             // free(ee);
             delete ee;
@@ -432,7 +432,7 @@ graph_t* read_dot_graph(const char* filename, const char* memory_label, const ch
         fprintf(stderr, "Unable to read file \"%s\"\n", filename);
         exit(1);
     }
-    Agraph_t* ag_graph = agread(input_graph_file, 0);
+    Agraph_t* ag_graph = agread(input_graph_file, nullptr);
     fclose(input_graph_file);
 
     graph_t* graph = new_graph();
@@ -457,7 +457,6 @@ graph_t* read_dot_graph(const char* filename, const char* memory_label, const ch
         double time;
         double node_memory;
         char* name = agget(ag_node, (char*)"label");
-        char* name2 = agnameof(ag_node);
         if (timing_label) {
             time = strtod(agget(ag_node, (char*)timing_label), nullptr);
         } else {
@@ -490,7 +489,7 @@ graph_t* read_dot_graph(const char* filename, const char* memory_label, const ch
             vertex_t* head = MY_NODE_IN_VERTEX(aghead(ag_edge));
             double edge_weight;
             if (memory_label) {
-                char* str = agget(ag_edge, (char*)memory_label);
+                const char* str = agget(ag_edge, (char*)memory_label);
                 if (!str) {
                     fprintf(stderr, "Unable to find memory attribue with label \"%s\" in graph %s\n", memory_label, filename);
                     exit(1);
@@ -528,7 +527,7 @@ graph_t* read_dot_graph(const char* filename, const char* memory_label, const ch
  * is created and edges are added from (resp. to) this vertex to
  * (resp. from) the existing sources (resp. targets).
  */
-void enforce_single_source_and_target(graph_t* graph, std::string suffix)
+void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
 {
     vertex_t *source = nullptr, *target = nullptr;
 
@@ -583,7 +582,7 @@ void enforce_single_source_and_target(graph_t* graph, std::string suffix)
     graph->target = target;
 }
 
-void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, std::string suffix)
+void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const std::string& suffix)
 {
     vertex_t *source = nullptr, *target = nullptr;
 
@@ -663,12 +662,12 @@ edge_t* find_edge(vertex_t* tail, vertex_t* head)
 /**
  * Simple BFS search to test dependence between two vertices
  */
-int check_if_path_exists(vertex_t* origin, vertex_t* destination)
+int check_if_path_exists(vertex_t* origin, const vertex_t* destination)
 {
     fifo_t* vertices_to_visit = fifo_new();
     fifo_write(vertices_to_visit, (void*)origin);
     while (!fifo_is_empty(vertices_to_visit)) {
-        vertex_t* v = (vertex_t*)fifo_read(vertices_to_visit);
+        const auto v = (vertex_t*)fifo_read(vertices_to_visit);
         for (auto* e : v->out_edges) {
             // fprintf(stderr, "Checking edge %s -> %s\n", e->tail->name, e->head->name);
             if (e->head == destination) {
@@ -681,18 +680,18 @@ int check_if_path_exists(vertex_t* origin, vertex_t* destination)
     fifo_free(vertices_to_visit);
     return 0;
 }
-vertex_t* findVertexByName(graph_t* graph, std::string toFind)
+vertex_t* findVertexByName(const graph_t* graph, const std::string& toFind)
 {
     vertex_t* vertex = graph->first_vertex;
 
     while (vertex != nullptr) {
         std::string vname = vertex->name;
         std::transform(vname.begin(), vname.end(), vname.begin(),
-            [](unsigned char c) { return std::tolower(c); });
+            [](const unsigned char c) { return std::tolower(c); });
 
         std::string vnameToFind = toFind;
         std::transform(vnameToFind.begin(), vnameToFind.end(), vnameToFind.begin(),
-            [](unsigned char c) { return std::tolower(c); });
+            [](const unsigned char c) { return std::tolower(c); });
 
         if (vname == vnameToFind)
             return vertex;
@@ -701,7 +700,7 @@ vertex_t* findVertexByName(graph_t* graph, std::string toFind)
     return nullptr;
 }
 
-vertex_t* findVertexById(graph_t* graph, int idToFind)
+vertex_t* findVertexById(const graph_t* graph, const int idToFind)
 {
     vertex_t* vertex = graph->first_vertex;
     while (vertex != nullptr) {
@@ -743,8 +742,8 @@ double peakMemoryRequirementOfVertex(const vertex_t* v)
 {
     double maxMemReq = v->memoryRequirement;
 
-    double sumIn = inMemoryRequirement(v);
-    double sumOut = outMemoryRequirement(v);
+    const double sumIn = inMemoryRequirement(v);
+    const double sumOut = outMemoryRequirement(v);
 
     if (sumIn > maxMemReq) {
         maxMemReq = sumIn;
