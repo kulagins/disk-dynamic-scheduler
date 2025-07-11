@@ -196,7 +196,6 @@ int main(int argc, char *argv[]) {
     std::chrono::duration<double> elapsed_seconds = end - start;
    // std::cout << " duration_of_prep " << elapsed_seconds.count()<<" ";// << endl;
 
-    start = std::chrono::system_clock::now();
     vector<Assignment *> assignments;
     cout<<std::setprecision(15);
 
@@ -207,10 +206,12 @@ int main(int argc, char *argv[]) {
     assert(cluster->getProcessors().at(2)->getMemorySize()== actualCluster->getProcessors().at(2)->getMemorySize());
     assert(cluster->getProcessors().at(3)->getMemorySize()== actualCluster->getProcessors().at(3)->getMemorySize());
 
-    double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant, usePreemptiveWrites);
+    double runtime =0;
+
+    double d = new_heuristic_dynamic(graphMemTopology, cluster, algoNumber, isBaseline, deviationVariant, usePreemptiveWrites, runtime);
 
     events.deleteAll();
-    std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
+    std::cout << " duration_of_algorithm " << runtime<<" ";// << endl;
     cout<<"makespan_1 "<<d<<"\t";
 
 
@@ -219,10 +220,10 @@ int main(int argc, char *argv[]) {
 
     clearGraph(graphMemTopology);
     start = std::chrono::system_clock::now();
-    d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline);
-     end = std::chrono::system_clock::now();
-     elapsed_seconds = end - start;
-    std::cout << " duration_of_algorithm " << elapsed_seconds.count()<<" ";// << endl;
+    double runtimeStatic=0;
+    d = new_heuristic(graphMemTopology,  currentAlgoNum, isBaseline, runtimeStatic);
+
+    std::cout << " duration_of_algorithm " << runtimeStatic<<" ";// << endl;
     cout<<"makespan_2 "<<d<<endl;
 
 
