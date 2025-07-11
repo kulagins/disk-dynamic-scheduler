@@ -1,20 +1,16 @@
 #ifndef cluster_h
 #define cluster_h
 
-#include <assert.h>
-#include <forward_list>
+#include <cassert>
 #include <iostream>
 #include <list>
-#include <map>
 #include <memory>
 #include <ostream>
-#include <stdio.h>
 #include <vector>
 
 #include "graph.hpp"
 #include <algorithm>
 #include <functional>
-#include <limits>
 #include <set>
 #include <unordered_map>
 
@@ -27,9 +23,9 @@ class Event;
 
 class Processor : public std::enable_shared_from_this<Processor> {
 protected:
-    double memorySize;
-    double processorSpeed;
-    vertex_t* assignedTask;
+    double memorySize = 0;
+    double processorSpeed = 1;
+    vertex_t* assignedTask = nullptr;
     // std::unordered_map<string, std::weak_ptr<Event>> eventsOnProc;
     bool isKeptValid = true;
 
@@ -49,85 +45,53 @@ public:
         } else
             return a->weight > b->weight;
     }
-    int id;
-    std::string name;
-    bool isBusy;
 
-    double softReadyTimeWrite;
+    int id = -1;
+    std::string name = {};
+    bool isBusy = false;
 
-    double memoryOffloadingPenalty;
-    std::vector<edge_t*> writingQueue;
+    double softReadyTimeWrite = 0;
+
+    double memoryOffloadingPenalty = 0;
+    std::vector<edge_t*> writingQueue = {};
 
 protected:
-    double availableMemory;
-    // std::set<edge_t *, decltype(comparePendingMemories)*> pendingMemories{comparePendingMemories};
-    std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>> pendingMemories;
+    double availableMemory = 0;
+    std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>> pendingMemories { comparePendingMemories };
 
-    double afterAvailableMemory;
-    // std::set<edge_t *, decltype(comparePendingMemories)*> afterPendingMemories{comparePendingMemories};
-    std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>> afterPendingMemories;
+    double afterAvailableMemory = 0;
+    std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>> afterPendingMemories { comparePendingMemories };
 
 public:
-    double readSpeedDisk;
-    double writeSpeedDisk;
+    double readSpeedDisk = 0;
+    double writeSpeedDisk = 0;
     double peakMemConsumption = 0;
 
-    std::string assignment;
+    std::string assignment = {};
 
 private:
-    std::weak_ptr<Event> lastReadEvent;
-    std::weak_ptr<Event> lastWriteEvent;
-    std::weak_ptr<Event> lastComputeEvent;
+    std::weak_ptr<Event> lastReadEvent = {};
+    std::weak_ptr<Event> lastWriteEvent = {};
+    std::weak_ptr<Event> lastComputeEvent = {};
 
-    double readyTimeCompute;
-    double readyTimeRead;
-    double readyTimeWrite;
+    double readyTimeCompute = 0;
+    double readyTimeRead = 0;
+    double readyTimeWrite = 0;
 
 public:
-    Processor()
-        : pendingMemories(comparePendingMemories)
+    Processor() = default;
+
+    explicit Processor(const double memorySize, const int id = -1)
+        : memorySize(memorySize)
+        , id(id)
     {
-        this->memorySize = 0;
-        this->processorSpeed = 1;
-        isBusy = false;
-        assignedTask = nullptr;
-        id = -1;
-        this->readyTimeCompute = 0;
-        this->readyTimeRead = 0;
-        this->readyTimeWrite = 0;
-        this->softReadyTimeWrite = 0;
     }
 
-    explicit Processor(double memorySize, int id = -1)
-        : pendingMemories(comparePendingMemories)
+    Processor(const double memorySize, const double processorSpeed, const int id = -1)
+        : memorySize(memorySize)
+        , processorSpeed(processorSpeed)
+        , id(id)
     {
-        this->memorySize = memorySize;
-        this->availableMemory = memorySize;
-        this->afterAvailableMemory = memorySize;
-        this->processorSpeed = 1;
-        isBusy = false;
-        assignedTask = nullptr;
-        this->id = id;
-        this->readyTimeCompute = 0;
-        this->readyTimeRead = 0;
-        this->readyTimeWrite = 0;
-        this->softReadyTimeWrite = 0;
-    }
-
-    Processor(double memorySize, double processorSpeed, int id = -1)
-        : pendingMemories(comparePendingMemories)
-    {
-        this->memorySize = memorySize;
-        this->availableMemory = memorySize;
-        this->afterAvailableMemory = memorySize;
-        this->processorSpeed = processorSpeed;
-        isBusy = false;
-        assignedTask = nullptr;
-        this->id = id;
-        this->readyTimeCompute = 0;
-        this->readyTimeRead = 0;
-        this->readyTimeWrite = 0;
-        this->softReadyTimeWrite = 0;
     }
 
     Processor(const Processor& copy);

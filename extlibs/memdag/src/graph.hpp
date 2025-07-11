@@ -175,7 +175,7 @@ struct edge_t {
 struct graph_t {
     vertex_t* first_vertex = nullptr;
     edge_t* first_edge = nullptr;
-    int next_vertex_index = -1;
+    int next_vertex_index = 0;
     std::unordered_map<int, vertex_t*> vertices_by_id;
     vertex_t* source = nullptr;
     vertex_t* target = nullptr;

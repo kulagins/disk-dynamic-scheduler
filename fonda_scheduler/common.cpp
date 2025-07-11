@@ -301,7 +301,7 @@ void Processor::updateFrom(const Processor& other)
     this->readyTimeRead = other.readyTimeRead;
     this->readyTimeWrite = other.readyTimeWrite;
 
-    assert(other.availableMemory <= other.getMemorySize() || abs(other.availableMemory - other.getMemorySize()) < 1);
+    assert(other.availableMemory <= other.getMemorySize() || std::abs(other.availableMemory - other.getMemorySize()) < 1);
     this->availableMemory = other.availableMemory;
     std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>> updatedMemories(comparePendingMemories);
     // First, add elements that exist in both and new ones from 'other'
@@ -311,7 +311,7 @@ void Processor::updateFrom(const Processor& other)
     // Swap the updated set into place
     pendingMemories.swap(updatedMemories);
 
-    assert(other.afterAvailableMemory < other.getMemorySize() || abs(other.afterAvailableMemory - other.getMemorySize()) < 0.01);
+    assert(other.afterAvailableMemory < other.getMemorySize() || std::abs(other.afterAvailableMemory - other.getMemorySize()) < 0.01);
     this->afterAvailableMemory = other.afterAvailableMemory;
     updatedMemories.clear();
     // First, add elements that exist in both and new ones from 'other'

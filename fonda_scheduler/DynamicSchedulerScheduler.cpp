@@ -71,7 +71,7 @@ std::vector<std::shared_ptr<Event>> bestTentativeAssignment(vertex_t* vertex, st
         event->processor = cluster->getProcessorById(event->processor->id);
     }
 
-    for (const auto & in_edge : vertex->in_edges) {
+    for (const auto& in_edge : vertex->in_edges) {
         assert( // vertex->in_edges[j]->tail->makespan==-1 ||
             bestFinishTime > in_edge->tail->makespan);
     }
@@ -310,7 +310,7 @@ tentativeAssignment(vertex_t* vertex, const std::shared_ptr<Processor>& ourModif
     finishTime = eventStartTask->getExpectedTimeFire() + vertex->time / ourModifiedProc->getProcessorSpeed();
     if (resultingVar == 1) {
         assert(Res < 0);
-        finishTime += abs(Res) / ourModifiedProc->memoryOffloadingPenalty;
+        finishTime += std::abs(Res) / ourModifiedProc->memoryOffloadingPenalty;
     } else if (resultingVar == 2) {
         finishTime += amountToOffloadWithoutBiggestFile / ourModifiedProc->memoryOffloadingPenalty;
     } else if (resultingVar == 3) {
@@ -532,7 +532,7 @@ scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::ve
 
     // if this start of the read is happening during the runtime  of the previous task
     // TODO WHAT IF BEFORE IT STARTS?
-    assert(ourModifiedProc->getLastComputeEvent().expired() || abs(ourModifiedProc->getReadyTimeCompute() - ourModifiedProc->getLastComputeEvent().lock()->getActualTimeFire()) < 0.001);
+    assert(ourModifiedProc->getLastComputeEvent().expired() || std::abs(ourModifiedProc->getReadyTimeCompute() - ourModifiedProc->getLastComputeEvent().lock()->getActualTimeFire()) < 0.001);
     if (estimatedStartOfRead < ourModifiedProc->getExpectedOrActualReadyTimeCompute() && ourModifiedProc->getAvailableMemory() < incomingEdge->weight) {
         estimatedStartOfRead = ourModifiedProc->getExpectedOrActualReadyTimeCompute();
     }
@@ -748,7 +748,7 @@ void scheduleWriteAndRead(const vertex_t* v, const std::shared_ptr<Event>& ourEv
     double estimatedStartOfRead = startTimeOfTask - incomingEdge->weight / ourModifiedProc->readSpeedDisk;
     estimatedStartOfRead = std::max(estimatedStartOfRead, ourModifiedProc->getExpectedOrActualReadyTimeRead());
 
-    assert(ourModifiedProc->getLastComputeEvent().expired() || abs(ourModifiedProc->getReadyTimeCompute() - ourModifiedProc->getLastComputeEvent().lock()->getActualTimeFire()) < 0.001);
+    assert(ourModifiedProc->getLastComputeEvent().expired() || std::abs(ourModifiedProc->getReadyTimeCompute() - ourModifiedProc->getLastComputeEvent().lock()->getActualTimeFire()) < 0.001);
 
     if (estimatedStartOfRead < ourModifiedProc->getExpectedOrActualReadyTimeCompute() && ourModifiedProc->getAvailableMemory() < incomingEdge->weight) {
         estimatedStartOfRead = ourModifiedProc->getExpectedOrActualReadyTimeCompute();
