@@ -660,21 +660,14 @@ int check_if_path_exists(vertex_t* origin, const vertex_t* destination)
     fifo_free(vertices_to_visit);
     return 0;
 }
+
 vertex_t* findVertexByName(const graph_t* graph, const std::string& toFind)
 {
     vertex_t* vertex = graph->first_vertex;
-
     while (vertex != nullptr) {
-        std::string vname = vertex->name;
-        std::transform(vname.begin(), vname.end(), vname.begin(),
-            [](const unsigned char c) { return std::tolower(c); });
-
-        std::string vnameToFind = toFind;
-        std::transform(vnameToFind.begin(), vnameToFind.end(), vnameToFind.begin(),
-            [](const unsigned char c) { return std::tolower(c); });
-
-        if (vname == vnameToFind)
+        if (vertex->name == toFind) {
             return vertex;
+        }
         vertex = vertex->next;
     }
     return nullptr;
@@ -684,10 +677,10 @@ vertex_t* findVertexById(const graph_t* graph, const int idToFind)
 {
     vertex_t* vertex = graph->first_vertex;
     while (vertex != nullptr) {
-        if (vertex->id == idToFind)
+        if (vertex->id == idToFind) {
             return vertex;
-        else
-            vertex = vertex->next;
+        }
+        vertex = vertex->next;
     }
     return nullptr;
 }
