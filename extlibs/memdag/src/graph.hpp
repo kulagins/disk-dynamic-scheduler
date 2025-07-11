@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -66,8 +67,8 @@ struct vertex_t {
     vertex_t* prev = nullptr;
     int in_degree = 0;
     int out_degree = 0;
-    std::unordered_map<int, edge_t*> in_edges;
-    std::unordered_map<int, edge_t*> out_edges;
+    std::vector<edge_t*> in_edges;
+    std::vector<edge_t*> out_edges;
 
     ///\cond HIDDEN_SYMBOLS
     /* other data used for graph algorithms */

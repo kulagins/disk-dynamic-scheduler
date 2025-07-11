@@ -627,7 +627,7 @@ scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::ve
     // if(abs(actualLength - incomingEdge->weight / ourModifiedProc->readSpeedDisk) > 0.00001){
     // cerr<<"WRONG LENGTH OF READ PLANNED ON "<<buildEdgeName(incomingEdge)<<" actual length "<<actualLength<<" should be "<<to_string(incomingEdge->weight / ourModifiedProc->readSpeedDisk)<<endl;
     //}
-    assert(abs(actualLength - incomingEdge->weight / ourModifiedProc->readSpeedDisk) < 0.001);
+    assert(std::abs(actualLength - incomingEdge->weight / ourModifiedProc->readSpeedDisk) < 0.001);
     return { eventStartRead, eventFinishRead };
 }
 
@@ -888,7 +888,7 @@ void checkBestEvents(std::vector<std::shared_ptr<Event>>& bestEvents)
                 });
             if (itWriteStart != bestEvents.end()) {
                 const auto actualLength = item->getExpectedTimeFire() - (*itWriteStart)->getExpectedTimeFire();
-                assert(abs(actualLength - item->edge->weight / item->processor->writeSpeedDisk) < 0.00001);
+                assert(std::abs(actualLength - item->edge->weight / item->processor->writeSpeedDisk) < 0.00001);
             } else {
                 throw std::runtime_error("no pair found ofr " + item->id);
             }
@@ -900,7 +900,7 @@ void checkBestEvents(std::vector<std::shared_ptr<Event>>& bestEvents)
                 });
             if (itReadStart != bestEvents.end()) {
                 const auto actualLength = item->getExpectedTimeFire() - (*itReadStart)->getExpectedTimeFire();
-                assert(abs(actualLength - item->edge->weight / item->processor->readSpeedDisk) < 0.00001);
+                assert(std::abs(actualLength - item->edge->weight / item->processor->readSpeedDisk) < 0.00001);
                 std::cout << "ys" << '\n';
             } else {
                 throw std::runtime_error("no pair found ofr " + item->id);

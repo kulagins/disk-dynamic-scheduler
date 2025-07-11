@@ -22,7 +22,7 @@ graph_t* new_graph(void)
 }
 
 ///\cond HIDDEN_SYMBOLS
-vertex_t* new_vertex_with_id(graph_t* graph, int id, const std::string name, double time, void* data)
+vertex_t* new_vertex_with_id(graph_t* graph, int id, const std::string& name, double time, void* data)
 {
     auto* new_vertex = new vertex_t;
     new_vertex->name = name;
@@ -83,7 +83,7 @@ vertex_t* new_vertex2Weights(graph_t* graph, const char* name, double time, doub
  * @param data pointer to user data (possibly void)
  */
 
-edge_t* new_edge(graph_t* graph, vertex_t* tail, vertex_t* head, double weight, void* data)
+edge_t* new_edge(graph_t* graph, vertex_t* tail, vertex_t* head, const double weight, void* data)
 {
     edge_t* new_edge = new edge_t;
     new_edge->weight = weight;
@@ -92,12 +92,12 @@ edge_t* new_edge(graph_t* graph, vertex_t* tail, vertex_t* head, double weight, 
     new_edge->head = head;
 
     // register edge at tail vertex
-    tail->out_edges[tail->out_degree] = new_edge;
-    tail->out_degree++;
+    tail->out_edges.emplace_back(new_edge);
+    tail->out_degree = tail->out_edges.size();
 
     // register edge at head vertex
-    head->in_edges[head->in_degree] = new_edge;
-    head->in_degree++;
+    head->in_edges.emplace_back(new_edge);
+    head->in_degree = head->in_edges.size();
 
     edge_t* old_first = graph->first_edge;
     new_edge->next = old_first;
@@ -122,20 +122,31 @@ void remove_vertex(graph_t* graph, vertex_t* v)
         fprintf(stderr, "ERROR: attempt to remove vertex \"%s\" from another graph.\n", v->name.c_str());
         exit(1);
     }
-    fifo_t* edges_to_be_suppressed = fifo_new();
-    // Remove edges associated to vertex
-    for (int i = 0; i < v->in_degree; i++) {
-        fifo_write(edges_to_be_suppressed, (void*)v->in_edges[i]);
+    std::unordered_set<edge_t*> edges_to_be_suppressed;
+    for (auto* edge : v->in_edges) {
+        edges_to_be_suppressed.insert(edge);
     }
-    for (int i = 0; i < v->out_degree; i++) {
-        fifo_write(edges_to_be_suppressed, (void*)v->out_edges[i]);
+    for (auto* edge : v->out_edges) {
+        edges_to_be_suppressed.insert(edge);
     }
+    // fifo_t* edges_to_be_suppressed = fifo_new();
+    // // Remove edges associated to vertex
+    // for (int i = 0; i < v->in_degree; i++) {
+    //     fifo_write(edges_to_be_suppressed, (void*)v->in_edges[i]);
+    // }
+    // for (int i = 0; i < v->out_degree; i++) {
+    //     fifo_write(edges_to_be_suppressed, (void*)v->out_edges[i]);
+    // }
+    //
+    // while (!fifo_is_empty(edges_to_be_suppressed)) {
+    //     edge_t* e = (edge_t*)fifo_read(edges_to_be_suppressed);
+    //     remove_edge(graph, e);
+    // }
+    // fifo_free(edges_to_be_suppressed);
 
-    while (!fifo_is_empty(edges_to_be_suppressed)) {
-        edge_t* e = (edge_t*)fifo_read(edges_to_be_suppressed);
-        remove_edge(graph, e);
+    for (auto* edge : edges_to_be_suppressed) {
+        remove_edge(graph, edge);
     }
-    fifo_free(edges_to_be_suppressed);
 
     // Remove from vertex list and array
     vertex_t* n = v->next;
@@ -147,15 +158,17 @@ void remove_vertex(graph_t* graph, vertex_t* v)
     } else {
         graph->first_vertex = n;
     }
-    graph->vertices_by_id[v->id] = nullptr;
+    // graph->vertices_by_id[v->id] = nullptr;
+    graph->vertices_by_id.erase(v->id);
 
-    graph->number_of_vertices--;
+    graph->number_of_vertices = graph->vertices_by_id.size();
 
     // Free vertex data
     if (v->subgraph != nullptr)
         free_graph(v->subgraph);
     // free(v->name);
-    free(v);
+    // free(v);
+    delete v;
 }
 
 /**
@@ -175,34 +188,12 @@ void remove_edge(graph_t* graph, edge_t* e)
     // fprintf(stderr,"removing edge  \"%s->%s\" \n", tail->name, head->name);
 
     // Remove in tail out_edges
-    int index_in_tail_out_edges = 0;
-    for (int i = 0; i < tail->out_degree; i++) {
-        if (tail->out_edges[i] == e) {
-            index_in_tail_out_edges = i;
-            break;
-        }
-    }
-    assert(index_in_tail_out_edges < tail->out_degree);
-    for (int i = index_in_tail_out_edges + 1; i < tail->out_degree; i++) {
-        tail->out_edges[i - 1] = tail->out_edges[i];
-    }
-    tail->out_degree--;
-    tail->out_edges[tail->out_degree] = nullptr;
+    tail->out_edges.erase(std::remove(tail->out_edges.begin(), tail->out_edges.end(), e), tail->out_edges.end());
+    tail->out_degree = tail->out_edges.size();
 
     // Remove in head in_edges
-    int index_in_head_in_edges = 0;
-    for (int i = 0; i < head->in_degree; i++) {
-        if (head->in_edges[i] == e) {
-            index_in_head_in_edges = i;
-            break;
-        }
-    }
-    assert(index_in_head_in_edges < head->in_degree);
-    for (int i = index_in_head_in_edges + 1; i < head->in_degree; i++) {
-        head->in_edges[i - 1] = head->in_edges[i];
-    }
-    head->in_degree--;
-    head->in_edges[head->in_degree] = nullptr;
+    head->in_edges.erase(std::remove(head->in_edges.begin(), head->in_edges.end(), e), head->in_edges.end());
+    head->in_degree = head->in_edges.size();
 
     // Remove from edge list
     edge_t* n = e->next;
@@ -218,7 +209,8 @@ void remove_edge(graph_t* graph, edge_t* e)
     graph->number_of_edges--;
 
     // Free edge
-    free(e);
+    // free(e);
+    delete e;
 }
 
 /**
@@ -391,7 +383,8 @@ void free_graph(graph_t* graph)
             vertex_t* vv = v;
             v = vv->next;
             // free(vv->name);
-            free(vv);
+            // free(vv);
+            delete vv;
         } while (v);
     }
 
@@ -400,11 +393,13 @@ void free_graph(graph_t* graph)
         do {
             edge_t* ee = e;
             e = ee->next;
-            free(ee);
+            // free(ee);
+            delete ee;
         } while (e);
     }
 
-    free(graph);
+    // free(graph);
+    delete graph;
 }
 
 /**
@@ -654,8 +649,7 @@ edge_t* find_edge(vertex_t* tail, vertex_t* head)
 #ifdef DEBUG_GRAPH
     fprintf(stderr, "find_edge called with tail:%s (out_degree:%d) head:%s\n", tail->name, tail->out_degree, head->name);
 #endif
-    for (int i = 0; i < tail->out_degree; i++) {
-        edge_t* e = tail->out_edges[i];
+    for (auto* e : tail->out_edges) {
 #ifdef DEBUG_GRAPH
         fprintf(stderr, " %dth edge points to:%s\n", i, e->head->name);
 #endif
@@ -675,13 +669,13 @@ int check_if_path_exists(vertex_t* origin, vertex_t* destination)
     fifo_write(vertices_to_visit, (void*)origin);
     while (!fifo_is_empty(vertices_to_visit)) {
         vertex_t* v = (vertex_t*)fifo_read(vertices_to_visit);
-        for (int i = 0; i < v->out_degree; i++) {
-            vertex_t* u = v->out_edges[i]->head;
-            if (u == destination) {
+        for (auto* e : v->out_edges) {
+            // fprintf(stderr, "Checking edge %s -> %s\n", e->tail->name, e->head->name);
+            if (e->head == destination) {
                 fifo_free(vertices_to_visit);
                 return 1;
             }
-            fifo_write(vertices_to_visit, u);
+            fifo_write(vertices_to_visit, e);
         }
     }
     fifo_free(vertices_to_visit);
@@ -728,17 +722,20 @@ double inMemoryRequirement(const vertex_t* v)
 {
     double sumIn = 0;
 
-    for (int i = 0; i < v->in_degree; i++) {
-        sumIn += v->in_edges.at(i)->weight;
+    for (const auto* edge : v->in_edges) {
+        sumIn += edge->weight;
     }
+
     return sumIn;
 }
 double outMemoryRequirement(const vertex_t* v)
 {
     double sumOut = 0;
-    for (int i = 0; i < v->out_degree; i++) {
-        sumOut += v->out_edges.at(i)->weight;
+
+    for (const auto* edge : v->out_edges) {
+        sumOut += edge->weight;
     }
+
     return sumOut;
 }
 

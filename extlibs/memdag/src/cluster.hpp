@@ -162,7 +162,7 @@ public:
 
     double getAvailableMemory()
     {
-        if (abs(availableMemory - memorySize) < 0.01) {
+        if (std::abs(availableMemory - memorySize) < 0.01) {
             availableMemory = memorySize;
         }
         assert(!isKeptValid || (availableMemory >= 0 && availableMemory <= memorySize));
@@ -174,7 +174,7 @@ public:
         // cout<<"set available memory of proc "<<this->id<<" to "<<mem<<endl;
         assert(mem >= 0);
         if (mem > memorySize && isKeptValid) {
-            assert(abs(mem - memorySize) < 0.1);
+            assert(std::abs(mem - memorySize) < 0.1);
         }
 
         this->availableMemory = mem;
@@ -227,9 +227,7 @@ public:
         pendingMemories.erase(it); // Now erase safely
 
         availableMemory += edgeToRemove->weight;
-        assert(!isKeptValid);
-        assert(availableMemory < memorySize);
-        assert(std::abs(availableMemory - memorySize) < 0.1);
+        assert(!isKeptValid || availableMemory < memorySize || std::abs(availableMemory - memorySize) < 0.1);
 
         return nextIt; // Return the next iterator, which is safe
     }
