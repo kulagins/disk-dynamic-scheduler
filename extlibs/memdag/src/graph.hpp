@@ -62,8 +62,6 @@ struct vertex_t {
     /* graph structure around the vertex */
     vertex_t* next = nullptr;
     vertex_t* prev = nullptr;
-    int in_degree = 0;
-    int out_degree = 0;
     std::vector<edge_t*> in_edges;
     std::vector<edge_t*> out_edges;
 

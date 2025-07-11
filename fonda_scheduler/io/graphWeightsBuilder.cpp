@@ -197,12 +197,12 @@ void retrieveEdgeWeights(const graph_t* graphMemTopology)
     const vertex_t* vertex = graphMemTopology->first_vertex;
     while (vertex != nullptr) {
         double totalOutput = 1;
-        for (int j = 0; j < vertex->in_degree; j++) {
+        for (int j = 0; j < vertex->in_edges.size(); j++) {
             const edge_t* incomingEdge = vertex->in_edges.at(j);
             const vertex_t* predecessor = incomingEdge->tail;
             totalOutput += predecessor->wchar;
         }
-        for (int j = 0; j < vertex->in_degree; j++) {
+        for (int j = 0; j < vertex->in_edges.size(); j++) {
             edge_t* incomingEdge = vertex->in_edges.at(j);
             const vertex_t* predecessor = incomingEdge->tail;
             incomingEdge->weight = (predecessor->wchar / totalOutput) * vertex->taskinputsize;

@@ -390,11 +390,11 @@ int check_if_tree(graph_t *graph, int add_common_root_if_forest) {
   int several_targets = 0;
 
   for(vertex_t *v = graph->first_vertex; v; v=v->next) {
-    if (v->out_degree > 1) {
+    if (v->out_edges.size() > 1) {
       //      fprintf(stderr,"out_degree > 1\n");
       return 0;
     }
-    if (v->out_degree==0) {
+    if (v->out_edges.size()==0) {
       if (target == NULL) { // If no current target, update
 	target = v;
 	//	fprintf(stderr,"found 1 target\n");
@@ -409,7 +409,7 @@ int check_if_tree(graph_t *graph, int add_common_root_if_forest) {
   if (several_targets && add_common_root_if_forest) {
     target = new_vertex(graph, "GRAPH_TARGET", 0.0, NULL);
     for(vertex_t *v = graph->first_vertex; v; v=v->next) {
-      if ((v->out_degree==0) && (v!= target)) {
+      if ((v->out_edges.size()==0) && (v!= target)) {
 	new_edge(graph, v, target, 0, NULL);
       }
     }
@@ -450,15 +450,15 @@ tree_t graph_to_tree(graph_t *graph) {
   for(vertex_t *v = graph->first_vertex; v; v=v->next) {
     int id = graph_id_to_tree_id[v->id];
     tree[id].id = id;
-    if (v->out_degree > 0) {
+    if (v->out_edges.size() > 0) {
       tree[id].out_size = v->out_edges[0]->weight;
       tree[id].parent = &tree[graph_id_to_tree_id[v->out_edges[0]->head->id]];
     }
     tree[id].time = v->time;
-    tree[id].nb_of_children = v->in_degree;
-    tree[id].max_nb_of_children = v->in_degree;
-    tree[id].children = (node_t**) calloc(v->in_degree, sizeof(node_t*));
-    for(int i=0; i<v->in_degree; i++) {
+    tree[id].nb_of_children = v->in_edges.size();
+    tree[id].max_nb_of_children = v->in_edges.size();
+    tree[id].children = (node_t**) calloc(v->in_edges.size(), sizeof(node_t*));
+    for(int i=0; i<v->in_edges.size(); i++) {
       tree[id].children[i] = &tree[graph_id_to_tree_id[v->in_edges[i]->tail->id]];
     }
   }

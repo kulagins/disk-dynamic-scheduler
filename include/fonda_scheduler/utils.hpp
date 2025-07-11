@@ -101,8 +101,8 @@ inline void scaleToFit(const graph_t* graphMemTopology, double biggestMem)
             pv->memoryRequirement = peakMemoryRequirementOfVertex(pv) + MEMORY_EPSILON;
         }
 
-        scaleMemory(outMemoryRequirement, pv->out_degree, [&](const int j) { return pv->out_edges[j]; }, "Out");
-        scaleMemory(inMemoryRequirement, pv->in_degree, [&](const int j) { return pv->in_edges[j]; }, "In");
+        scaleMemory(outMemoryRequirement, pv->out_edges.size(), [&](const int j) { return pv->out_edges[j]; }, "Out");
+        scaleMemory(inMemoryRequirement, pv->in_edges.size(), [&](const int j) { return pv->in_edges[j]; }, "In");
 
         pv = pv->next;
     }

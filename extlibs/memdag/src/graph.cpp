@@ -95,11 +95,9 @@ edge_t* new_edge(graph_t* graph, vertex_t* tail, vertex_t* head, const double we
 
     // register edge at tail vertex
     tail->out_edges.emplace_back(new_edge);
-    tail->out_degree = tail->out_edges.size();
 
     // register edge at head vertex
     head->in_edges.emplace_back(new_edge);
-    head->in_degree = head->in_edges.size();
 
     edge_t* old_first = graph->first_edge;
     new_edge->next = old_first;
@@ -191,11 +189,9 @@ void remove_edge(graph_t* graph, edge_t* e)
 
     // Remove in tail out_edges
     tail->out_edges.erase(std::remove(tail->out_edges.begin(), tail->out_edges.end(), e), tail->out_edges.end());
-    tail->out_degree = tail->out_edges.size();
 
     // Remove in head in_edges
     head->in_edges.erase(std::remove(head->in_edges.begin(), head->in_edges.end(), e), head->in_edges.end());
-    head->in_degree = head->in_edges.size();
 
     // Remove from edge list
     edge_t* n = e->next;
@@ -537,7 +533,7 @@ void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
     int several_sources = 0;
     int several_targets = 0;
     for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-        if (v->in_degree == 0) {
+        if (v->in_edges.size() == 0) {
             if (source == nullptr) { // If no current source, update
                 source = v;
             } else {
@@ -545,7 +541,7 @@ void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
                 several_sources = 1;
             }
         }
-        if (v->out_degree == 0) {
+        if (v->out_edges.size() == 0) {
             if (target == nullptr) { // If no current target, update
                 target = v;
             } else { // If several targets, remember it
@@ -561,7 +557,7 @@ void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
     if (several_sources) {
         source = new_vertex(graph, "GRAPH_SOURCE" + suffix, 0.0, nullptr);
         for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-            if ((v->in_degree == 0) && (v != source)) {
+            if ((v->in_edges.size() == 0) && (v != source)) {
                 new_edge(graph, source, v, 0, nullptr);
             }
         }
@@ -573,7 +569,7 @@ void enforce_single_source_and_target(graph_t* graph, const std::string& suffix)
     if (several_targets) {
         target = new_vertex(graph, "GRAPH_TARGET" + suffix, 0.0, nullptr);
         for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-            if ((v->out_degree == 0) && (v != target)) {
+            if ((v->out_edges.size() == 0) && (v != target)) {
                 new_edge(graph, v, target, 0, nullptr);
             }
         }
@@ -592,7 +588,7 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const
     int several_sources = 0;
     int several_targets = 0;
     for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-        if (v->in_degree == 0) {
+        if (v->in_edges.size() == 0) {
             if (source == nullptr) { // If no current source, update
                 source = v;
             } else {
@@ -600,7 +596,7 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const
                 several_sources = 1;
             }
         }
-        if (v->out_degree == 0) {
+        if (v->out_edges.size() == 0) {
             if (target == nullptr) { // If no current target, update
                 target = v;
             } else { // If several targets, remember it
@@ -616,7 +612,7 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const
     if (several_sources) {
         source = new_vertex(graph, "GRAPH_SOURCE" + suffix, 1, nullptr);
         for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-            if ((v->in_degree == 0) && (v != source)) {
+            if ((v->in_edges.size() == 0) && (v != source)) {
                 new_edge(graph, source, v, 1, nullptr);
             }
         }
@@ -628,7 +624,7 @@ void enforce_single_source_and_target_with_minimal_weights(graph_t* graph, const
     if (several_targets) {
         target = new_vertex(graph, "GRAPH_TARGET" + suffix, 0.1, nullptr);
         for (vertex_t* v = graph->first_vertex; v; v = v->next) {
-            if ((v->out_degree == 0) && (v != target)) {
+            if ((v->out_edges.size() == 0) && (v != target)) {
                 new_edge(graph, v, target, 0.1, nullptr);
             }
         }

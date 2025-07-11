@@ -67,7 +67,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
 
     vertex_t* vertex = graph->first_vertex;
     while (vertex != nullptr) {
-        if (vertex->in_degree == 0) {
+        if (vertex->in_edges.size() == 0) {
             //  cout << "starting task " << vertex->name << endl;
             std::vector<std::shared_ptr<Processor>> bestModifiedProcs;
             std::shared_ptr<Processor> bestProcessorToAssign;
@@ -179,7 +179,7 @@ void Event::fireTaskStart()
     // ourFinishEvent->setActualTimeFire(d);
     events.update(ourFinishEvent->id, d);
 
-    for (int i = 0; i < this->task->in_degree; i++) {
+    for (int i = 0; i < this->task->in_edges.size(); i++) {
         edge_t* inEdge = this->task->in_edges.at(i);
         const std::string& edgeName = buildEdgeName(inEdge);
         std::shared_ptr<Event> startWrite = events.findByEventId(edgeName + "-w-s");
@@ -242,16 +242,16 @@ void Event::fireTaskFinish()
 
     std::string thisId = this->id;
 
-    for (int i = 0; i < thisTask->out_degree; i++) {
+    for (int i = 0; i < thisTask->out_edges.size(); i++) {
         locateToThisProcessorFromNowhere(thisTask->out_edges.at(i), this->processor->id, false,
             this->getActualTimeFire());
     }
 
-    for (int i = 0; i < thisTask->out_degree; i++) {
+    for (int i = 0; i < thisTask->out_edges.size(); i++) {
         vertex_t* childTask = thisTask->out_edges.at(i)->head;
         // cout << "deal with child " << childTask->name << endl;
         bool isReady = true;
-        for (int j = 0; j < childTask->in_degree; j++) {
+        for (int j = 0; j < childTask->in_edges.size(); j++) {
             if (childTask->in_edges.at(j)->tail->status == Status::Unscheduled) {
                 isReady = false;
             }

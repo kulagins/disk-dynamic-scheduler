@@ -11,8 +11,7 @@ double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t* v
 {
     assert(!pj->getIsKeptValid() || pj->getAvailableMemory() >= 0);
     double Res = pj->getAvailableMemory() - peakMemoryRequirementOfVertex(v);
-    for (int i = 0; i < v->in_degree; i++) {
-        const auto inEdge = v->in_edges.at(i);
+    for (auto inEdge : v->in_edges) {
         if (pj->getPendingMemories().find(inEdge) != pj->getPendingMemories().end()) {
             // incoming edge occupied memory
             Res += inEdge->weight;
@@ -504,9 +503,7 @@ void putChangeOnCluster(vertex_t* vertex, SchedulingResult& schedulingResult, Cl
     assert(schedulingResult.processorOfAssignment->getReadyTimeCompute() < std::numeric_limits<double>::max());
     vertex->assignedProcessorId = schedulingResult.processorOfAssignment->id;
 
-    for (int j = 0; j < vertex->in_degree; j++) {
-        edge_t* ine = vertex->in_edges[j];
-
+    for (auto ine : vertex->in_edges) {
         const int onWhichProcessor = whatProcessorIsLocatedOn(ine, shouldUseImaginary);
         assert(onWhichProcessor == -1 || onWhichProcessor == schedulingResult.processorOfAssignment->id || cluster->getProcessorById(onWhichProcessor)->getPendingMemories().find(ine) == cluster->getProcessorById(onWhichProcessor)->getPendingMemories().end());
 
@@ -539,7 +536,7 @@ void putChangeOnCluster(vertex_t* vertex, SchedulingResult& schedulingResult, Cl
 
     checkIfPendingMemoryCorrect(schedulingResult.processorOfAssignment);
 
-    for (int i = 0; i < vertex->out_degree; i++) {
+    for (int i = 0; i < vertex->out_edges.size(); i++) {
         const auto v1 = vertex->out_edges[i];
         schedulingResult.processorOfAssignment->loadFromNowhere(v1, shouldUseImaginary, schedulingResult.finishTime);
         checkIfPendingMemoryCorrect(schedulingResult.processorOfAssignment);
@@ -555,7 +552,7 @@ void putChangeOnCluster(vertex_t* vertex, SchedulingResult& schedulingResult, Cl
 
 void realSurplusOfOutgoingEdges(const vertex_t* v, const std::shared_ptr<Processor>& ourModifiedProc, double& sumOut)
 {
-    for (int i = 0; i < v->in_degree; i++) {
+    for (int i = 0; i < v->in_edges.size(); i++) {
         auto inEdge = v->in_edges.at(i);
         if (isLocatedOnThisProcessor(inEdge, ourModifiedProc->id, false)) {
             //     cout<<"in is located here "; print_edge(v->in_edges[i]);
@@ -579,7 +576,7 @@ void processIncomingEdges(const vertex_t* v, const bool realAsNotImaginary, cons
 
     const bool shouldUseImaginary = isHeft & !realAsNotImaginary;
     earliestStartingTimeToComputeVertex = ourModifiedProc->getReadyTimeCompute();
-    for (int j = 0; j < v->in_degree; j++) {
+    for (int j = 0; j < v->in_edges.size(); j++) {
         edge_t* incomingEdge = v->in_edges.at(j);
         const vertex_t* predecessor = incomingEdge->tail;
 
@@ -704,7 +701,7 @@ graph_t* convertToNonMemRepresentation(graph_t* withMemories, std::map<int, int>
         edge_t* e = new_edge(noNodeMemories, invtx, outvtx, vertex->memoryRequirement, nullptr);
         noNodeMemories->target = outvtx;
 
-        for (int i = 0; i < vertex->in_degree; i++) {
+        for (int i = 0; i < vertex->in_edges.size(); i++) {
             const edge_t* inEdgeOriginal = vertex->in_edges[i];
             const std::string expectedName = inEdgeOriginal->tail->name + "-out";
             vertex_t* outVtxOfCopiedInVtxOfEdge = findVertexByName(noNodeMemories, expectedName);
@@ -727,7 +724,7 @@ double calculateSimpleBottomUpRank(vertex_t* task)
     //    cout<<"rank for "<<task->name<<" ";
 
     double maxCost = 0.0;
-    for (int j = 0; j < task->out_degree; j++) {
+    for (int j = 0; j < task->out_edges.size(); j++) {
         const double communicationCost = task->out_edges[j]->weight;
         // cout<<communicationCost<<" ";
         if (task->out_edges[j]->head->bottom_level == -1) {
@@ -750,7 +747,7 @@ double calculateBLCBottomUpRank(const vertex_t* task)
 {
 
     double maxCost = 0.0;
-    for (int j = 0; j < task->out_degree; j++) {
+    for (int j = 0; j < task->out_edges.size(); j++) {
         const double communicationCost = task->out_edges.at(j)->weight;
         const double successorCost = calculateBLCBottomUpRank(task->out_edges.at(j)->head);
         double cost = communicationCost + successorCost;
@@ -759,7 +756,7 @@ double calculateBLCBottomUpRank(const vertex_t* task)
     const double simpleBl = task->time + maxCost;
 
     double maxInputCost = 0.0;
-    for (int j = 0; j < task->in_degree; j++) {
+    for (int j = 0; j < task->in_edges.size(); j++) {
         double communicationCost = task->in_edges.at(j)->weight;
         maxInputCost = std::max(maxInputCost, communicationCost);
     }
@@ -831,7 +828,7 @@ std::vector<std::pair<vertex_t*, double>> buildRanksWalkOver(graph_t* graph)
     int rank = 0;
     vertex_t* vertex = graph->first_vertex;
     while (vertex != nullptr) {
-        if (vertex->in_degree == 0) {
+        if (vertex->in_edges.size() == 0) {
             ranks.emplace_back(vertex, rank);
         }
     }

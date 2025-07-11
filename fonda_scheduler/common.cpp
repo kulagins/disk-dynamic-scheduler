@@ -251,7 +251,7 @@ void locateToDisk(edge_t* edge, bool imaginary, double afterWhen)
 double getSumOut(vertex_t* v)
 {
     double sumOut = 0;
-    for (int i = 0; i < v->out_degree; i++) {
+    for (int i = 0; i < v->out_edges.size(); i++) {
         sumOut += v->out_edges[i]->weight;
         //      cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
     }
@@ -261,7 +261,7 @@ double getSumOut(vertex_t* v)
 double getSumIn(vertex_t* v)
 {
     double sumIn = 0;
-    for (int i = 0; i < v->in_degree; i++) {
+    for (int i = 0; i < v->in_edges.size(); i++) {
         sumIn += v->in_edges[i]->weight;
         //      cout<<sumOut<<" by "<<v->out_edges[i]->weight<<endl;
     }
