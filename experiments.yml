@@ -919,6 +919,8 @@ variants:
      #   extra_args: [ '100000000', '0.01', '1', '0.00001' ]
      - name: 'final'
        extra_args: [ '100000000', '100', '1', '0.00001' ]
+     - name: 'fin10pw3'
+       extra_args: [ '100000000', '100', '1', '0.001' ]
 
 
 experiments:
