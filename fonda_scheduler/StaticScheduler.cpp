@@ -19,13 +19,18 @@ double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t *v
     return Res;
 }
 
-double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
+double new_heuristic(graph_t *graph, int algoNum, bool isHeft, double & runtime) {
     algoNum = isHeft ? 1 : algoNum;
     if (isHeft) {
         imaginedCluster->mayBecomeInvalid();
     }
+    auto start = std::chrono::system_clock::now();
     vector<pair<vertex_t *, double>> ranks = calculateBottomLevels(graph, algoNum);
     removeSourceAndTarget(graph, ranks);
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    runtime += elapsed_seconds.count();
+
     sort(ranks.begin(), ranks.end(),
          [](pair<vertex_t *, double> a, pair<vertex_t *, double> b) {
              return a.second > b.second;
@@ -40,7 +45,11 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
         SchedulingResult bestSchedulingResult = SchedulingResult(nullptr);
         SchedulingResult bestSchedulingResultCorrectForHeftOnly = SchedulingResult(nullptr);
       //  cout << "imagine" << endl;
+        start = std::chrono::system_clock::now();
         bestTentativeAssignment(isHeft, vertex, bestSchedulingResult, bestSchedulingResultCorrectForHeftOnly);
+        end = std::chrono::system_clock::now();
+        elapsed_seconds = end - start;
+        runtime += elapsed_seconds.count();
 
         SchedulingResult bestSchedulingResultOnReal = SchedulingResult(
                 actualCluster->getProcessorById(bestSchedulingResult.processorOfAssignment->id));
@@ -76,7 +85,11 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
 
 
       //  cout << "imagine" << endl;
+        start = std::chrono::system_clock::now();
         putChangeOnCluster(vertex, bestSchedulingResult, imaginedCluster, numberWithEvictedCases, false, isHeft);
+        end = std::chrono::system_clock::now();
+        elapsed_seconds = end - start;
+        runtime += elapsed_seconds.count();
         //try {
        // cout << "real" << endl;
         putChangeOnCluster(vertex, bestSchedulingResultOnReal, actualCluster, numberWithEvictedCases2, true, isHeft);
@@ -89,7 +102,7 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
             cout<<buildEdgeName(item)<<endl;
         }
         cout<<"<<<<<<<<<"<<endl; */
-
+        start = std::chrono::system_clock::now();
         if (!isHeft) {
             for (const auto &item: imaginedCluster->getProcessors()) {
                 if(item.second->getPendingMemories().size() !=
@@ -106,6 +119,10 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft) {
                 }
             }
         }
+
+        end = std::chrono::system_clock::now();
+        elapsed_seconds = end - start;
+        runtime += elapsed_seconds.count();
 
         vertex->makespanPerceived = bestSchedulingResult.finishTime;
         assert(bestSchedulingResult.startTime < bestSchedulingResult.finishTime);
