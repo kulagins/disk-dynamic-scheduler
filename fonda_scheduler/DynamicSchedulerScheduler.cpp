@@ -9,7 +9,7 @@ vector<shared_ptr<Event>> bestTentativeAssignment(vertex_t *vertex, vector<share
             bestReallyUsedMem;
     vector<shared_ptr<Event>> bestEvents;
     double resultingVar;
-
+    bestProcessorToAssign=make_shared<Processor>(*cluster->getMemBiggestFreeProcessor());
     for (auto &[id, processor]: cluster->getProcessors()) {
         double finTime = -1, startTime = -1, reallyUsedMem = 0;
         int resultingEvictionVariant = -1;
@@ -141,7 +141,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
         double shortestFT = std::numeric_limits<double>::max();
 
         double timeToFinishNoEvicted = startTime + vertex->time / ourModifiedProc->getProcessorSpeed() +
-                                       amountToOffload / ourModifiedProc->memoryOffloadingPenalty;
+                (amountToOffload / ourModifiedProc->readSpeedDisk) / ourModifiedProc->memoryOffloadingPenalty;
         assert(timeToFinishNoEvicted > startTime);
         if (sumOut > ourModifiedProc->getAvailableMemory()) {
             //cout<<"cant"<<endl;
@@ -182,7 +182,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
             timeToFinishBiggestEvicted =
                     startTimeFor1Evicted
                     + vertex->time / ourModifiedProc->getProcessorSpeed() +
-                    amountToOffloadWithoutBiggestFile / ourModifiedProc->memoryOffloadingPenalty;
+                            (amountToOffloadWithoutBiggestFile / ourModifiedProc->readSpeedDisk) / ourModifiedProc->memoryOffloadingPenalty;
             assert(timeToFinishBiggestEvicted > startTimeFor1Evicted);
 
             double availableMemWithoutBiggest = ourModifiedProc->getAvailableMemory() + biggestFileWeight;
@@ -210,7 +210,7 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
             //                    timeToWriteAllPending;
             startTimeForAllEvicted = max(startTimeForAllEvicted, finishTimeToWrite);
             timeToFinishAllEvicted = startTimeForAllEvicted + vertex->time / ourModifiedProc->getProcessorSpeed() +
-                                     amountToOffloadWithoutAllFiles / ourModifiedProc->memoryOffloadingPenalty;
+                    (amountToOffloadWithoutAllFiles/ ourModifiedProc->readSpeedDisk) / ourModifiedProc->memoryOffloadingPenalty;
             assert(timeToFinishAllEvicted > startTimeForAllEvicted);
 
 
@@ -351,11 +351,11 @@ tentativeAssignment(vertex_t *vertex, shared_ptr<Processor> ourModifiedProc,
     finishTime = eventStartTask->getExpectedTimeFire() + vertex->time / ourModifiedProc->getProcessorSpeed();
     if (resultingVar == 1) {
         assert(Res < 0);
-        finishTime += abs(Res) / ourModifiedProc->memoryOffloadingPenalty;
+        finishTime += (abs(Res) / ourModifiedProc->readSpeedDisk) / ourModifiedProc->memoryOffloadingPenalty;
     } else if (resultingVar == 2) {
-        finishTime += amountToOffloadWithoutBiggestFile / ourModifiedProc->memoryOffloadingPenalty;
+        finishTime += (amountToOffloadWithoutBiggestFile/ ourModifiedProc->readSpeedDisk) / ourModifiedProc->memoryOffloadingPenalty;
     } else if (resultingVar == 3) {
-        finishTime += amountToOffloadWithoutAllFiles / ourModifiedProc->memoryOffloadingPenalty;
+        finishTime += (amountToOffloadWithoutAllFiles/ ourModifiedProc->readSpeedDisk) / ourModifiedProc->memoryOffloadingPenalty;
     }
     if (vertex->time == 0) {
         finishTime = finishTime + 0.0001;

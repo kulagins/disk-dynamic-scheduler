@@ -331,7 +331,8 @@ void Event::fireTaskFinish() {
                 assert(cluster->getProcessorById(item->processor->id).use_count() ==
                        item->processor.use_count());
                 events.insert(item);
-               // cout<<"new event "<<item->id<<" w preds "<<endl;
+              ///  cout<<"new event planned "<<item->id<< " at "<<item->getExpectedTimeFire()<< " on "<<item->processor->id<<endl;
+                //" w preds "<<endl;
                 //for (const auto &item1: item->predecessors){
                 //    cout<<item1->id<<", ";
                 //}

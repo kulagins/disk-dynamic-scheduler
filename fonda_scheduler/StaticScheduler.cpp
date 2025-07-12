@@ -40,7 +40,8 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft, double & runtime)
     int numberWithEvictedCases = 0, numberWithEvictedCases2 = 0;
     for (auto &pair: ranks) {
         auto vertex = pair.first;
-        //cout<<"deal w "<<vertex->name<<endl;
+
+        //cout<<"deal w "<<vertex->name<<" factor "<<vertex->factorForRealExecution<<endl;
 
         SchedulingResult bestSchedulingResult = SchedulingResult(nullptr);
         SchedulingResult bestSchedulingResultCorrectForHeftOnly = SchedulingResult(nullptr);
@@ -69,18 +70,19 @@ double new_heuristic(graph_t *graph, int algoNum, bool isHeft, double & runtime)
             cout << "Invalid assignment of " << vertex->name;
             return -1;
         } else {
-           /* cout  << vertex->name << " best " <<
-           " "<< bestSchedulingResult.startTime << " "
-                << bestSchedulingResult.finishTime << " on "
-                 << bestSchedulingResult.processorOfAssignment->id
-                 << " variant " << bestSchedulingResult.resultingVar
-                <<" with av mem "<<bestSchedulingResult.processorOfAssignment->getAvailableMemory()<<endl;
+          //  cout  << vertex->name << " best " <<
+          // " "<< bestSchedulingResult.startTime << " "
+           //     << bestSchedulingResult.finishTime << " on "
+           //      << bestSchedulingResult.processorOfAssignment->id
+                // << " variant " << bestSchedulingResult.resultingVar
+               // <<" with av mem "<<bestSchedulingResult.processorOfAssignment->getAvailableMemory()<<endl;
 
-            cout << " for " << vertex->name << " best real " << bestSchedulingResultOnReal.startTime << " "
-                 << bestSchedulingResultOnReal.finishTime << " on proc "
-                 << bestSchedulingResultOnReal.processorOfAssignment->id
-                 << " variant " << bestSchedulingResultOnReal.resultingVar
-                 <<" with av mem "<<bestSchedulingResultOnReal.processorOfAssignment->getAvailableMemory()<<endl; */
+           // cout << " for " << vertex->name
+          //  << " best real " << bestSchedulingResultOnReal.startTime << " "
+           //      << bestSchedulingResultOnReal.finishTime << " on proc "
+            //     << bestSchedulingResultOnReal.processorOfAssignment->id
+           //      << " variant " << bestSchedulingResultOnReal.resultingVar
+            //     <<" with av mem "<<bestSchedulingResultOnReal.processorOfAssignment->getAvailableMemory()<<endl;
         }
 
 
@@ -225,7 +227,7 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
 
         double timeToFinishNoEvicted =
                 result.startTime + timeToRun / result.processorOfAssignment->getProcessorSpeed() +
-                amountToOffload / result.processorOfAssignment->memoryOffloadingPenalty;
+                        (amountToOffload / result.processorOfAssignment->readSpeedDisk) / result.processorOfAssignment->memoryOffloadingPenalty;
         assert(timeToFinishNoEvicted > result.startTime);
         if (sumOut > result.processorOfAssignment->getAvailableMemory()) {
             //cout<<"cant"<<endl;
@@ -266,7 +268,7 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
             timeToFinishBiggestEvicted =
                     startTimeFor1Evicted
                     + timeToRun / result.processorOfAssignment->getProcessorSpeed() +
-                    amountToOffloadWithoutBiggestFile / result.processorOfAssignment->memoryOffloadingPenalty;
+                            (amountToOffloadWithoutBiggestFile/ result.processorOfAssignment->readSpeedDisk) / result.processorOfAssignment->memoryOffloadingPenalty;
             assert(timeToFinishBiggestEvicted > startTimeFor1Evicted);
 
             double availableMemWithoutBiggest = result.processorOfAssignment->getAvailableMemory() + biggestFileWeight;
@@ -298,7 +300,7 @@ tentativeAssignment(vertex_t *v, bool real, SchedulingResult &result) {
             startTimeForAllEvicted = max(startTimeForAllEvicted, finishTimeToWrite);
             timeToFinishAllEvicted =
                     startTimeForAllEvicted + timeToRun / result.processorOfAssignment->getProcessorSpeed() +
-                    amountToOffloadWithoutAllFiles / result.processorOfAssignment->memoryOffloadingPenalty;
+                            (amountToOffloadWithoutAllFiles / result.processorOfAssignment->readSpeedDisk) / result.processorOfAssignment->memoryOffloadingPenalty;
             assert(timeToFinishAllEvicted > startTimeForAllEvicted);
 
         }
@@ -455,7 +457,7 @@ tentativeAssignmentHEFT(vertex_t *v, bool real, SchedulingResult &result, Schedu
 
         resultCorrect.finishTime =
                 resultCorrect.startTime + timeToRun / resultCorrect.processorOfAssignment->getProcessorSpeed() +
-                amountToOffload / resultCorrect.processorOfAssignment->memoryOffloadingPenalty;
+                        (amountToOffload /resultCorrect.processorOfAssignment->readSpeedDisk) / resultCorrect.processorOfAssignment->memoryOffloadingPenalty;
         assert(resultCorrect.finishTime > resultCorrect.startTime);
 
 
