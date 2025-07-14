@@ -179,7 +179,6 @@ struct graph_t {
     std::unordered_map<int, vertex_t*> vertices_by_id;
     vertex_t* source = nullptr;
     vertex_t* target = nullptr;
-    int number_of_vertices = 0;
     int number_of_edges = 0;
     ///\cond HIDDEN_SYMBOLS
     int generic_vertex_pointer_lock = 0;

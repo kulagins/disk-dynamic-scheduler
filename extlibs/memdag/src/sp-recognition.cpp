@@ -282,7 +282,7 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
 
   // If it was a SP-graph, it should now be a single edge source->sink
   SP_tree_t *result = NULL;
-  if ((graph->number_of_vertices==2) && (graph->number_of_edges==1)) {
+  if ((graph->vertices_by_id.size()==2) && (graph->number_of_edges==1)) {
     edge_t *single_edge = graph->first_edge;
     SP_tree_t *tree = (SP_tree_t*) single_edge->generic_pointer;
     SP_minimize_tree(tree);

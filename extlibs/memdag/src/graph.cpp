@@ -48,8 +48,6 @@ vertex_t* new_vertex_with_id(graph_t* graph, const int id, const std::string& na
 
     graph->vertices_by_id[new_vertex->id] = new_vertex;
 
-    graph->number_of_vertices++;
-
     return new_vertex;
 }
 ///\endcond
@@ -123,6 +121,7 @@ void remove_vertex(graph_t* graph, const vertex_t* v)
         exit(1);
     }
     std::vector<edge_t*> edges_to_be_suppressed;
+    edges_to_be_suppressed.reserve(v->in_edges.size() + v->out_edges.size());
     for (auto* edge : v->in_edges) {
         edges_to_be_suppressed.emplace_back(edge);
     }
@@ -160,8 +159,6 @@ void remove_vertex(graph_t* graph, const vertex_t* v)
     }
     // graph->vertices_by_id[v->id] = nullptr;
     graph->vertices_by_id.erase(v->id);
-
-    graph->number_of_vertices = graph->vertices_by_id.size();
 
     // Free vertex data
     if (v->subgraph != nullptr)
@@ -300,7 +297,6 @@ graph_t* copy_graph(const graph_t* graph, const int reverse_edges)
 #endif
         }
     }
-    new_g->number_of_vertices = graph->number_of_vertices;
     new_g->number_of_edges = graph->number_of_edges;
     if (graph->source) {
         if (reverse_edges == 0) {

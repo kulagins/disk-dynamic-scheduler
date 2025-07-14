@@ -779,7 +779,7 @@ std::vector<std::pair<vertex_t*, double>> calculateMMBottomUpRank(graph_t* graph
     if (sp_tree) {
         vertex_t** schedule = compute_optimal_SP_traversal(sp_graph, sp_tree);
 
-        for (int i = 0; i < sp_graph->number_of_vertices; i++) {
+        for (int i = 0; i < sp_graph->vertices_by_id.size(); i++) {
             const vertex_t* vInSp = schedule[i];
             // cout<<vInSp->name<<endl;
             const std::map<int, int>::iterator& it = noMemToWithMem.find(vInSp->id);
@@ -791,7 +791,7 @@ std::vector<std::pair<vertex_t*, double>> calculateMMBottomUpRank(graph_t* graph
                         })
                     == scheduleOnOriginal.end()) {
                     scheduleOnOriginal.emplace_back(vertexWithMem,
-                        sp_graph->number_of_vertices - i); // TODO: #vertices - i?
+                        sp_graph->vertices_by_id.size() - i); // TODO: #vertices - i?
                 }
             }
         }

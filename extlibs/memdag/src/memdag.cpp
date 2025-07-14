@@ -231,7 +231,7 @@ int runMemdag(int argc, char **argv) {
       assert(sp_tree);
       vertex_t **schedule = compute_optimal_SP_traversal(sp_graph, sp_tree);
       fprintf(stdout,"optimal schedule:\n");
-      for(int i=0; i<sp_graph->number_of_vertices; i++)
+      for(int i=0; i<sp_graph->vertices_by_id.size(); i++)
 	fprintf(stdout,"%s%s",(i==0)?"":", ", schedule[i]->name.c_str());
       fprintf(stdout,"\n");
       fprintf(stdout,"Peak memory: %f\n", compute_peak_memory(sp_graph, schedule));
