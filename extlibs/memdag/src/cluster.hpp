@@ -284,7 +284,7 @@ public:
 
     void setAfterPendingMemories(std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>>& memories);
 
-    edge_t* getBiggestPendingEdgeThatIsNotIncomingOfAndLocatedOnProc(vertex_t* v)
+    edge_t* getBiggestPendingEdgeThatIsNotIncomingOfAndLocatedOnProc(const vertex_t* v)
     {
         auto it = pendingMemories.begin();
         while (it != pendingMemories.end()) {

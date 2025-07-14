@@ -61,7 +61,7 @@ std::vector<std::pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, 
 
 double howMuchMemoryIsStillAvailableOnProcIfTaskScheduledThere(const vertex_t* v, const std::shared_ptr<Processor>& pj);
 
-void tentativeAssignment(vertex_t* v, bool real, SchedulingResult& result);
+void tentativeAssignment(const vertex_t* v, bool real, SchedulingResult& result);
 
 void tentativeAssignmentHEFT(const vertex_t* v, bool real, SchedulingResult& result, SchedulingResult& resultCorrect);
 
@@ -75,7 +75,7 @@ void checkIfPendingMemoryCorrect(const std::shared_ptr<Processor>& p);
 
 bool hasDuplicates(const std::vector<std::shared_ptr<Processor>>& vec);
 
-void bestTentativeAssignment(bool isHeft, vertex_t* vertex, SchedulingResult& result, SchedulingResult& correctResultForHeftOnly);
+void bestTentativeAssignment(bool isHeft, const vertex_t* vertex, SchedulingResult& result, SchedulingResult& correctResultForHeftOnly);
 
 void realSurplusOfOutgoingEdges(const vertex_t* v, const std::shared_ptr<Processor>& ourModifiedProc, double& sumOut);
 
