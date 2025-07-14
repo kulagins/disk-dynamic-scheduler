@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <ostream>
+#include <tuple>
 #include <vector>
 
 #include "graph.hpp"
@@ -29,20 +30,15 @@ protected:
     bool isKeptValid = true;
 
 public:
-    static auto comparePendingMemories(const edge_t* a, const edge_t* b) -> bool
+    static bool comparePendingMemories(const edge_t* a, const edge_t* b)
     {
-        // std::cout << "Comparing: " << a << " vs " << b << '\n';
-        if (!a || !b) {
-            std::cout << "a or b invalid in comparison on memories" << '\n';
-            return false; // Handle null pointers safely
-        }
-        if (a->weight == b->weight) {
-            if (a->head->id == b->head->id)
-                return a->tail->id > b->tail->id;
-            else
-                return a->head->id > b->head->id;
-        } else
-            return a->weight > b->weight;
+        assert(a);
+        assert(b);
+        // Compare:
+        // 1. weight
+        // 2. head task id
+        // 3. tail task id
+        return std::tie(a->weight, a->head->id, a->tail->id) > std::tie(b->weight, b->head->id, b->tail->id);
     }
 
     int id = -1;
