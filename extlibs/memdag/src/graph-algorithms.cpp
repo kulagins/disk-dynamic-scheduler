@@ -21,7 +21,7 @@ double compute_peak_memory(graph_t* graph, vertex_t** schedule)
 {
     double current_memory = 0.0;
     double peak_memory = 0.0;
-    for (int i = 0; i < graph->number_of_vertices; i++) {
+    for (int i = 0; i < graph->vertices_by_id.size(); i++) {
         vertex_t* v = schedule[i];
         double mem_increment = 0.0;
         for (const auto* e : v->in_edges) {
@@ -42,7 +42,7 @@ std::vector<vertex_t*> compute_peak_memory_until(graph_t* graph, vertex_t** sche
     double current_memory = 0.0;
 
     std::vector<vertex_t*> schedulePart;
-    for (int i = indexToStartFrom; i < graph->number_of_vertices; i++) {
+    for (int i = indexToStartFrom; i < graph->vertices_by_id.size(); i++) {
         vertex_t* v = schedule[i];
         double mem_increment = 0.0;
         for (const auto* e : v->in_edges) {

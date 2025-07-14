@@ -432,7 +432,7 @@ tree_t graph_to_tree(graph_t *graph) {
   if (check_if_tree(graph,0)==0)
     return NULL;
 
-  tree_t tree = (node_t*) calloc(graph->number_of_vertices, sizeof(node_t));
+  tree_t tree = (node_t*) calloc(graph->vertices_by_id.size(), sizeof(node_t));
 
   /* First pass: register IDs of tree nodes (target=root should be at id 0) */
   int *graph_id_to_tree_id = (int*) calloc(graph->next_vertex_index, sizeof(int));
