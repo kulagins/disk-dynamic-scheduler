@@ -363,8 +363,7 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
 
     double howMuchWasLoaded = ourModifiedProc->getAvailableMemory();
     // if(ind>0){
-    for (int p = 0; p < v->in_edges.size(); p++) {
-        edge_t* incomingEdge = v->in_edges.at(p);
+    for (auto * incomingEdge : v->in_edges) {
         std::shared_ptr<Event> eventStartFromQueue = events.findByEventId(
             buildEdgeName(incomingEdge) + "-w-s");
         std::shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-f");
@@ -435,7 +434,7 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
                 ourEvent->setBothTimesFire(atThisTime);
             }
         } else if (isLocatedOnAnyProcessor(incomingEdge, false)) {
-            const std::shared_ptr<Processor> predecessorsProc = findPredecessorsProcessor(incomingEdge, modifiedProcs);
+            const auto predecessorsProc = findPredecessorsProcessor(incomingEdge, modifiedProcs);
             if (predecessorsProc->getAfterPendingMemories().find(incomingEdge) == predecessorsProc->getAfterPendingMemories().end()) {
                 //    cout << "edge " << buildEdgeName(incomingEdge) << " not found in after pending mems on proc "
                 //        << predecessorsProc->id << endl;
@@ -744,7 +743,7 @@ void scheduleWriteAndRead(const vertex_t* v, const std::shared_ptr<Event>& ourEv
 {
     // cout << "scehdule write and read for " << buildEdgeName(incomingEdge) << endl;
 
-    const std::shared_ptr<Processor> predecessorsProc = findPredecessorsProcessor(incomingEdge, modifiedProcs);
+    const auto predecessorsProc = findPredecessorsProcessor(incomingEdge, modifiedProcs);
     double estimatedStartOfRead = startTimeOfTask - incomingEdge->weight / ourModifiedProc->readSpeedDisk;
     estimatedStartOfRead = std::max(estimatedStartOfRead, ourModifiedProc->getExpectedOrActualReadyTimeRead());
 

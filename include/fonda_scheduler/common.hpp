@@ -518,10 +518,8 @@ public:
 
     std::shared_ptr<Event> findByEventId(const std::string& id)
     {
-        if (eventByIdMap.find(id) != eventByIdMap.end()) {
-            return *eventByIdMap[id];
-        }
-        return nullptr;
+        const auto it = eventByIdMap.find(id);
+        return (it != eventByIdMap.end()) ? *(it->second) : nullptr; // Return the event if found, else nullptr
     }
 
     const std::set<std::shared_ptr<Event>, CompareByTimestamp>& findByProcessorId(const int processorId)

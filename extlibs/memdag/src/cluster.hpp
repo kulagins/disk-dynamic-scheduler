@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <iostream>
-#include <list>
 #include <memory>
 #include <ostream>
 #include <vector>
@@ -30,7 +29,7 @@ protected:
     bool isKeptValid = true;
 
 public:
-    static auto comparePendingMemories(edge_t* a, edge_t* b) -> bool
+    static auto comparePendingMemories(const edge_t* a, const edge_t* b) -> bool
     {
         // std::cout << "Comparing: " << a << " vs " << b << '\n';
         if (!a || !b) {
@@ -94,17 +93,6 @@ public:
     {
     }
 
-    Processor(const Processor& copy);
-
-    // TODO impelement
-    ~Processor()
-    {
-        writingQueue.clear();
-        pendingMemories.clear();
-        afterPendingMemories.clear();
-        assignedTask = nullptr; // just nullify borrowed pointer
-    }
-
     double getMemorySize() const
     {
         return memorySize;
@@ -120,7 +108,7 @@ public:
         return processorSpeed;
     }
 
-    void setProcessorSpeed(double s)
+    void setProcessorSpeed(const double s)
     {
         this->processorSpeed = s;
     }
@@ -145,14 +133,14 @@ public:
         this->availableMemory = mem;
     }
 
-    void setReadyTimeCompute(double newTime)
+    void setReadyTimeCompute(const double newTime)
     {
         // cout<<"proc "<<this->id<<"now ready at "<<newTime<<endl;
         this->readyTimeCompute = newTime;
     }
     int getAssignedTaskId() const;
 
-    void setIsKeptValid(bool is)
+    void setIsKeptValid(const bool is)
     {
         this->isKeptValid = is;
     }
@@ -174,12 +162,11 @@ public:
     std::set<edge_t*, decltype(comparePendingMemories)*>::iterator delocateToNowhereOptionally(edge_t* edge, bool shouldUseImaginary, double afterWhen);
 
     std::set<edge_t*, decltype(comparePendingMemories)*>::iterator
-    // bool
     removePendingMemory(edge_t* edgeToRemove)
     {
         // cout<<"removing pending memory "<<buildEdgeName(edgeToRemove)<<" from proc "<<this->id<<endl;
 
-        auto it = pendingMemories.find(edgeToRemove);
+        const auto it = pendingMemories.find(edgeToRemove);
         if (it == pendingMemories.end()) {
             if (isKeptValid) {
                 throw std::runtime_error("not found edge in pending " + buildEdgeName(edgeToRemove));
@@ -188,7 +175,7 @@ public:
             }
         }
 
-        auto nextIt = std::next(it); // Get the next iterator before erasing
+        const auto nextIt = std::next(it); // Get the next iterator before erasing
         pendingMemories.erase(it); // Now erase safely
 
         availableMemory += edgeToRemove->weight;
@@ -207,8 +194,7 @@ public:
             if (!edge->head || !edge->tail) {
                 throw std::runtime_error("Edge has uninitialized fields!");
             }
-            auto it = pendingMemories.find(edge);
-            if (it != pendingMemories.end()) {
+            if (pendingMemories.find(edge) != pendingMemories.end()) {
                 throw std::runtime_error(" found edge in pending");
             }
         }
@@ -219,12 +205,11 @@ public:
 
     void addPendingMemoryAfter(edge_t* edge)
     {
-        auto it = afterPendingMemories.find(edge);
-        if (it != afterPendingMemories.end()) {
+        if (afterPendingMemories.find(edge) != afterPendingMemories.end()) {
             throw std::runtime_error("Found edge in pending");
-        } else {
-            afterPendingMemories.emplace(edge);
         }
+
+        afterPendingMemories.emplace(edge);
         afterAvailableMemory -= edge->weight;
         if (afterAvailableMemory < 0) {
             throw std::runtime_error("After avail mem <0");
@@ -284,14 +269,11 @@ public:
 
     void setAfterPendingMemories(std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>>& memories);
 
-    edge_t* getBiggestPendingEdgeThatIsNotIncomingOfAndLocatedOnProc(const vertex_t* v)
+    edge_t* getBiggestPendingEdgeThatIsNotIncomingOfAndLocatedOnProc(const vertex_t* v) const
     {
-        auto it = pendingMemories.begin();
-        while (it != pendingMemories.end()) {
-            if ((*it)->head->name != v->name) {
-                return *it;
-            } else {
-                it++;
+        for (const auto pendingMemory : pendingMemories) {
+            if (pendingMemory->head->name != v->name) {
+                return pendingMemory;
             }
         }
         // throw runtime_error("No pending memories that are not incoming edges of task "+v->name);
@@ -322,11 +304,11 @@ public:
     double getExpectedOrActualReadyTimeRead() const;
     double getExpectedOrActualReadyTimeCompute() const;
 
-    void setReadyTimeWrite(double rtw)
+    void setReadyTimeWrite(const double rtw)
     {
         this->readyTimeWrite = rtw;
     }
-    void setReadyTimeRead(double rtr)
+    void setReadyTimeRead(const double rtr)
     {
         this->readyTimeRead = rtr;
     }
@@ -399,8 +381,8 @@ public:
     void mayBecomeInvalid()
     {
         this->isKeptValid = false;
-        for (auto& item : processors) {
-            item.second->setIsKeptValid(false);
+        for (const auto& [id, processor] : processors) {
+            processor->setIsKeptValid(false);
         }
     }
 
@@ -408,14 +390,9 @@ public:
     std::shared_ptr<Processor> getFastestFreeProcessor();
     std::shared_ptr<Processor> getFastestProcessorFitting(double memReq);
 
-    std::shared_ptr<Processor> getFirstFreeProcessorOrSmallest();
-
-    std::shared_ptr<Processor> getProcessorById(int id)
+    std::shared_ptr<Processor> getProcessorById(const int id)
     {
-        if (processors[id] == NULL) {
-            throw std::runtime_error("Processor not found by id " + std::to_string(id));
-        }
-        return processors[id];
+        return processors.at(id);
     }
 
     std::shared_ptr<Processor> getOneProcessorByName(const std::string& name)
@@ -427,15 +404,7 @@ public:
         throw std::runtime_error("Processor not found by name " + name);
     }
 
-    bool hasFreeProcessor();
-
     void clean();
-
-    std::shared_ptr<Processor> smallestFreeProcessorFitting(double requiredMem);
-
-    void freeAllBusyProcessors();
-    void sortProcessorsByMemSize();
-    void sortProcessorsByProcSpeed();
 
     void printAssignment();
 };

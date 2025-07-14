@@ -250,7 +250,7 @@ void Event::fireTaskFinish()
         vertex_t* childTask = out_edge->head;
         // cout << "deal with child " << childTask->name << endl;
         bool isReady = true;
-        for (const auto & in_edge : childTask->in_edges) {
+        for (const auto& in_edge : childTask->in_edges) {
             if (in_edge->tail->status == Status::Unscheduled) {
                 isReady = false;
             }
@@ -323,24 +323,22 @@ void Event::fireTaskFinish()
 std::shared_ptr<Processor> findPredecessorsProcessor(const edge_t* incomingEdge, std::vector<std::shared_ptr<Processor>>& modifiedProcs)
 {
     const vertex_t* predecessor = incomingEdge->tail;
-    auto predecessorsProcessorsId = predecessor->assignedProcessorId;
+    const auto predecessorsProcessorsId = predecessor->assignedProcessorId;
     // assert(isLocatedOnThisProcessor(incomingEdge, predecessorsProcessorsId));
-    std::shared_ptr<Processor> addedProc;
-    const auto it = // modifiedProcs.size()==1?
-                    //   modifiedProcs.begin():
-        std::find_if(modifiedProcs.begin(), modifiedProcs.end(),
-            [predecessorsProcessorsId](const std::shared_ptr<Processor>& p) {
-                return p->id == predecessorsProcessorsId;
-            });
 
-    if (it == modifiedProcs.end()) {
-        addedProc = std::make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
-        // cout << "adding modified proc " << addedProc->id << endl;
-        modifiedProcs.emplace_back(addedProc);
-        // checkIfPendingMemoryCorrect(addedProc);
-    } else {
-        addedProc = *it;
+    const auto it = std::find_if(modifiedProcs.begin(), modifiedProcs.end(),
+        [&](const std::shared_ptr<Processor>& p) {
+            return p->id == predecessorsProcessorsId;
+        });
+
+    if (it != modifiedProcs.end()) {
+        // Return the processor if found
+        return *it;
     }
+
+    // If not found, create a new processor based on the predecessor's assigned processor ID
+    auto addedProc = std::make_shared<Processor>(*cluster->getProcessorById(predecessorsProcessorsId));
+    modifiedProcs.emplace_back(addedProc);
 
     return addedProc;
 }
