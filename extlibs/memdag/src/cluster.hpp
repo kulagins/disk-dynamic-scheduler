@@ -190,11 +190,11 @@ public:
             if (!edge->head || !edge->tail) {
                 throw std::runtime_error("Edge has uninitialized fields!");
             }
-            if (pendingMemories.find(edge) != pendingMemories.end()) {
-                throw std::runtime_error(" found edge in pending");
-            }
         }
-        pendingMemories.emplace(edge);
+        const auto [it, newElement] = pendingMemories.emplace(edge);
+        if (!newElement) {
+            throw std::runtime_error("Edge already exists in pending memories: " + buildEdgeName(edge));
+        }
         availableMemory -= edge->weight;
         assert(!isKeptValid || availableMemory >= 0);
     }

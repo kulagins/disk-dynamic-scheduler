@@ -525,7 +525,7 @@ public:
     const std::set<std::shared_ptr<Event>, CompareByTimestamp>& findByProcessorId(const int processorId)
     {
         static const std::set<std::shared_ptr<Event>, CompareByTimestamp> emptySet; // Constant empty set with the same comparator
-        auto it = eventsByProcessorIdMap.find(processorId);
+        const auto it = eventsByProcessorIdMap.find(processorId);
         if (it != eventsByProcessorIdMap.end()) {
             return it->second; // Return the const set of events for that processor
         }

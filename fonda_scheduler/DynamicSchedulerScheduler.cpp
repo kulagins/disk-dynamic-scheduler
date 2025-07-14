@@ -360,74 +360,54 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
     std::vector<std::shared_ptr<Event>>& createdEvents)
 {
     // cout<<"processing, avail mem "<<ourModifiedProc->getAvailableMemory()<<endl;
-
     double howMuchWasLoaded = ourModifiedProc->getAvailableMemory();
-    // if(ind>0){
-    for (auto * incomingEdge : v->in_edges) {
-        std::shared_ptr<Event> eventStartFromQueue = events.findByEventId(
-            buildEdgeName(incomingEdge) + "-w-s");
-        std::shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-f");
+    for (auto* incomingEdge : v->in_edges) {
+        if (ourModifiedProc->getPendingMemories().find(incomingEdge) != ourModifiedProc->getPendingMemories().end()) {
+            continue;
+        }
 
-        // cout<<"processing inc edge "<<buildEdgeName(incomingEdge)<<endl;
         const vertex_t* predecessor = incomingEdge->tail;
         if (predecessor->makespan > 0) {
             ourEvent->setBothTimesFire(std::max(ourEvent->getExpectedTimeFire(), predecessor->makespan));
         }
-        if (ourModifiedProc->getPendingMemories().find(incomingEdge) != ourModifiedProc->getPendingMemories().end()) {
-            //    cout<<"already on proc, judginbg from proc"<<endl;
-            continue;
-        }
+
         if (isLocatedNowhere(incomingEdge, false)) {
-            std::shared_ptr<Processor> plannedOnThisProc = nullptr;
-            for (const auto& [proc_id, processor] : cluster->getProcessors()) {
-                if (proc_id == ourModifiedProc->id) {
-                    continue;
-                }
-                if (processor->getPendingMemories().find(incomingEdge) != processor->getPendingMemories().end()) {
-                    //     cout<<"found planned in pending mems on proc "<<item.second->id<<endl;
-                    plannedOnThisProc = processor;
-                    break;
-                }
-                if (processor->getAfterPendingMemories().find(incomingEdge) != processor->getAfterPendingMemories().end()) {
-                    //        cout<<"found planned in after pending mems on proc "<<item.second->id<<endl;
-                    plannedOnThisProc = processor;
-                    break;
-                }
-            }
-            if (plannedOnThisProc == nullptr) {
-                //  throw runtime_error("Edge located nowhere " + buildEdgeName(incomingEdge));
+            auto plannedOnThisProcIt = std::find_if(
+                cluster->getProcessors().begin(), cluster->getProcessors().end(),
+                [&](const auto& item) {
+                    const auto& [proc_id, processor] = item;
+                    if (proc_id == ourModifiedProc->id) {
+                        return false; // Skip our own processor
+                    }
+                    if (processor->getPendingMemories().find(incomingEdge) != processor->getPendingMemories().end()) {
+                        return true; // Found a processor with the edge in pending memories
+                    }
+                    if (processor->getAfterPendingMemories().find(incomingEdge) != processor->getAfterPendingMemories().end()) {
+                        return true; // Found a processor with the edge in after pending memories
+                    }
+                    return false;
+                });
+
+            if (plannedOnThisProcIt == cluster->getProcessors().end()) {
                 // it has been written to disk, but not yet fired the event
-
-                organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents,
-                    ourEvent->getExpectedTimeFire());
-
+                organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents, ourEvent->getExpectedTimeFire());
             } else {
-                const auto predProc = findPredecessorsProcessor(incomingEdge, modifiedProcs);
-                assert(predProc->id == plannedOnThisProc->id);
+                const auto& plannedOnThisProc = plannedOnThisProcIt->second;
+                assert(findPredecessorsProcessor(incomingEdge, modifiedProcs)->id == plannedOnThisProc->id);
+                std::shared_ptr<Event> eventStartFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-s");
+                std::shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-f");
                 if (eventStartFromQueue != nullptr || eventFinishFromQueue != nullptr) {
-                    // the write has already started, no other option but to finish it
-                    // schedule only a read
-                    // cout << "already exist write events" << endl;
-                    organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents,
-                        eventFinishFromQueue->getExpectedTimeFire());
-
-                    scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,
-                        incomingEdge,
-                        modifiedProcs);
-                } else {
-                    scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,
-                        incomingEdge,
-                        modifiedProcs);
+                    // the write has already started, no other option but to finish it schedule only a read
+                    organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents, eventFinishFromQueue->getExpectedTimeFire());
                 }
+                scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge, modifiedProcs);
             }
-
         } else if (isLocatedOnThisProcessor(incomingEdge, ourModifiedProc->id, false)) {
             //   cout << "edge " << buildEdgeName(incomingEdge) << " already on proc" << endl;
         } else if (isLocatedOnDisk(incomingEdge, false)) {
             // schedule a read
             double atThisTime = ourEvent->getExpectedTimeFire();
-            scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge,
-                atThisTime);
+            scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge, atThisTime);
             if (atThisTime > ourEvent->getExpectedTimeFire()) {
                 std::unordered_set<Event*> visited;
                 Event::propagateChainInPlanning(ourEvent, atThisTime - ourEvent->getExpectedTimeFire(), visited);
@@ -444,39 +424,29 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
                 const double prev = plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning();
                 if (plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning() > ourEvent->getExpectedTimeFire() && plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning() > ourModifiedProc->getExpectedOrActualReadyTimeRead()) {
                     double atWhatTime = plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning();
-                    readEVents = scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(),
-                        ourModifiedProc,
-                        incomingEdge,
-                        atWhatTime);
+                    readEVents = scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge, atWhatTime);
 
                     if (atWhatTime > ourEvent->getExpectedTimeFire()) {
                         std::unordered_set<Event*> visited;
                         Event::propagateChainInPlanning(ourEvent, atWhatTime - ourEvent->getExpectedTimeFire(), visited);
                         ourEvent->setBothTimesFire(atWhatTime);
                     }
-                    readEVents.first->addPredecessorInPlanning(plannedWriteFinishOfIncomingEdge);
                 } else {
                     double atWhatTime = -1;
-                    readEVents = scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(),
-                        ourModifiedProc,
-                        incomingEdge, atWhatTime);
-                    readEVents.first->addPredecessorInPlanning(plannedWriteFinishOfIncomingEdge);
+                    readEVents = scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge, atWhatTime);
                 }
+                readEVents.first->addPredecessorInPlanning(plannedWriteFinishOfIncomingEdge);
                 assert(prev == plannedWriteFinishOfIncomingEdge->getVisibleTimeFireForPlanning());
                 assert(incomingEdge->weight < 1 || readEVents.first->getActualTimeFire() < readEVents.second->getActualTimeFire());
             } else {
                 // schedule a write
-                //  cout<<buildEdgeName(incomingEdge)+"-w-s"<<endl;
+                std::shared_ptr<Event> eventStartFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-s");
+                std::shared_ptr<Event> eventFinishFromQueue = events.findByEventId(buildEdgeName(incomingEdge) + "-w-f");
                 if (eventStartFromQueue != nullptr || eventFinishFromQueue != nullptr) {
-                    // the write has already started, no other option but to finish it
-                    // schedule only a read
-                    //   cout << "already exist write events" << endl;
-                    organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents,
-                        eventFinishFromQueue->getExpectedTimeFire());
+                    // the write has already started, no other option but to finish it schedule only a read
+                    organizeAReadAndPredecessorWrite(v, incomingEdge, ourEvent, ourModifiedProc, createdEvents, eventFinishFromQueue->getExpectedTimeFire());
                 } else {
-                    scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc,
-                        incomingEdge,
-                        modifiedProcs);
+                    scheduleWriteAndRead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge, modifiedProcs);
                 }
             }
         }
