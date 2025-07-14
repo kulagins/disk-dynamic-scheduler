@@ -804,6 +804,7 @@ std::vector<std::pair<vertex_t*, double>> calculateMMBottomUpRank(graph_t* graph
     // delete graph;
 
     std::vector<std::pair<vertex_t*, double>> double_vector;
+    double_vector.reserve(scheduleOnOriginal.size());
 
     // Convert each pair from (vertex_t*, int) to (vertex_t*, double)
     for (const auto& [vertex, rank] : scheduleOnOriginal) {
