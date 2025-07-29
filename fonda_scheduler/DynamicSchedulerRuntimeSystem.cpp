@@ -136,11 +136,6 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
 
 void Event::fireTaskStart()
 {
-    std::string thisid = this->id;
-    // cout << " firing task start for " << thisid << " at " << this->actualTimeFire << " on proc " << this->processor->id << endl;
-
-    //   cout<<this->task->name<<" "<<this->actualTimeFire<<" "<<events.find(this->task->name+"-f")->getActualTimeFire()<<" on "<<this->processor->id<<endl;
-
     const auto canRun = dealWithPredecessors(shared_from_this());
     if (!canRun) {
         // cout << "BAD because #preds " << this->predecessors.size() << " esp " << (*this->predecessors.begin())->id
@@ -194,10 +189,8 @@ void Event::fireTaskStart()
             std::unordered_set<Event*> visited;
             propagateChainInPlanning(finishWrite,
                 startWrite->getActualTimeFire() - finishWrite->getActualTimeFire(), visited);
-        } else {
-            if (finishWrite != nullptr) {
-                finishWrite->setActualTimeFire(this->getActualTimeFire());
-            }
+        } else if (finishWrite != nullptr) {
+            finishWrite->setActualTimeFire(this->getActualTimeFire());
         }
 
         for (auto& [proc_id, processor] : cluster->getProcessors()) {
@@ -310,13 +303,11 @@ void Event::fireTaskFinish()
             //  cout <<endl;
         }
 
-        existsIdleProcessor = false;
-        for (const auto& [proc_id, processor] : cluster->getProcessors()) {
-            if (processor->getReadyTimeCompute() < this->getActualTimeFire()) {
-                existsIdleProcessor = true;
-                break;
-            }
-        }
+        existsIdleProcessor = std::any_of(cluster->getProcessors().begin(), cluster->getProcessors().end(),
+            [&](const auto& item) {
+                const auto & [procId, processor] = item;
+                return processor->getReadyTimeCompute() < this->getActualTimeFire();
+            });
     }
 }
 
@@ -545,7 +536,7 @@ void Event::removeOurselfFromSuccessors(const Event* us)
         // if (!isREmoved) cout << "NOT REMOVED FROM SUCCESSOR " << (*successor)->id << endl;
         ++successor;
     }
-    // successors.clear();
+    successors.clear();
     /*cout << "sanity check!" << endl;
     for (const auto &s: successors) {
         std::cout << "Successor " << s->id << " has predecessors: ";
