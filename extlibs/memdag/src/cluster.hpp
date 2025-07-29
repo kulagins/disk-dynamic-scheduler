@@ -243,6 +243,11 @@ public:
         return pendingMemories;
     }
 
+    const std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>>& getPendingMemories() const
+    {
+        return pendingMemories;
+    }
+
     void setPendingMemories(std::set<edge_t*, std::function<bool(edge_t*, edge_t*)>>& pendingMemories);
 
     void resetPendingMemories()
