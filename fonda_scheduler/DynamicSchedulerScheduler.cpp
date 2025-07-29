@@ -506,18 +506,12 @@ scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::ve
         estimatedStartOfRead = ourModifiedProc->getExpectedOrActualReadyTimeCompute();
     }
 
-    if (atThisTime != -1) {
-        if (estimatedStartOfRead > atThisTime) {
-            atThisTime = estimatedStartOfRead;
-        } else {
-            estimatedStartOfRead = atThisTime;
-        }
-    }
+   if (atThisTime != -1) {
+       estimatedStartOfRead = std::max(estimatedStartOfRead, atThisTime);
+       atThisTime = estimatedStartOfRead;
+   }
 
     std::vector<std::shared_ptr<Event>> newEvents = evictFilesUntilThisFits(ourModifiedProc, incomingEdge);
-    if (!newEvents.empty()) {
-        // cout << "evicted" << newEvents.size() << endl;
-    }
     createdEvents.insert(createdEvents.end(), newEvents.begin(), newEvents.end());
 
     //??????If the starting time of the read is during the execution of the previous task and there
@@ -548,7 +542,6 @@ scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::ve
                 const double diff = incomingEdge->tail->makespan - eventStartRead->getExpectedTimeFire();
                 eventStartRead->setBothTimesFire(incomingEdge->tail->makespan);
                 if (!eventStartRead->getSuccessors().empty()) {
-
                     std::unordered_set<Event*> visited;
                     Event::propagateChainInPlanning(eventStartRead, diff, visited);
                 }

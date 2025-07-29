@@ -87,33 +87,6 @@ private:
     double expectedTimeFire = -1;
     double actualTimeFire = -1;
 
-public:
-    Event(vertex_t* task, edge_t* edge,
-        const eventType type, const std::shared_ptr<Processor>& processor,
-        const double expectedTimeFire, const double actualTimeFire,
-        const bool isEviction, std::string idN)
-        : id(std::move(idN))
-        , task(task)
-        , edge(edge)
-        , type(type)
-        , processor(processor) // shared ownership
-        , onlyPreemptive(isEviction)
-        , expectedTimeFire(expectedTimeFire)
-        , actualTimeFire(actualTimeFire)
-    {
-    }
-
-    void initialize(const std::vector<std::shared_ptr<Event>>& ppredecessors,
-        const std::vector<std::shared_ptr<Event>>& ssuccessors)
-    {
-        for (const auto& pred : ppredecessors) {
-            this->addPredecessorInPlanning(pred);
-        }
-        for (const auto& succ : ssuccessors) {
-            this->addSuccessorInPlanning(succ);
-        }
-    }
-
     struct EventHasher {
         size_t operator()(const std::shared_ptr<Event>& e) const
         {
@@ -124,18 +97,42 @@ public:
     struct EventEqual {
         bool operator()(const std::shared_ptr<Event>& lhs, const std::shared_ptr<Event>& rhs) const
         {
-            // if(lhs->id!= rhs->id){
             return lhs->id == rhs->id; // Compare by id for equality
-            //}
-            // else
-            //    throw runtime_error("");
         }
     };
 
-    // set<std::shared_ptr<Event>> predecessors, successors;
     std::unordered_set<std::shared_ptr<Event>, EventHasher, EventEqual> predecessors, successors;
 
+    void initialize(const std::vector<std::shared_ptr<Event>>& predecessors,
+        const std::vector<std::shared_ptr<Event>>& successors)
+    {
+        for (const auto& pred : predecessors) {
+            this->addPredecessorInPlanning(pred);
+        }
+        for (const auto& succ : successors) {
+            this->addSuccessorInPlanning(succ);
+        }
+    }
+
 public:
+    Event(vertex_t* task, edge_t* edge,
+        const eventType type, const std::shared_ptr<Processor>& processor,
+        const double expectedTimeFire, const double actualTimeFire,
+        const bool isEviction, std::string idN,
+        const std::vector<std::shared_ptr<Event>>& predecessors = {},
+        const std::vector<std::shared_ptr<Event>>& successors = {})
+        : id(std::move(idN))
+        , task(task)
+        , edge(edge)
+        , type(type)
+        , processor(processor) // shared ownership
+        , onlyPreemptive(isEviction)
+        , expectedTimeFire(expectedTimeFire)
+        , actualTimeFire(actualTimeFire)
+    {
+        initialize(predecessors, successors);
+    }
+
     static std::shared_ptr<Event> createEvent(vertex_t* task, edge_t* edge,
         eventType type, const std::shared_ptr<Processor>& processor,
         double expectedTimeFire, double actualTimeFire,
@@ -143,29 +140,16 @@ public:
         const std::vector<std::shared_ptr<Event>>& successors,
         bool isEviction, const std::string& id)
     {
-        //  cout<<"creating event "<<id<<endl;
-        auto event = std::make_shared<Event>(task, edge, type, processor, expectedTimeFire, actualTimeFire, isEviction, id);
-        event->initialize(predecessors, successors);
-        return event;
+        return std::make_shared<Event>(task, edge, type, processor, expectedTimeFire,
+            actualTimeFire, isEviction, id, predecessors, successors);
     }
 
-    ~Event()
-    {
-        task = nullptr;
-        edge = nullptr;
-
-        // Clear shared_ptr references to help break potential shared_ptr cycles (if any)
-        processor.reset();
-        predecessors.clear();
-        successors.clear();
-    }
-
-    std::unordered_set<std::shared_ptr<Event>, EventHasher, EventEqual>& getPredecessors()
+    auto& getPredecessors()
     {
         return predecessors;
     }
 
-    std::unordered_set<std::shared_ptr<Event>, EventHasher, EventEqual>& getSuccessors()
+    auto& getSuccessors()
     {
         return successors;
     }
@@ -489,19 +473,16 @@ public:
         const auto foundIterator = eventByIdMap.find(event->id);
         if (foundIterator != eventByIdMap.end()) {
             remove(event->id);
-        } else {
-            for (const auto& pred : event->getPredecessors()) {
-                if (eventByIdMap.find(pred->id) == eventByIdMap.end()) {
-                }
-            }
-            // auto it = eventSet.insert(event);
-            auto [it, inserted] = eventSet.insert(event);
-            if (!inserted) {
-                std::cout << "Event " << event->id << " was NOT inserted. Conflicted with: " << (*it)->id << '\n';
-            }
-            eventByIdMap[event->id] = it;
-            eventsByProcessorIdMap[event->processor->id].insert(*it);
+            return;
         }
+
+        // auto it = eventSet.insert(event);
+        auto [it, inserted] = eventSet.insert(event);
+        if (!inserted) {
+            std::cout << "Event " << event->id << " was NOT inserted. Conflicted with: " << (*it)->id << '\n';
+        }
+        eventByIdMap[event->id] = it;
+        eventsByProcessorIdMap[event->processor->id].insert(*it);
     }
 
     std::shared_ptr<Event> findByEventId(const std::string& id)
@@ -522,59 +503,61 @@ public:
 
     bool update(const std::string& id, const double newTimestamp)
     {
-        // cout << "updating event " << id << endl;
         const auto it = eventByIdMap.find(id);
-        if (it != eventByIdMap.end()) {
-            const auto event = *(it->second);
-
-            if (event->getActualTimeFire() != newTimestamp) {
-                // Remove from eventSet
-                eventSet.erase(it->second);
-
-                // Remove from processor map
-                eventsByProcessorIdMap[event->processor->id].erase(event);
-
-                // Update the timestamp
-                event->setActualTimeFire(newTimestamp);
-
-                // Reinsert updated event
-                auto [newIt, inserted] = eventSet.insert(event);
-                if (inserted) {
-                    // Update the ID map and processor map
-                    eventByIdMap[id] = newIt;
-                    eventsByProcessorIdMap[event->processor->id].insert(event);
-                    return true;
-                }
-                std::cerr << "Failed to reinsert updated event: " << id << '\n';
-            }
+        if (it == eventByIdMap.end()) {
+            return false;
         }
-        return false; // Event not found or timestamp unchanged
+
+        const auto event = *(it->second);
+
+        if (event->getExpectedTimeFire() == newTimestamp) {
+            return false;
+        }
+
+        // Remove from eventSet
+        eventSet.erase(it->second);
+
+        // Remove from processor map
+        eventsByProcessorIdMap[event->processor->id].erase(event);
+
+        // Update the timestamp
+        event->setActualTimeFire(newTimestamp);
+
+        // Reinsert updated event
+        auto [newIt, inserted] = eventSet.insert(event);
+        if (!inserted) {
+            std::cerr << "Failed to reinsert updated event: " << id << '\n';
+            return false;
+        }
+
+        // Update the ID map and processor map
+        eventByIdMap[id] = newIt;
+        eventsByProcessorIdMap[event->processor->id].insert(event);
+        return true;
     }
 
     bool remove(const std::string& id)
     {
         const auto it = eventByIdMap.find(id);
-        if (it != eventByIdMap.end()) {
-            const auto event = *(it->second);
-
-            // Remove from processor map
-            const int pid = event->processor->id; // Assuming you have this field
-            const auto processorIt = eventsByProcessorIdMap.find(pid);
-            if (processorIt != eventsByProcessorIdMap.end()) {
-                processorIt->second.erase(event);
-                if (processorIt->second.empty()) {
-                    eventsByProcessorIdMap.erase(pid); // optional cleanup
-                }
-            }
-
-            // Remove from set and map
-            eventSet.erase(it->second);
-            eventByIdMap.erase(it);
-
-            return true;
+        if (it == eventByIdMap.end()) {
+            return false;
         }
 
-        return false;
+        const auto event = *(it->second);
+        const int pid = event->processor->id;
+
+        const auto processorIt = eventsByProcessorIdMap.find(pid);
+        if (processorIt != eventsByProcessorIdMap.end()) {
+            processorIt->second.erase(event);
+            if (processorIt->second.empty()) {
+                eventsByProcessorIdMap.erase(pid); // optional cleanup
+            }
+        }
+
+        eventSet.erase(it->second);
+        eventByIdMap.erase(it);
+
+        return true;
     }
 
     // Get the earliest event (smallest timestamp)
