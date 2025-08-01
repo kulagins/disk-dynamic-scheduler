@@ -519,70 +519,43 @@ void Event::fireWriteFinish()
 
 void Event::removeFromPredecessors(Event* event)
 {
-    // cout << "removing from predecessors us, " << us->id;
-    for (auto predIt = event->predecessors.begin(); predIt != event->predecessors.end();) {
-        const auto& predecessor = *predIt;
+    for (const auto& predecessor : event->predecessors) {
         if (!predecessor) {
             continue;
-            // throw std::runtime_error("Invalid (nullptr) predecessor to " + event->id);
         }
-        // cout << " from " << predecessor->id << "'s successors "; //<< endl;
         for (auto predsucIt = predecessor->successors.begin();
             predsucIt != predecessor->successors.end();) {
-            const auto& predsuc = predsucIt->lock();
-            // if (!predsuc) {
-            //     throw std::runtime_error("Invalid (nullptr) successor to " + predecessor->id);
-            // }
+            const auto predsuc = predsucIt->lock();
             if (!predsuc || predsuc->id == event->id) {
-                // cout << "removed" << endl;
                 predsucIt = predecessor->successors.erase(predsucIt);
             } else {
-                // Move to the next element
                 ++predsucIt;
             }
         }
-        // if (!isREmoved) cout << "NOT REMOVED FROM PREDECESSOR " << predecessor->id << endl;
-        ++predIt;
     }
     event->predecessors.clear();
 }
 
 void Event::removeFromSuccessors(Event* event)
 {
-    // cout << "removing from successors us, " << us->id;
     for (auto succIt = event->successors.begin(); succIt != event->successors.end();) {
         const auto successor = succIt->lock();
         if (!successor) {
             throw std::runtime_error("Invalid (nullptr) successor to " + event->id);
         }
 
-        // cout << " from " << (*successor)->id << "'s predecessors "; //<< endl;
         for (auto succspredIt = successor->predecessors.begin();
             succspredIt != successor->predecessors.end();) {
             const auto succspred = *succspredIt;
-            if (!succspred) {
-                throw std::runtime_error("Invalid (nullptr) predecessor to " + successor->id);
-            }
             if (succspred->id == event->id) {
-                // cout << "removed" << endl;
                 succspredIt = successor->predecessors.erase(succspredIt);
             } else {
-                // Move to the next element
                 ++succspredIt;
             }
         }
-        // if (!isREmoved) cout << "NOT REMOVED FROM SUCCESSOR " << (*successor)->id << endl;
         ++succIt;
     }
     event->successors.clear();
-    /*cout << "sanity check!" << endl;
-    for (const auto &s: successors) {
-        std::cout << "Successor " << s->id << " has predecessors: ";
-        for (const auto &pred: s->predecessors) {
-            std::cout << pred->id << " ";
-        }
-        std::cout << '\n';
-    } */
 }
 
 void Cluster::printProcessorsEvents()
