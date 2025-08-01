@@ -95,17 +95,12 @@ tentativeAssignment(vertex_t* vertex, const std::shared_ptr<Processor>& ourModif
 
     startTime = std::max(notEarlierThan, ourModifiedProc->getExpectedOrActualReadyTimeCompute());
 
-    std::vector<std::shared_ptr<Event>> preds;
-    std::vector<std::shared_ptr<Event>> succs;
-
     auto eventStartTask = Event::createEvent(vertex, nullptr, OnTaskStart, ourModifiedProc,
-        startTime, startTime, preds,
-        succs, false,
+        startTime, startTime, false,
         vertex->name + "-s");
     auto finishTime = startTime + vertex->time / ourModifiedProc->getProcessorSpeed();
     auto eventFinishTask = Event::createEvent(vertex, nullptr, OnTaskFinish, ourModifiedProc,
-        finishTime, finishTime, preds,
-        succs, false,
+        finishTime, finishTime, false,
         vertex->name + "-f");
     eventFinishTask->addPredecessorInPlanning(eventStartTask);
 
@@ -284,9 +279,6 @@ tentativeAssignment(vertex_t* vertex, const std::shared_ptr<Processor>& ourModif
         }
 
     } else {
-        if (vertex->name == "circularmapper") {
-            std::cout << "!";
-        }
         processIncomingEdges(vertex, eventStartTask, ourModifiedProc, modifiedProcs, newEvents);
 
         actuallyUsedMemory = peakMemoryRequirementOfVertex(vertex);
@@ -409,7 +401,7 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
             double atThisTime = ourEvent->getExpectedTimeFire();
             scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge, atThisTime);
             if (atThisTime > ourEvent->getExpectedTimeFire()) {
-                std::unordered_set<Event*> visited;
+                std::unordered_set<std::shared_ptr<Event>> visited;
                 Event::propagateChainInPlanning(ourEvent, atThisTime - ourEvent->getExpectedTimeFire(), visited);
                 ourEvent->setBothTimesFire(atThisTime);
             }
@@ -427,7 +419,7 @@ processIncomingEdges(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, 
                     readEVents = scheduleARead(v, ourEvent, createdEvents, ourEvent->getExpectedTimeFire(), ourModifiedProc, incomingEdge, atWhatTime);
 
                     if (atWhatTime > ourEvent->getExpectedTimeFire()) {
-                        std::unordered_set<Event*> visited;
+                        std::unordered_set<std::shared_ptr<Event>> visited;
                         Event::propagateChainInPlanning(ourEvent, atWhatTime - ourEvent->getExpectedTimeFire(), visited);
                         ourEvent->setBothTimesFire(atWhatTime);
                     }
@@ -494,9 +486,10 @@ scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::ve
     estimatedStartOfRead = std::max(estimatedStartOfRead, ourModifiedProc->getExpectedOrActualReadyTimeRead());
 
     std::vector<std::shared_ptr<Event>> predsOfRead;
-    std::vector<std::shared_ptr<Event>> succsOfRead;
+    std::vector<std::weak_ptr<Event>> succsOfRead;
     if (events.findByEventId(v->name + "-s") != nullptr) {
-        succsOfRead.emplace_back(events.findByEventId(v->name + "-s"));
+        const auto eventStartTask = events.findByEventId(v->name + "-s");
+        succsOfRead.emplace_back(eventStartTask);
     }
 
     // if this start of the read is happening during the runtime  of the previous task
@@ -542,7 +535,7 @@ scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::ve
                 const double diff = incomingEdge->tail->makespan - eventStartRead->getExpectedTimeFire();
                 eventStartRead->setBothTimesFire(incomingEdge->tail->makespan);
                 if (!eventStartRead->getSuccessors().empty()) {
-                    std::unordered_set<Event*> visited;
+                    std::unordered_set<std::shared_ptr<Event>> visited;
                     Event::propagateChainInPlanning(eventStartRead, diff, visited);
                 }
             }
@@ -553,8 +546,8 @@ scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::ve
 
     const double estimatedTimeOfFinishRead = eventStartRead->getExpectedTimeFire() + incomingEdge->weight / ourModifiedProc->readSpeedDisk;
 
-    predsOfRead = std::vector<std::shared_ptr<Event>> {};
-    succsOfRead = std::vector<std::shared_ptr<Event>> {};
+    predsOfRead.clear();
+    succsOfRead.clear();
     auto eventFinishRead = Event::createEvent(nullptr, incomingEdge, OnReadFinish, ourModifiedProc,
         estimatedTimeOfFinishRead, estimatedTimeOfFinishRead, predsOfRead,
         succsOfRead, false,
@@ -562,7 +555,8 @@ scheduleARead(const vertex_t* v, const std::shared_ptr<Event>& ourEvent, std::ve
 
     eventFinishRead->addSuccessorInPlanning(ourEvent);
     if (events.findByEventId(v->name + "-s") != nullptr) {
-        eventFinishRead->addSuccessorInPlanning(events.findByEventId(v->name + "-s"));
+        const auto eventSucc = events.findByEventId(v->name + "-s");
+        eventFinishRead->addSuccessorInPlanning(eventSucc);
     }
     eventFinishRead->addPredecessorInPlanning(eventStartRead);
 
@@ -738,12 +732,8 @@ void scheduleWriteAndRead(const vertex_t* v, const std::shared_ptr<Event>& ourEv
         estimatedStartOfWrite = estimatedStartOfWrite + slack;
     }
 
-    std::vector<std::shared_ptr<Event>> predsOfWrite;
-    std::vector<std::shared_ptr<Event>> succsOfWrite;
-
     auto eventStartWrite = Event::createEvent(nullptr, incomingEdge, OnWriteStart, predecessorsProc,
-        estimatedStartOfWrite, estimatedStartOfWrite, predsOfWrite,
-        succsOfWrite, false,
+        estimatedStartOfWrite, estimatedStartOfWrite, false,
         buildEdgeName(incomingEdge) + "-w-s");
     assert(eventStartWrite->getExpectedTimeFire() == estimatedStartOfWrite);
     assert(eventStartWrite->getExpectedTimeFire() == eventStartWrite->getActualTimeFire());
@@ -762,11 +752,8 @@ void scheduleWriteAndRead(const vertex_t* v, const std::shared_ptr<Event>& ourEv
 
     const double estimatedTimeOfFinishWrite = eventStartWrite->getExpectedTimeFire() + incomingEdge->weight / predecessorsProc->writeSpeedDisk;
 
-    predsOfWrite = std::vector<std::shared_ptr<Event>> {};
-    succsOfWrite = std::vector<std::shared_ptr<Event>> {};
     auto eventFinishWrite = Event::createEvent(nullptr, incomingEdge, OnWriteFinish, predecessorsProc,
-        estimatedTimeOfFinishWrite, estimatedTimeOfFinishWrite, predsOfWrite,
-        succsOfWrite, false,
+        estimatedTimeOfFinishWrite, estimatedTimeOfFinishWrite, false,
         buildEdgeName(incomingEdge) + "-w-f");
 
     if (events.findByEventId(v->name + "-s")) {

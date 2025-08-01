@@ -85,7 +85,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     int cntr = 0;
     while (!events.empty()) {
         cntr++;
-        std::shared_ptr<Event> firstEvent = events.getEarliest();
+        auto firstEvent = events.getEarliest();
         bool removed = events.remove(firstEvent->id);
         assert(removed == true);
 
@@ -147,7 +147,7 @@ void Event::fireTaskStart()
     }
 
     // cout << "DONE" << endl;
-    removeOurselfFromSuccessors(this);
+    removeFromSuccessors(this);
     this->task->status = Status::Running;
     const auto ourFinishEvent = events.findByEventId(this->task->name + "-f");
     if (ourFinishEvent == nullptr) {
@@ -161,12 +161,14 @@ void Event::fireTaskStart()
     const auto factor = applyDeviationTo(durationTask);
     this->task->factorForRealExecution = factor;
     assert(factor > 0);
-    for (auto successor = successors.begin(); successor != successors.end();) {
-        // cout << " from " << (*successor)->id << "'s predecessors" << endl;
-        if ((*successor)->task == nullptr) {
+    for (auto& succ : successors) {
+        const auto& successor = succ.lock();
+        if (!successor) {
+            throw std::runtime_error("Invalid (nullptr) successor to " + this->task->name);
+        }
+        if (successor->task == nullptr) {
             throw std::runtime_error("edge-based event depends on task start " + this->id);
         }
-        ++successor;
     }
 
     const double d = this->getActualTimeFire() + durationTask;
@@ -181,12 +183,12 @@ void Event::fireTaskStart()
         if (startWrite != nullptr) {
             events.remove(startWrite->id);
             events.remove(finishWrite->id);
-            removeOurselfFromSuccessors(startWrite.get());
-            removeOurselfFromSuccessors(finishWrite.get());
+            removeFromSuccessors(startWrite.get());
+            removeFromSuccessors(finishWrite.get());
             startWrite->isDone = true;
             finishWrite->isDone = true;
 
-            std::unordered_set<Event*> visited;
+            std::unordered_set<std::shared_ptr<Event>> visited;
             propagateChainInPlanning(finishWrite,
                 startWrite->getActualTimeFire() - finishWrite->getActualTimeFire(), visited);
         } else if (finishWrite != nullptr) {
@@ -222,7 +224,7 @@ void Event::fireTaskFinish()
     }
 
     // cout << "DONE " << endl;
-    removeOurselfFromSuccessors(this);
+    removeFromSuccessors(this);
     // set its status to finished
     this->task->status = Status::Finished;
     this->isDone = true;
@@ -305,7 +307,7 @@ void Event::fireTaskFinish()
 
         existsIdleProcessor = std::any_of(cluster->getProcessors().begin(), cluster->getProcessors().end(),
             [&](const auto& item) {
-                const auto & [procId, processor] = item;
+                const auto& [procId, processor] = item;
                 return processor->getReadyTimeCompute() < this->getActualTimeFire();
             });
     }
@@ -348,7 +350,7 @@ void Event::fireReadStart()
     }
 
     // cout << "DONE" << endl;
-    removeOurselfFromSuccessors(this);
+    removeFromSuccessors(this);
     double durationOfRead = this->edge->weight / this->processor->readSpeedDisk;
     const double factor = applyDeviationTo(durationOfRead);
     assert(factor > 0);
@@ -381,7 +383,7 @@ void Event::fireReadFinish()
         events.insert(shared_from_this());
     } else {
         // cout << "DONE " << endl;
-        removeOurselfFromSuccessors(this);
+        removeFromSuccessors(this);
         assert(cluster->getProcessorById(this->processor->id).use_count() == this->processor.use_count());
         if (!isLocatedOnDisk(this->edge, false)) {
             const auto ptr = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
@@ -407,7 +409,7 @@ void Event::fireWriteStart()
     }
 
     // cout << "DONE" << endl;
-    removeOurselfFromSuccessors(this);
+    removeFromSuccessors(this);
 
     assert(cluster->getProcessorById(this->processor->id).use_count() == this->processor.use_count());
 
@@ -450,7 +452,7 @@ void Event::fireWriteFinish()
     }
 
     // cout << "DONE" << endl;
-    removeOurselfFromSuccessors(this);
+    removeFromSuccessors(this);
     if (this->onlyPreemptive) {
         locateToDisk(this->edge, false, this->getActualTimeFire());
         assert(isLocatedOnThisProcessor(this->edge, this->processor->id, false));
@@ -505,9 +507,6 @@ void Event::fireWriteFinish()
         events.insert(writeEvents.second);
         assert(isLocatedOnThisProcessor(edgeToWriteJustInCase, this->processor->id, false));
         this->processor->writingQueue.erase(this->processor->writingQueue.begin());
-        if (buildEdgeName(edgeToWriteJustInCase) == "preseq_00000155-multiqc_00000149") {
-            std::cout << '\n';
-        }
         // for (const auto &item: this->processor->writingQueue){
         //    cout<<buildEdgeName(item)<<endl;
         // }
@@ -518,25 +517,64 @@ void Event::fireWriteFinish()
     }
 }
 
-void Event::removeOurselfFromSuccessors(const Event* us)
+void Event::removeFromPredecessors(Event* event)
 {
-    // cout << "removing from successors us, " << us->id;
-
-    for (auto successor = successors.begin(); successor != successors.end();) {
-        // cout << " from " << (*successor)->id << "'s predecessors "; //<< endl;
-        for (auto succspred = (*successor)->predecessors.begin(); succspred != (*successor)->predecessors.end();) {
-            if ((*succspred)->id == us->id) {
+    // cout << "removing from predecessors us, " << us->id;
+    for (auto predIt = event->predecessors.begin(); predIt != event->predecessors.end();) {
+        const auto& predecessor = *predIt;
+        if (!predecessor) {
+            continue;
+            // throw std::runtime_error("Invalid (nullptr) predecessor to " + event->id);
+        }
+        // cout << " from " << predecessor->id << "'s successors "; //<< endl;
+        for (auto predsucIt = predecessor->successors.begin();
+            predsucIt != predecessor->successors.end();) {
+            const auto& predsuc = predsucIt->lock();
+            // if (!predsuc) {
+            //     throw std::runtime_error("Invalid (nullptr) successor to " + predecessor->id);
+            // }
+            if (!predsuc || predsuc->id == event->id) {
                 // cout << "removed" << endl;
-                succspred = (*successor)->predecessors.erase(succspred);
+                predsucIt = predecessor->successors.erase(predsucIt);
             } else {
                 // Move to the next element
-                ++succspred;
+                ++predsucIt;
+            }
+        }
+        // if (!isREmoved) cout << "NOT REMOVED FROM PREDECESSOR " << predecessor->id << endl;
+        ++predIt;
+    }
+    event->predecessors.clear();
+}
+
+void Event::removeFromSuccessors(Event* event)
+{
+    // cout << "removing from successors us, " << us->id;
+    for (auto succIt = event->successors.begin(); succIt != event->successors.end();) {
+        const auto successor = succIt->lock();
+        if (!successor) {
+            throw std::runtime_error("Invalid (nullptr) successor to " + event->id);
+        }
+
+        // cout << " from " << (*successor)->id << "'s predecessors "; //<< endl;
+        for (auto succspredIt = successor->predecessors.begin();
+            succspredIt != successor->predecessors.end();) {
+            const auto succspred = *succspredIt;
+            if (!succspred) {
+                throw std::runtime_error("Invalid (nullptr) predecessor to " + successor->id);
+            }
+            if (succspred->id == event->id) {
+                // cout << "removed" << endl;
+                succspredIt = successor->predecessors.erase(succspredIt);
+            } else {
+                // Move to the next element
+                ++succspredIt;
             }
         }
         // if (!isREmoved) cout << "NOT REMOVED FROM SUCCESSOR " << (*successor)->id << endl;
-        ++successor;
+        ++succIt;
     }
-    successors.clear();
+    event->successors.clear();
     /*cout << "sanity check!" << endl;
     for (const auto &s: successors) {
         std::cout << "Successor " << s->id << " has predecessors: ";
@@ -607,29 +645,58 @@ void Processor::addEvent(const std::shared_ptr<Event>& event)
     } */
 }
 
+// bool dealWithPredecessors(const std::shared_ptr<Event>& us)
+// {
+//     if (!us->getPredecessors().empty()) {
+//
+//         auto it = us->getPredecessors().begin();
+//         while (it != us->getPredecessors().end()) {
+//             if ((*it)->isDone) {
+//                 it = us->getPredecessors().erase(it);
+//             } else {
+//                 it++;
+//             }
+//         }
+//
+//         // cout << "predecessors not empty for " << us->id << endl;
+//         for (const auto& item : us->getPredecessors()) {
+//             //      cout << "predecessor " << item->id << ", ";
+//             if (item->getActualTimeFire() > us->getActualTimeFire()) {
+//                 //  cout<<"predecessor "<<item->id<<"'s fire time is larger than ours. "<<item->getActualTimeFire()<<" vs "<<us->getActualTimeFire()<<endl;
+//                 us->setActualTimeFire(
+//                     item->getActualTimeFire());
+//             }
+//         }
+//     }
+//     return us->getPredecessors().empty();
+// }
+
 bool dealWithPredecessors(const std::shared_ptr<Event>& us)
 {
-    if (!us->getPredecessors().empty()) {
+    auto& preds = us->getPredecessors();
 
-        auto it = us->getPredecessors().begin();
-        while (it != us->getPredecessors().end()) {
-            if ((*it)->isDone) {
-                it = us->getPredecessors().erase(it);
-            } else {
-                it++;
-            }
+    // Remove completed predecessors
+    for (auto it = preds.begin(); it != preds.end();) {
+        const auto& pred = *it;
+        if (!pred) {
+            throw std::runtime_error("Invalid (nullptr) predecessor to " + us->id);
         }
-        // cout << "predecessors not empty for " << us->id << endl;
-        for (const auto& item : us->getPredecessors()) {
-            //      cout << "predecessor " << item->id << ", ";
-            if (item->getActualTimeFire() > us->getActualTimeFire()) {
-                //  cout<<"predecessor "<<item->id<<"'s fire time is larger than ours. "<<item->getActualTimeFire()<<" vs "<<us->getActualTimeFire()<<endl;
-                us->setActualTimeFire(
-                    item->getActualTimeFire());
-            }
+        if (pred->isDone) {
+            // cout << "removing done predecessor " << pred->id << endl;
+            it = preds.erase(it);
+        } else {
+            ++it;
         }
     }
-    return us->getPredecessors().empty();
+
+    // Adjust actual fire time based on remaining predecessors
+    for (const auto& pred : preds) {
+        if (pred->getActualTimeFire() > us->getActualTimeFire()) {
+            us->setActualTimeFire(pred->getActualTimeFire());
+        }
+    }
+
+    return preds.empty();
 }
 
 void transferAfterMemoriesToBefore(const std::shared_ptr<Processor>& ourModifiedProc)
