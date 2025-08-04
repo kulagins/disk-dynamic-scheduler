@@ -919,6 +919,8 @@ variants:
      #   extra_args: [ '-m 100000000', '-s 0.01', '-r 1', '-o 0.00001' ]
      - name: 'final'
        extra_args: [ '-m 100000000', '-s 100', '-r 1', '-o 0.00001' ]
+     - name: 'fin10pw3'
+       extra_args: [ '-m 100000000', '-s 100', '-r 1', '-o 0.001' ]
 
 
 experiments:

@@ -103,12 +103,13 @@ int main(int argc, char* argv[])
     cout << std::setprecision(15);
 
     start = std::chrono::system_clock::now();
-    double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.algoNumber == 0, options.deviationModel, true /* usePreemptiveWrites */);
+    double runtimeDynamic = 0;
+    double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.algoNumber == 0, options.deviationModel, true /* usePreemptiveWrites */, runtimeDynamic);
     end = std::chrono::system_clock::now();
     elapsed_seconds = end - start;
 
     events.deleteAll();
-    std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
+    std::cout << " duration_of_algorithm " << runtimeDynamic << " "; // << endl;
     cout << "makespan_1 " << d << "\t";
 
     delete actualCluster;
@@ -116,10 +117,11 @@ int main(int argc, char* argv[])
 
     clearGraph(graphMemTopology);
     start = std::chrono::system_clock::now();
-    d = medih(graphMemTopology, options.algoNumber, options.algoNumber == 0);
+    double runtimeStatic = 0;
+    d = medih(graphMemTopology, options.algoNumber, options.algoNumber == 0, runtimeStatic);
     end = std::chrono::system_clock::now();
     elapsed_seconds = end - start;
-    std::cout << " duration_of_algorithm " << elapsed_seconds.count() << " "; // << endl;
+    std::cout << " duration_of_algorithm " << runtimeStatic << " "; // << endl;
     cout << "makespan_2 " << d << endl;
 
     delete graphMemTopology;
