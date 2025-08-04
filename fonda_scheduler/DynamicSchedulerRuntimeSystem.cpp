@@ -22,9 +22,6 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
     devationVariant = deviationNumber;
     usePreemptiveWrites= upw;
 
-    static thread_local std::mt19937 gen(std::random_device{}());
-    static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
-
     auto start = std::chrono::system_clock::now();
     vertex_t *vertex = graph->first_vertex;
     switch (algoNum) {
@@ -33,7 +30,6 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
 
             while (vertex != nullptr) {
                 double rank = calculateSimpleBottomUpRank(vertex);
-                rank = rank + dist(gen);
                 vertex->rank = rank;
                 vertex = vertex->next;
             }
@@ -41,12 +37,9 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
         }
         case 2: {
             vertex_t *vertex = graph->first_vertex;
-            static thread_local std::mt19937 gen(std::random_device{}());
-            static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
 
             while (vertex != nullptr) {
                 double rank = calculateBLCBottomUpRank(vertex);
-                rank = rank + dist(gen);
                 vertex->rank = rank;
                 vertex = vertex->next;
             }
@@ -55,7 +48,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
         case 3: {
             vector<std::pair<vertex_t *, double>> ranks = calculateMMBottomUpRank(graph);
             std::for_each(ranks.begin(), ranks.end(), [](std::pair<vertex_t *, double> pair) {
-                pair.first->rank = pair.second + dist(gen);
+                pair.first->rank = pair.second;
             });
         }
             break;
