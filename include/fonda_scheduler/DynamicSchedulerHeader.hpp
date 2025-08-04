@@ -13,7 +13,7 @@ extern Cluster* cluster;
 extern EventManager events;
 extern ReadyQueue readyQueue;
 
-double dynMedih(graph_t* graph, Cluster* cluster, int algoNum, int deviationNumber, bool upw);
+double dynMedih(graph_t* graph, Cluster* cluster, int algoNum, int deviationNumber, bool upw, double& runtime);
 
 double applyDeviationTo(double& in);
 std::vector<std::shared_ptr<Processor>>

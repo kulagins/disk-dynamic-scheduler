@@ -55,7 +55,7 @@ double calculateBLCBottomUpRank(const vertex_t* task);
 
 std::vector<std::pair<vertex_t*, double>> calculateMMBottomUpRank(graph_t* graphWMems);
 
-double medih(graph_t* graph, int algoNum);
+double medih(graph_t* graph, int algoNum, double& runtime);
 
 std::vector<std::pair<vertex_t*, double>> calculateBottomLevels(graph_t* graph, int algoNum);
 

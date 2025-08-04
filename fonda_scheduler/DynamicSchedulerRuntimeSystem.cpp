@@ -12,8 +12,9 @@ int devationVariant;
 bool usePreemptiveWrites;
 
 std::string lastEventName;
+double runtimeOfScheduler;
 
-double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int deviationNumber, const bool upw)
+double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int deviationNumber, const bool upw, double& runtime)
 {
     double resMakespan = -1;
     cluster = cluster1;
@@ -25,11 +26,11 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     static std::mt19937 gen(std::random_device {}());
     static std::uniform_real_distribution<double> dist(0.0, 1);
 
+    auto start = std::chrono::system_clock::now();
+    vertex_t* vertex = graph->first_vertex;
     switch (algoNum) {
     case fonda_scheduler::HEFT:
     case fonda_scheduler::HEFT_BL: {
-        vertex_t* vertex = graph->first_vertex;
-
         while (vertex != nullptr) {
             double rank = calculateSimpleBottomUpRank(vertex);
             rank = rank + dist(gen);
@@ -39,8 +40,6 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
         break;
     }
     case fonda_scheduler::HEFT_BLC: {
-        vertex_t* vertex = graph->first_vertex;
-
         while (vertex != nullptr) {
             double rank = calculateBLCBottomUpRank(vertex);
             rank = rank + dist(gen);
@@ -65,7 +64,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
         remove_vertex(graph, findVertexByName(graph, "GRAPH_TARGET"));
     }
 
-    vertex_t* vertex = graph->first_vertex;
+    vertex = graph->first_vertex;
     while (vertex != nullptr) {
         if (vertex->in_edges.empty()) {
             //  cout << "starting task " << vertex->name << endl;
@@ -81,6 +80,10 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
         }
         vertex = vertex->next;
     }
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    runtimeOfScheduler += elapsed_seconds.count();
 
     int cntr = 0;
     while (!events.empty()) {
@@ -130,6 +133,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
 
         //  cout<<"events now "; events.printAll();
     }
+    runtime = runtimeOfScheduler;
 
     return resMakespan;
 }
@@ -273,8 +277,13 @@ void Event::fireTaskFinish()
         std::vector<std::shared_ptr<Processor>> bestModifiedProcs;
         std::shared_ptr<Processor> bestProcessorToAssign;
         // cout<<"assigning vertex "<<mostReadyVertex->name<<" ";
+        auto start = std::chrono::system_clock::now();
         std::vector<std::shared_ptr<Event>> newEvents = bestTentativeAssignment(mostReadyVertex, bestModifiedProcs, bestProcessorToAssign,
             this->actualTimeFire);
+
+        auto end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        runtimeOfScheduler += elapsed_seconds.count();
 
         mostReadyVertex->status = Status::Scheduled;
         readyQueue.readyTasks.erase(mostReadyVertex);
