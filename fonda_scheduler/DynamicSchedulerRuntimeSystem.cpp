@@ -504,7 +504,7 @@ void Event::fireWriteFinish() {
                     positionInWriteQ);
         }
         else{
-            cout<<"";
+           // cout<<"";
         }
 
 
@@ -544,9 +544,6 @@ void Event::fireWriteFinish() {
                     events.insert(writeEvents.second);
                     assert(isLocatedOnThisProcessor(edgeToWriteJustInCase, this->processor->id, false));
                     this->processor->writingQueue.erase(this->processor->writingQueue.begin());
-                    if(buildEdgeName(edgeToWriteJustInCase)=="preseq_00000155-multiqc_00000149"){
-                        cout<<endl;
-                    }
                     // for (const auto &item: this->processor->writingQueue){
                     //    cout<<buildEdgeName(item)<<endl;
                     // }
