@@ -11,8 +11,9 @@ int devationVariant;
 bool usePreemptiveWrites;
 
 string lastEventName;
+double runtimeOfScheduler;
 
-double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, bool isHeft, int deviationNumber, bool upw) {
+double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, bool isHeft, int deviationNumber, bool upw, double & runtime) {
     double resMakespan = -1;
     cluster = cluster1;
     algoNum = isHeft ? 1 : algoNum;
@@ -76,6 +77,11 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
         }
         vertex = vertex->next;
     }
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    runtimeOfScheduler+=elapsed_seconds.count();
+
     int cntr = 0;
     while (!events.empty()) {
         cntr++;
@@ -127,6 +133,7 @@ double new_heuristic_dynamic(graph_t *graph, Cluster *cluster1, int algoNum, boo
 
         //  cout<<"events now "; events.printAll();
     }
+    runtime= runtimeOfScheduler;
     return resMakespan;
 }
 
@@ -288,9 +295,14 @@ void Event::fireTaskFinish() {
             vector<shared_ptr<Processor>> bestModifiedProcs;
             shared_ptr<Processor> bestProcessorToAssign;
             // cout<<"assigning vertex "<<mostReadyVertex->name<<" ";
+            auto start = std::chrono::system_clock::now();
             vector<shared_ptr<Event>> newEvents =
                     bestTentativeAssignment(mostReadyVertex, bestModifiedProcs, bestProcessorToAssign,
                                             this->actualTimeFire);
+
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_seconds = end - start;
+            runtimeOfScheduler+=elapsed_seconds.count();
 
 
             mostReadyVertex->status = Status::Scheduled;

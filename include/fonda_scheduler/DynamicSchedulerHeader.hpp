@@ -17,7 +17,7 @@ extern EventManager events;
 extern ReadyQueue readyQueue;
 
 
-double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft, int deviationNumber, bool upw);
+double new_heuristic_dynamic(graph_t *graph, Cluster *cluster, int algoNum, bool isHeft, int deviationNumber, bool upw, double & runtime);
 
 double applyDeviationTo(double &in);
 vector<shared_ptr<Processor>>
