@@ -23,7 +23,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     devationVariant = deviationNumber;
     usePreemptiveWrites = upw;
 
-    auto start = std::chrono::system_clock::now();
+    const auto start = std::chrono::system_clock::now();
     vertex_t* vertex = graph->first_vertex;
     switch (algoNum) {
     case fonda_scheduler::HEFT:
@@ -74,8 +74,8 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
         vertex = vertex->next;
     }
 
-    auto end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end - start;
+    const auto end = std::chrono::system_clock::now();
+    const std::chrono::duration<double> elapsed_seconds = end - start;
     runtimeOfScheduler += elapsed_seconds.count();
 
     int cntr = 0;

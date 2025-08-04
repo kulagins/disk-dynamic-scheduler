@@ -212,9 +212,9 @@ public:
 
     void fireWriteFinish();
 
-    static void removeFromSuccessors(Event* us);
+    static void removeFromSuccessors(Event* event);
 
-    static void removeFromPredecessors(Event* us);
+    static void removeFromPredecessors(Event* event);
 
     static void propagateChainInPlanning(const std::shared_ptr<Event>& event, const double add, std::unordered_set<std::shared_ptr<Event>>& visited)
     {
