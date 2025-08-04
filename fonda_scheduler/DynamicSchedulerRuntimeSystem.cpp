@@ -23,27 +23,20 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     devationVariant = deviationNumber;
     usePreemptiveWrites = upw;
 
-    static std::mt19937 gen(std::random_device {}());
-    static std::uniform_real_distribution<double> dist(0.0, 1);
-
     auto start = std::chrono::system_clock::now();
     vertex_t* vertex = graph->first_vertex;
     switch (algoNum) {
     case fonda_scheduler::HEFT:
     case fonda_scheduler::HEFT_BL: {
         while (vertex != nullptr) {
-            double rank = calculateSimpleBottomUpRank(vertex);
-            rank = rank + dist(gen);
-            vertex->rank = rank;
+            vertex->rank = calculateSimpleBottomUpRank(vertex);
             vertex = vertex->next;
         }
         break;
     }
     case fonda_scheduler::HEFT_BLC: {
         while (vertex != nullptr) {
-            double rank = calculateBLCBottomUpRank(vertex);
-            rank = rank + dist(gen);
-            vertex->rank = rank;
+            vertex->rank = calculateBLCBottomUpRank(vertex);
             vertex = vertex->next;
         }
         break;
@@ -51,7 +44,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     case fonda_scheduler::HEFT_MM: {
         std::vector<std::pair<vertex_t*, double>> ranks = calculateMMBottomUpRank(graph);
         std::for_each(ranks.begin(), ranks.end(), [](const std::pair<vertex_t*, double>& pair) {
-            pair.first->rank = pair.second + dist(gen);
+            pair.first->rank = pair.second;
         });
         break;
     }
