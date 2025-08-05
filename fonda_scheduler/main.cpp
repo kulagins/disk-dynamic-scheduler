@@ -141,56 +141,54 @@ int main(int argc, char *argv[]) {
     Fonda::fillGraphWeightsFromExternalSource(graphMemTopology, workflow_rows, workflowName, inputSize, imaginedCluster, 1, 10);
     //print_graph_to_cout(graphMemTopology);
 
-    vertex_t *pv = graphMemTopology->first_vertex;
-    while(pv!= nullptr){
-        if(peakMemoryRequirementOfVertex(pv)> pv->memoryRequirement){
-            pv->memoryRequirement=peakMemoryRequirementOfVertex(pv)+1000;
-            //cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
+    vertex_t* pv = graphMemTopology->first_vertex;
+    while (pv != nullptr) {
+        const auto MEMORY_EPSILON = 1000;
+        const auto MEMORY_DIVISION_FACTOR = 4;
+        if (peakMemoryRequirementOfVertex(pv) > pv->memoryRequirement) {
+            pv->memoryRequirement = peakMemoryRequirementOfVertex(pv) + MEMORY_EPSILON;
+            // cout<<"peak of "<< pv->name<<" "<<peakMemoryRequirementOfVertex(pv)<<endl;
         }
-       if(outMemoryRequirement(pv)> biggestMem) {
-          // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+        if (outMemoryRequirement(pv) > biggestMem) {
+            // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
 
-       for (int i = 0; i < pv->out_degree; i++) {
-                     pv->out_edges[i]->weight /= 4;
-                 }
-                 double d = inMemoryRequirement(pv);
-                 double requirement = outMemoryRequirement(pv);
-                 if(outMemoryRequirement(pv)> biggestMem){
+            for (int i = 0; i < pv->out_degree; i++) {
+                pv->out_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
+                // throw an error
+            }
+            double d = inMemoryRequirement(pv);
+            double requirement = outMemoryRequirement(pv);
+            if (outMemoryRequirement(pv) > biggestMem) {
 
-                    // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                     for (int i = 0; i < pv->out_degree; i++) {
-                         pv->out_edges[i]->weight /= 4;
-                     }
-                     if(outMemoryRequirement(pv)> biggestMem) {
-                         return 0;
-                     }
-                 }
+                // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                for (int i = 0; i < pv->out_degree; i++) {
+                    pv->out_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
+                    // throw an error
+                }
+                if (outMemoryRequirement(pv) > biggestMem) {
+                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster.");
+                }
+            }
+        }
 
+        if (inMemoryRequirement(pv) > biggestMem) {
+            // cout<<"WILL BE INVALID "<< inMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+            for (int i = 0; i < pv->in_degree; i++) {
+                pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
+            }
 
-             }
-
-             if(inMemoryRequirement(pv)> biggestMem){
-                  // cout<<"WILL BE INVALID "<< inMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                 for (int i = 0; i < pv->in_degree; i++) {
-                     pv->in_edges[i]->weight /= 4;
-                 }
-
-                 if(inMemoryRequirement(pv)> biggestMem){
-                     // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
-                     for (int i = 0; i < pv->in_degree; i++) {
-                         pv->in_edges[i]->weight /= 4;
-                     }
-                     if(inMemoryRequirement(pv)> biggestMem) {
-                         return 0;
-                     }
-                 }
-
-
-             }
-        pv= pv->next;
+            if (inMemoryRequirement(pv) > biggestMem) {
+                // cout<<"WILL BE INVALID "<< outMemoryRequirement(pv)<<" vs "<<biggestMem<< " on "<<pv->name<< endl;
+                for (int i = 0; i < pv->in_degree; i++) {
+                    pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
+                }
+                if (inMemoryRequirement(pv) > biggestMem) {
+                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster.");
+                }
+            }
+        }
+        pv = pv->next;
     }
-  //  cout<<endl;
-    // cluster->printProcessors();
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
