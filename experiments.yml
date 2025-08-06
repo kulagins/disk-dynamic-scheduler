@@ -917,8 +917,8 @@ variants:
      #   extra_args: [ '-m 100000000', '-s 0.1', '-r 1', '-o 0.00001' ]
      # - name: 'pspw-2'
      #   extra_args: [ '-m 100000000', '-s 0.01', '-r 1', '-o 0.00001' ]
-     - name: 'final'
-       extra_args: [ '-m 100000000', '-s 100', '-r 1', '-o 0.00001' ]
+     # - name: 'final'
+     #   extra_args: [ '-m 100000000', '-s 100', '-r 1', '-o 0.00001' ]
      - name: 'fin10pw3'
        extra_args: [ '-m 100000000', '-s 100', '-r 1', '-o 0.001' ]
 
@@ -1042,5 +1042,5 @@ experiments:
 ##
 matrix:
   include:
-    - experiments: [ A1-dev, A2-dev, A3-dev, BASE-dev, A1-bdev, A2-bdev, A3-bdev, BASE-bdev, A1-30dev, A2-30dev, A3-30dev, BASE-30dev] #BASE-ndev, A1-ndev, A3-ndev ] #,
+    - experiments: [ A1-ndev] #A1-dev, A2-dev, A3-dev, BASE-dev, A1-bdev, A2-bdev, A3-bdev, BASE-bdev, A1-30dev, A2-30dev, A3-30dev, BASE-30dev] #BASE-ndev, A1-ndev, A3-ndev ] #,
       axes: [penalties]

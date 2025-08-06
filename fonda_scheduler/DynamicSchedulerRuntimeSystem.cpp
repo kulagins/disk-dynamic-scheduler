@@ -23,9 +23,6 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
     devationVariant = deviationNumber;
     usePreemptiveWrites = upw;
 
-    static thread_local std::mt19937 gen(std::random_device {}());
-    static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
-
     auto start = std::chrono::system_clock::now();
     vertex_t* vertex = graph->first_vertex;
     switch (algoNum) {
@@ -34,7 +31,6 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
 
         while (vertex != nullptr) {
             double rank = calculateSimpleBottomUpRank(vertex);
-            rank = rank + dist(gen);
             vertex->rank = rank;
             vertex = vertex->next;
         }
@@ -42,12 +38,9 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
     }
     case 2: {
         vertex_t* vertex = graph->first_vertex;
-        static thread_local std::mt19937 gen(std::random_device {}());
-        static thread_local std::uniform_real_distribution<double> dist(0.0, 1);
 
         while (vertex != nullptr) {
             double rank = calculateBLCBottomUpRank(vertex);
-            rank = rank + dist(gen);
             vertex->rank = rank;
             vertex = vertex->next;
         }
@@ -56,7 +49,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, int algoNum, bool isHeft, int
     case 3: {
         vector<std::pair<vertex_t*, double>> ranks = calculateMMBottomUpRank(graph);
         std::for_each(ranks.begin(), ranks.end(), [](std::pair<vertex_t*, double> pair) {
-            pair.first->rank = pair.second + dist(gen);
+                pair.first->rank = pair.second;
         });
     } break;
     default:
@@ -485,7 +478,7 @@ void Event::fireWriteFinish()
             this->processor->writingQueue.erase(
                 positionInWriteQ);
         } else {
-            cout << "";
+           // cout << "";
         }
 
         this->isDone = true;
@@ -520,9 +513,6 @@ void Event::fireWriteFinish()
                     events.insert(writeEvents.second);
                     assert(isLocatedOnThisProcessor(edgeToWriteJustInCase, this->processor->id, false));
                     this->processor->writingQueue.erase(this->processor->writingQueue.begin());
-                    if (buildEdgeName(edgeToWriteJustInCase) == "preseq_00000155-multiqc_00000149") {
-                        cout << endl;
-                    }
                     // for (const auto &item: this->processor->writingQueue){
                     //    cout<<buildEdgeName(item)<<endl;
                     // }
@@ -714,12 +704,14 @@ double applyDeviationTo(double& in)
 
     std::normal_distribution<double> dist(in, stddev);
     result = dist(gen);
-    result = max(result, 1.0);
+    result =(devationVariant!=3 &&devationVariant!=4)  ?  max(result, 1.0): result;
     if (devationVariant == 4) {
         result *= 2;
     }
     factor = result / in;
     in = result;
+    if (devationVariant==3)
+        assert(factor==1);
     return factor;
 }
 

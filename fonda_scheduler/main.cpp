@@ -92,8 +92,6 @@ int main(int argc, char* argv[])
     if (options.scaleToFit) {
         fonda_scheduler::scaleToFit(graphMemTopology, biggestMem);
     }
-    //  cout<<endl;
-    // cluster->printProcessors();
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
