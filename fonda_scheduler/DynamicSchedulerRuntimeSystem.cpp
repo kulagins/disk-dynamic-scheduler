@@ -44,7 +44,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     case fonda_scheduler::HEFT_MM: {
         std::vector<std::pair<vertex_t*, double>> ranks = calculateMMBottomUpRank(graph);
         std::for_each(ranks.begin(), ranks.end(), [](const std::pair<vertex_t*, double>& pair) {
-            pair.first->rank = pair.second;
+                pair.first->rank = pair.second;
         });
         break;
     }
@@ -712,12 +712,14 @@ double applyDeviationTo(double& in)
 
     std::normal_distribution<double> dist(in, stddev);
     double result = dist(gen);
-    result = std::max(result, 1.0);
+    result = (devationVariant != 3 && devationVariant != 4) ? std::max(result, 1.0) : result;
     if (devationVariant == 4) {
         result *= 2;
     }
     const double factor = result / in;
     in = result;
+    if (devationVariant==3)
+        assert(factor==1);
     return factor;
 }
 
