@@ -739,12 +739,14 @@ double applyDeviationTo(double &in) {
 
     std::normal_distribution<double> dist(in, stddev);
     result = dist(gen);
-    result = max(result, 1.0);
+    result =(devationVariant!=3 &&devationVariant!=4)  ?  max(result, 1.0): result;
     if (devationVariant == 4) {
         result *= 2;
     }
     factor = result / in;
     in = result;
+    if (devationVariant==3)
+        assert(factor==1);
     return factor;
 }
 

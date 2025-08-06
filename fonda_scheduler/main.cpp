@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
                     // throw an error
                 }
                 if (outMemoryRequirement(pv) > biggestMem) {
-                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster.");
+                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster. Out Memory requirement is "+ to_string(outMemoryRequirement(pv)));
                 }
             }
         }
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
                     pv->in_edges[i]->weight /= MEMORY_DIVISION_FACTOR;
                 }
                 if (inMemoryRequirement(pv) > biggestMem) {
-                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster.");
+                    throw std::runtime_error("Memory requirement of vertex " + std::string(pv->name) + " exceeds the biggest memory available in the cluster. In Memory requirement is "+ to_string(inMemoryRequirement(pv)));
                 }
             }
         }
