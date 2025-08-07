@@ -44,7 +44,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     case fonda_scheduler::HEFT_MM: {
         std::vector<std::pair<vertex_t*, double>> ranks = calculateMMBottomUpRank(graph);
         std::for_each(ranks.begin(), ranks.end(), [](const std::pair<vertex_t*, double>& pair) {
-                pair.first->rank = pair.second;
+            pair.first->rank = pair.second;
         });
         break;
     }
@@ -77,6 +77,10 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     const auto end = std::chrono::system_clock::now();
     const std::chrono::duration<double> elapsed_seconds = end - start;
     runtimeOfScheduler += elapsed_seconds.count();
+
+    if (not events.checkPredecessorsSuccessors()) {
+        throw std::runtime_error("Graph has inconsistent event dependencies");
+    }
 
     int cntr = 0;
     while (!events.empty()) {
@@ -718,8 +722,8 @@ double applyDeviationTo(double& in)
     }
     const double factor = result / in;
     in = result;
-    if (devationVariant==3)
-        assert(factor==1);
+    if (devationVariant == 3)
+        assert(factor == 1);
     return factor;
 }
 

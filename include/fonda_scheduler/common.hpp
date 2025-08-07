@@ -756,6 +756,83 @@ public:
             }
         }
     }
+
+    bool checkPredecessorsSuccessors()
+    {
+        bool success = true;
+
+        auto set_equal = [](const std::set<std::string>& a, const std::set<std::string>& b) {
+            return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+        };
+
+        auto set_str = [](const std::set<std::string>& s) {
+            std::string str = "{ ";
+            for (const auto& elem : s) {
+                str += elem + " ";
+            }
+            str += "}";
+            return str;
+        };
+
+        for (const auto& event : eventSet) {
+            std::clog << "Checking event: " << event->id << '\n';
+
+            std::set<std::string> expectedPredecessorsID;
+            for (const auto& pred : event->getPredecessors()) {
+                expectedPredecessorsID.insert(pred->id);
+            }
+            std::set<std::string> expectedSuccessorsID;
+            for (const auto& succ : event->getSuccessors()) {
+                expectedSuccessorsID.insert(succ.lock()->id);
+            }
+
+            std::set<std::string> actualPredecessorsId;
+            std::set<std::string> actualSuccessorsID;
+
+            for (const auto& other : eventSet) {
+                if (other->id == event->id)
+                    continue; // Skip self-comparison
+
+                // Check if 'other' is a successor of 'event'
+                if (std::any_of(other->getPredecessors().begin(), other->getPredecessors().end(),
+                        [&](const auto& other_pred) { return other_pred->id == event->id; })) {
+                    actualSuccessorsID.insert(other->id);
+                }
+
+                // Check if 'other' is a predecessor of 'event'
+                if (std::any_of(other->getSuccessors().begin(), other->getSuccessors().end(),
+                        [&](const auto& other_succ) { return other_succ.lock()->id == event->id; })) {
+                    actualPredecessorsId.insert(other->id);
+                }
+            }
+
+            if (set_equal(expectedPredecessorsID, actualPredecessorsId)) {
+                std::clog << '\t' << "OK : Event " + event->id + " has correct predecessors:" << '\n';
+            } else {
+                std::clog << '\t' << "ERR: Event " + event->id + " has incorrect predecessors:" << '\n';
+                success = false;
+            }
+            std::clog << "\t\t" << "Stored (" << expectedPredecessorsID.size() << "): " << set_str(expectedPredecessorsID) << '\n';
+            std::clog << "\t\t" << "Found  (" << actualPredecessorsId.size() << "): " << set_str(actualPredecessorsId) << '\n';
+
+            if (set_equal(expectedSuccessorsID, actualSuccessorsID)) {
+                std::clog << '\t' << "OK : Event " + event->id + " has correct successors (" << expectedSuccessorsID.size() << ")." << '\n';
+            } else {
+                std::clog << '\t' << "ERR: Event " + event->id + " has incorrect successors:" << '\n';
+                success = false;
+            }
+            std::clog << "\t\t" << "Stored (" << expectedSuccessorsID.size() << "): " << set_str(expectedSuccessorsID) << '\n';
+            std::clog << "\t\t" << "Found  (" << actualSuccessorsID.size() << "): " << set_str(actualSuccessorsID) << '\n';
+        }
+
+        if (success) {
+            std::clog << "All events have correct predecessors and successors." << '\n';
+        } else {
+            std::clog << "Some events have incorrect predecessors or successors." << '\n';
+        }
+
+        return success;
+    }
 };
 
 struct CompareByRank {

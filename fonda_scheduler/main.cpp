@@ -94,6 +94,7 @@ int main(const int argc, char* argv[])
     // std::cout << " duration_of_prep " << elapsed_seconds.count()<<" ";// << endl;
 
     std::cout << std::setprecision(15);
+    std::clog << std::setprecision(15);
 
     start = std::chrono::system_clock::now();
     double runtimeDynamic = 0;
