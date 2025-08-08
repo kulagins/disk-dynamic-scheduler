@@ -95,6 +95,8 @@ tentativeAssignment(vertex_t* vertex, const std::shared_ptr<Processor>& ourModif
 
     startTime = std::max(notEarlierThan, ourModifiedProc->getExpectedOrActualReadyTimeCompute());
 
+    const auto preds = events.findByEventId(vertex->name);
+
     auto eventStartTask = Event::createEvent(vertex, nullptr, OnTaskStart, ourModifiedProc,
         startTime, startTime, false,
         vertex->name + "-s");

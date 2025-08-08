@@ -154,8 +154,7 @@ public:
 
     ~Event()
     {
-        removeFromSuccessors(this);
-        removeFromPredecessors(this);
+        removeFromDependencies();
     }
 
     static std::shared_ptr<Event> createEvent(vertex_t* task, edge_t* edge,
@@ -212,9 +211,11 @@ public:
 
     void fireWriteFinish();
 
-    static void removeFromSuccessors(Event* event);
+    void removeFromSuccessors();
 
-    static void removeFromPredecessors(Event* event);
+    void removeFromPredecessors();
+
+    void removeFromDependencies();
 
     static void propagateChainInPlanning(const std::shared_ptr<Event>& event, const double add, std::unordered_set<std::shared_ptr<Event>>& visited)
     {
@@ -388,7 +389,7 @@ struct CompareByTimestamp {
     bool operator()(const std::shared_ptr<Event>& a, const std::shared_ptr<Event>& b) const
     {
         static constexpr double EPSILON = 1e-9; // Adjust this if needed
-        if (fabs(a->getActualTimeFire() - b->getActualTimeFire()) > EPSILON) {
+        if (std::abs(a->getActualTimeFire() - b->getActualTimeFire()) > EPSILON) {
             return a->getActualTimeFire() < b->getActualTimeFire();
         }
 
@@ -517,7 +518,7 @@ struct CompareByTimestamp {
 };
 
 class EventManager {
-private:
+public:
     std::set<std::shared_ptr<Event>, CompareByTimestamp> eventSet; // Sorted by timestamp
     std::unordered_map<std::string, std::set<std::shared_ptr<Event>>::iterator> eventByIdMap; // Fast lookup by ID
     std::unordered_map<int, std::set<std::shared_ptr<Event>, CompareByTimestamp>> eventsByProcessorIdMap;
@@ -546,6 +547,15 @@ public:
         }
         eventByIdMap[event->id] = it;
         eventsByProcessorIdMap[event->processor->id].insert(*it);
+
+        // Make sure that the event's predecessors know about this event
+        for (const auto& predecessor : event->getPredecessors()) {
+            predecessor->addSuccessorInPlanning(event);
+        }
+        // Make sure that the event's successors know about this event
+        for (const auto& successor : event->getSuccessors()) {
+            successor.lock()->addPredecessorInPlanning(event);
+        }
     }
 
     std::shared_ptr<Event> findByEventId(const std::string& id)
@@ -620,16 +630,53 @@ public:
         eventSet.erase(it->second);
         eventByIdMap.erase(it);
 
+        event->removeFromDependencies();
+
         return true;
     }
 
     // Get the earliest event (smallest timestamp)
+    // [[nodiscard]] std::shared_ptr<Event> getEarliest() const
+    // {
+    //     if (!eventSet.empty()) {
+    //         return *eventSet.begin();
+    //     }
+    //     return nullptr; // Empty set
+    // }
+
     [[nodiscard]] std::shared_ptr<Event> getEarliest() const
     {
-        if (!eventSet.empty()) {
-            return *eventSet.begin();
+        if (eventSet.empty()) {
+            return nullptr;
         }
-        return nullptr; // Empty set
+
+        // Get the first element of the set without predecessors
+        for (const auto& event : eventSet) {
+            if (event->getPredecessors().empty()) {
+                return event; // Return the first event with no predecessors
+            }
+        }
+
+        auto last_time = (*eventSet.begin())->getActualTimeFire();
+        std::clog << "Could not find an event with no predecessors in the event set" << '\n';
+        for (const auto& event : eventSet) {
+            std::clog << "Time: " << event->getActualTimeFire() << ", ID: " << event->id << '\n';
+            std::clog << '\t' << "Predecessors: ";
+            for (const auto& pred : event->getPredecessors()) {
+                std::clog << pred->id << " ";
+            }
+            std::clog << '\n';
+            std::clog << '\t' << "Successors: ";
+            for (const auto& succ : event->getSuccessors()) {
+                std::clog << succ.lock()->id << " ";
+            }
+            std::clog << '\n';
+            if (event->getActualTimeFire() < last_time) {
+                throw std::runtime_error("ERROR: Event " + event->id + " has an earlier time than previous: " + std::to_string(last_time) + " vs " + std::to_string(event->getActualTimeFire()));
+            }
+            last_time = event->getActualTimeFire();
+        }
+        throw std::runtime_error("Could not find an event with no predecessors in the event set");
     }
 
     // Print all events (for debugging)
@@ -757,7 +804,7 @@ public:
         }
     }
 
-    bool checkPredecessorsSuccessors()
+    [[nodiscard]] bool checkPredecessorsSuccessors(const bool verbose = false) const
     {
         bool success = true;
 
@@ -774,8 +821,29 @@ public:
             return str;
         };
 
+        auto check_set_equal = [&](const std::string& eventId, const std::string& pred_or_succ,
+                                   const std::set<std::string>& expected, const std::set<std::string>& actual) {
+            if (set_equal(expected, actual)) {
+                if (verbose) {
+                    std::clog << '\t' << "OK : Event " << eventId << " has correct " << pred_or_succ
+                              << " (" << expected.size() << ")." << '\n';
+                }
+            } else {
+                if (verbose) {
+                    std::clog << '\t' << "ERR: Event " << eventId << " has incorrect " << pred_or_succ << ':' << '\n';
+                }
+                success = false;
+            }
+            if (verbose) {
+                std::clog << "\t\t" << "Expected (" << expected.size() << "): " << set_str(expected) << '\n';
+                std::clog << "\t\t" << "Actual   (" << actual.size() << "): " << set_str(actual) << '\n';
+            }
+        };
+
         for (const auto& event : eventSet) {
-            std::clog << "Checking event: " << event->id << '\n';
+            if (verbose) {
+                std::clog << "Checking event: " << event->id << '\n';
+            }
 
             std::set<std::string> expectedPredecessorsID;
             for (const auto& pred : event->getPredecessors()) {
@@ -806,29 +874,16 @@ public:
                 }
             }
 
-            if (set_equal(expectedPredecessorsID, actualPredecessorsId)) {
-                std::clog << '\t' << "OK : Event " + event->id + " has correct predecessors:" << '\n';
-            } else {
-                std::clog << '\t' << "ERR: Event " + event->id + " has incorrect predecessors:" << '\n';
-                success = false;
-            }
-            std::clog << "\t\t" << "Stored (" << expectedPredecessorsID.size() << "): " << set_str(expectedPredecessorsID) << '\n';
-            std::clog << "\t\t" << "Found  (" << actualPredecessorsId.size() << "): " << set_str(actualPredecessorsId) << '\n';
-
-            if (set_equal(expectedSuccessorsID, actualSuccessorsID)) {
-                std::clog << '\t' << "OK : Event " + event->id + " has correct successors (" << expectedSuccessorsID.size() << ")." << '\n';
-            } else {
-                std::clog << '\t' << "ERR: Event " + event->id + " has incorrect successors:" << '\n';
-                success = false;
-            }
-            std::clog << "\t\t" << "Stored (" << expectedSuccessorsID.size() << "): " << set_str(expectedSuccessorsID) << '\n';
-            std::clog << "\t\t" << "Found  (" << actualSuccessorsID.size() << "): " << set_str(actualSuccessorsID) << '\n';
+            check_set_equal(event->id, "predecessors", expectedPredecessorsID, actualPredecessorsId);
+            check_set_equal(event->id, "successors", expectedSuccessorsID, actualSuccessorsID);
         }
 
-        if (success) {
-            std::clog << "All events have correct predecessors and successors." << '\n';
-        } else {
-            std::clog << "Some events have incorrect predecessors or successors." << '\n';
+        if (verbose) {
+            if (success) {
+                std::clog << "All events have correct predecessors and successors." << '\n';
+            } else {
+                std::clog << "Some events have incorrect predecessors or successors." << '\n';
+            }
         }
 
         return success;

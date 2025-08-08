@@ -59,6 +59,7 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
 
     vertex = graph->first_vertex;
     while (vertex != nullptr) {
+        // Schedule events without predecessors (i.e., starting tasks)
         if (vertex->in_edges.empty()) {
             //  cout << "starting task " << vertex->name << endl;
             std::vector<std::shared_ptr<Processor>> bestModifiedProcs;
@@ -78,55 +79,26 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     const std::chrono::duration<double> elapsed_seconds = end - start;
     runtimeOfScheduler += elapsed_seconds.count();
 
-    if (not events.checkPredecessorsSuccessors()) {
-        throw std::runtime_error("Graph has inconsistent event dependencies");
-    }
-
     int cntr = 0;
     while (!events.empty()) {
         cntr++;
-        auto firstEvent = events.getEarliest();
-        bool removed = events.remove(firstEvent->id);
-        assert(removed == true);
 
-        if (firstEvent->id == lastEventName && !firstEvent->getPredecessors().empty()) {
-            // cout << "FIRE SAME EVENT " << lastEventName << " with predecessor "
-            //    << (*firstEvent->getPredecessors().begin())->id << endl;
-            events.insert(firstEvent);
-            events.update(firstEvent->id, firstEvent->getActualTimeFire() + 1);
-
-            while (!firstEvent->getPredecessors().empty() && !(*firstEvent->getPredecessors().begin())->isDone) {
-                firstEvent = *firstEvent->getPredecessors().begin();
-            }
-            // cout << "firing predecessor without predecessors " << firstEvent->id <<" done? "<<(firstEvent->isDone?"yes":"no") << endl;
-            removed = events.remove(firstEvent->id);
-            // assert(removed == true);
-        }
-        // cout << "\nevent " << firstEvent->id << " at " << firstEvent->getActualTimeFire();
-        //   cout << " num fired " << firstEvent->timesFired << endl;
-        if (firstEvent->timesFired > 0 && !firstEvent->getPredecessors().empty()) {
-            // cout << "2-FIRE SAME EVENT " << lastEventName << " with predecessor "
-            //         << (*firstEvent->getPredecessors().begin())->id << endl;
-            events.insert(firstEvent);
-            while (!firstEvent->getPredecessors().empty() && !(*firstEvent->getPredecessors().begin())->isDone) {
-                firstEvent = *firstEvent->getPredecessors().begin();
-            }
-            // cout << "2-firing predecessor without predecessors " << firstEvent->id <<" done? "<<(firstEvent->isDone?"yes":"no") << endl;
-            removed = events.remove(firstEvent->id);
-            // assert(removed == true);
+        if (not events.checkPredecessorsSuccessors()) {
+            throw std::runtime_error(std::to_string(cntr) + " - Graph has inconsistent event dependencies");
         }
 
-        if (removed || !firstEvent->isDone) {
-            //  cout<<"finally event "<<firstEvent->id<<endl;
-            firstEvent->fire();
-            resMakespan = std::max(resMakespan, firstEvent->getActualTimeFire());
-            lastEventName = firstEvent->id;
-            auto ptr = events.findByEventId(firstEvent->id);
-        } else {
-            std::cout << "nthng " << '\n';
-            return -1;
+        const auto firstEvent = events.getEarliest();
+
+        if (firstEvent->isDone) {
+            throw std::runtime_error("Event " + firstEvent->id + " is already done, but it is in the queue.");
         }
-        //        assert(ptr == nullptr);
+
+        //  cout<<"finally event "<<firstEvent->id<<endl;
+        firstEvent->fire();
+        const bool removed = events.remove(firstEvent->id);
+        assert(removed);
+        resMakespan = std::max(resMakespan, firstEvent->getActualTimeFire());
+        lastEventName = firstEvent->id;
 
         //  cout<<"events now "; events.printAll();
     }
@@ -148,7 +120,7 @@ void Event::fireTaskStart()
     }
 
     // cout << "DONE" << endl;
-    removeFromSuccessors(this);
+    removeFromDependencies();
     this->task->status = Status::Running;
     const auto ourFinishEvent = events.findByEventId(this->task->name + "-f");
     if (ourFinishEvent == nullptr) {
@@ -184,8 +156,11 @@ void Event::fireTaskStart()
         if (startWrite != nullptr) {
             events.remove(startWrite->id);
             events.remove(finishWrite->id);
-            removeFromSuccessors(startWrite.get());
-            removeFromSuccessors(finishWrite.get());
+            // startWrite->removeFromSuccessors();
+            // finishWrite->removeFromSuccessors();
+            startWrite->removeFromDependencies();
+            finishWrite->removeFromDependencies();
+
             startWrite->isDone = true;
             finishWrite->isDone = true;
 
@@ -225,7 +200,8 @@ void Event::fireTaskFinish()
     }
 
     // cout << "DONE " << endl;
-    removeFromSuccessors(this);
+    removeFromDependencies();
+
     // set its status to finished
     this->task->status = Status::Finished;
     this->isDone = true;
@@ -356,7 +332,8 @@ void Event::fireReadStart()
     }
 
     // cout << "DONE" << endl;
-    removeFromSuccessors(this);
+    removeFromDependencies();
+
     double durationOfRead = this->edge->weight / this->processor->readSpeedDisk;
     const double factor = applyDeviationTo(durationOfRead);
     assert(factor > 0);
@@ -387,19 +364,20 @@ void Event::fireReadFinish()
         //  cout << "BAD because #preds " << this->predecessors.size() << " esp " << (*this->predecessors.begin())->id
         //    << endl;
         events.insert(shared_from_this());
-    } else {
-        // cout << "DONE " << endl;
-        removeFromSuccessors(this);
-        assert(cluster->getProcessorById(this->processor->id).use_count() == this->processor.use_count());
-        if (!isLocatedOnDisk(this->edge, false)) {
-            const auto ptr = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
-            assert(ptr != nullptr);
-            auto ptr1 = events.findByEventId(buildEdgeName(this->edge) + "-r-s");
-            assert(ptr->getActualTimeFire() < this->getActualTimeFire());
-        }
-        locateToThisProcessorFromDisk(this->edge, this->processor->id, false, this->getActualTimeFire());
-        this->isDone = true;
+        return;
     }
+    // cout << "DONE " << endl;
+    removeFromDependencies();
+
+    assert(cluster->getProcessorById(this->processor->id).use_count() == this->processor.use_count());
+    if (!isLocatedOnDisk(this->edge, false)) {
+        const auto ptr = events.findByEventId(buildEdgeName(this->edge) + "-w-f");
+        assert(ptr != nullptr);
+        auto ptr1 = events.findByEventId(buildEdgeName(this->edge) + "-r-s");
+        assert(ptr->getActualTimeFire() < this->getActualTimeFire());
+    }
+    locateToThisProcessorFromDisk(this->edge, this->processor->id, false, this->getActualTimeFire());
+    this->isDone = true;
 }
 
 void Event::fireWriteStart()
@@ -415,7 +393,7 @@ void Event::fireWriteStart()
     }
 
     // cout << "DONE" << endl;
-    removeFromSuccessors(this);
+    removeFromDependencies();
 
     assert(cluster->getProcessorById(this->processor->id).use_count() == this->processor.use_count());
 
@@ -458,7 +436,8 @@ void Event::fireWriteFinish()
     }
 
     // cout << "DONE" << endl;
-    removeFromSuccessors(this);
+    removeFromDependencies();
+
     if (this->onlyPreemptive) {
         locateToDisk(this->edge, false, this->getActualTimeFire());
         assert(isLocatedOnThisProcessor(this->edge, this->processor->id, false));
@@ -523,37 +502,37 @@ void Event::fireWriteFinish()
     }
 }
 
-void Event::removeFromPredecessors(Event* event)
+void Event::removeFromPredecessors()
 {
-    for (const auto& predecessor : event->predecessors) {
+    for (const auto& predecessor : this->predecessors) {
         if (!predecessor) {
             continue;
         }
         for (auto predsucIt = predecessor->successors.begin();
             predsucIt != predecessor->successors.end();) {
             const auto predsuc = predsucIt->lock();
-            if (!predsuc || predsuc->id == event->id) {
+            if (!predsuc || predsuc->id == this->id) {
                 predsucIt = predecessor->successors.erase(predsucIt);
             } else {
                 ++predsucIt;
             }
         }
     }
-    event->predecessors.clear();
+    this->predecessors.clear();
 }
 
-void Event::removeFromSuccessors(Event* event)
+void Event::removeFromSuccessors()
 {
-    for (auto succIt = event->successors.begin(); succIt != event->successors.end();) {
+    for (auto succIt = this->successors.begin(); succIt != this->successors.end();) {
         const auto successor = succIt->lock();
         if (!successor) {
-            throw std::runtime_error("Invalid (nullptr) successor to " + event->id);
+            throw std::runtime_error("Invalid (nullptr) successor to " + this->id);
         }
 
         for (auto succspredIt = successor->predecessors.begin();
             succspredIt != successor->predecessors.end();) {
             const auto succspred = *succspredIt;
-            if (succspred->id == event->id) {
+            if (succspred->id == this->id) {
                 succspredIt = successor->predecessors.erase(succspredIt);
             } else {
                 ++succspredIt;
@@ -561,7 +540,13 @@ void Event::removeFromSuccessors(Event* event)
         }
         ++succIt;
     }
-    event->successors.clear();
+    this->successors.clear();
+}
+
+void Event::removeFromDependencies()
+{
+    removeFromPredecessors();
+    removeFromSuccessors();
 }
 
 void Cluster::printProcessorsEvents()
