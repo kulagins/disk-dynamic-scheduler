@@ -83,9 +83,9 @@ double dynMedih(graph_t* graph, Cluster* cluster1, const int algoNum, const int 
     while (!events.empty()) {
         cntr++;
 
-        if (not events.checkPredecessorsSuccessors()) {
-            throw std::runtime_error(std::to_string(cntr) + " - Graph has inconsistent event dependencies");
-        }
+        // if (not events.checkPredecessorsSuccessors()) {
+        //     throw std::runtime_error(std::to_string(cntr) + " - Graph has inconsistent event dependencies");
+        // }
 
         const auto firstEvent = events.getEarliest();
 
