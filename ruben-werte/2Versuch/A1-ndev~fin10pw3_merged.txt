@@ -1,0 +1,316 @@
+algo_nr 1 atacseq_30000.dot input_size 14091675276  duration_of_algorithm 95.1411659939996 makespan_1 1595869131.12686	 ms perceived 1922839745.69907  duration_of_algorithm 110.491097062 makespan_2 1922839745.69907
+algo_nr 1 chipseq_15000.dot input_size 41366257414  duration_of_algorithm 29.72312255 makespan_1 3658657332.82868	 ms perceived 4792466335.82104  duration_of_algorithm 22.8603038189997 makespan_2 4792466335.82104
+algo_nr 1 methylseq_15000.dot input_size 6761426956 
+ duration_of_algorithm 205.660753128 makespan_1 122114045.884492	 ms perceived 145947093.713042  duration_of_algorithm 148.602647585998 makespan_2 145947093.713042
+algo_nr 1 eager input_size 19075314980 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! duration_of_algorithm 0.00931951 makespan_1 3190311.62804024	 ms perceived 5845557  duration_of_algorithm 0.00906708 makespan_2 5845557
+algo_nr 1 eager_1000.dot input_size 25705994498  duration_of_algorithm 0.519011151 makespan_1 24647388.2144766	 ms perceived 22661850.7186299  duration_of_algorithm 0.580646345999999 makespan_2 22661850.7186299
+algo_nr 1 eager_20000.dot input_size 8330435694  duration_of_algorithm 72.1218523599998 makespan_1 159665393.062389	 ms perceived 243622189.534738  duration_of_algorithm 351.380862200003 makespan_2 243622204.019549
+algo_nr 1 eager_25000.dot input_size 14754556884  duration_of_algorithm 51.0743909610003 makespan_1 396522891.54269	 ms perceived 620205122.130777  duration_of_algorithm 246.230373634003 makespan_2 620205127.573737
+algo_nr 1 methylseq_1000.dot input_size 110641579976  duration_of_algorithm 1.057281112 makespan_1 525624561.158467	 ms perceived 660132617.580672  duration_of_algorithm 0.371985835 makespan_2 660132617.580672
+algo_nr 1 chipseq_200.dot input_size 5058052541  duration_of_algorithm 0.095522359 makespan_1 8718203.09077281	 ms perceived 4725226.42815822  duration_of_algorithm 0.014474269 makespan_2 4725227.42552946
+algo_nr 1 atacseq_30000.dot input_size 11809629756  duration_of_algorithm 339.256379177996 makespan_1 937131771.616594	 ms perceived 1206815468.28703  duration_of_algorithm 172.828179411001 makespan_2 1206815468.28703
+algo_nr 1 methylseq_1000.dot input_size 6273818718  duration_of_algorithm 0.827060662000001 makespan_1 6840828.97212947	 ms perceived 5338992.625  duration_of_algorithm 0.303973995 makespan_2 5338992.625
+algo_nr 1 chipseq_4000.dot input_size 41366257414  duration_of_algorithm 4.77626611200001 makespan_1 969713477.106472	 ms perceived 1210147397.24094  duration_of_algorithm 1.180390769 makespan_2 1210147397.24094
+algo_nr 1 atacseq_18000.dot input_size 11809629756  duration_of_algorithm 148.152437352 makespan_1 541861101.420201	 ms perceived 700039460.417609  duration_of_algorithm 76.7118782859998 makespan_2 700039460.417609
+algo_nr 1 atacseq_2000.dot input_size 14091675276  duration_of_algorithm 2.757673517 makespan_1 115294799.502293	 ms perceived 82527948.4645167  duration_of_algorithm 1.375450555 makespan_2 82527948.4645167
+algo_nr 1 atacseq_1000.dot input_size 11809629756  duration_of_algorithm 0.87006372 makespan_1 28187287.3004704	 ms perceived 20236334.7050247  duration_of_algorithm 0.232480649 makespan_2 20236334.7050247
+algo_nr 1 methylseq_200.dot input_size 17027257018 
+ duration_of_algorithm 0.096408628 makespan_1 4481534.55492842	 ms perceived 4333641.705302  duration_of_algorithm 0.013830016 makespan_2 4333641.705302
+algo_nr 1 methylseq_30000.dot input_size 110641579976 
+ duration_of_algorithm 936.867839963001 makespan_1 16144838260.3426	 ms perceived 21726149546.4901  duration_of_algorithm 992.793249701008 makespan_2 21726149546.4901
+algo_nr 1 methylseq_8000.dot input_size 110641579976  duration_of_algorithm 48.596907258 makespan_1 4159813246.90018	 ms perceived 5556392400.29907  duration_of_algorithm 38.8681290140002 makespan_2 5556392400.29907
+algo_nr 1 atacseq_18000.dot input_size 2223941232  duration_of_algorithm 149.178791544 makespan_1 196771520.133573	 ms perceived 174223037.93476  duration_of_algorithm 155.670402031001 makespan_2 174223037.93476
+algo_nr 1 methylseq_20000.dot input_size 6761426956 
+ duration_of_algorithm 317.325157854 makespan_1 168034778.936436	 ms perceived 197474710.394414  duration_of_algorithm 304.797111987006 makespan_2 197474710.394414
+algo_nr 1 atacseq_8000.dot input_size 3908761308  duration_of_algorithm 41.166532074 makespan_1 142093412.829268	 ms perceived 116480747.709172  duration_of_algorithm 27.4125967399998 makespan_2 116480747.709172
+algo_nr 1 methylseq_8000.dot input_size 17027257018 
+ duration_of_algorithm 50.4742092519999 makespan_1 246374948.8693	 ms perceived 330437696.35775  duration_of_algorithm 33.7523092739998 makespan_2 330437696.35775
+algo_nr 1 atacseq_10000.dot input_size 14091675276  duration_of_algorithm 21.307819738 makespan_1 564061129.564502	 ms perceived 591277277.979489  duration_of_algorithm 12.029241045 makespan_2 591277277.979489
+algo_nr 1 atacseq_20000.dot input_size 11809629756  duration_of_algorithm 169.923981842001 makespan_1 628305895.541708	 ms perceived 777800427.629336  duration_of_algorithm 82.9864845010004 makespan_2 777800427.629336
+algo_nr 1 atacseq_30000.dot input_size 3908761308  duration_of_algorithm 227.80491126 makespan_1 580556958.330436	 ms perceived 516536736.281234  duration_of_algorithm 244.71285623 makespan_2 516536736.281234
+algo_nr 1 eager_2000.dot input_size 25705994498  duration_of_algorithm 1.482864155 makespan_1 48609572.7189942	 ms perceived 82484248.5796835  duration_of_algorithm 3.10618303700001 makespan_2 82484252.2749999
+algo_nr 1 eager_1000.dot input_size 14754556884  duration_of_algorithm 0.413226041 makespan_1 19013746.7532377	 ms perceived 16289956.8125  duration_of_algorithm 0.58544864 makespan_2 16289956.8125
+algo_nr 1 atacseq_30000.dot input_size 11187378708  duration_of_algorithm 342.874214828997 makespan_1 908731315.798902	 ms perceived 1154917774.07106  duration_of_algorithm 189.477288549002 makespan_2 1154917774.07106
+algo_nr 1 methylseq_10000.dot input_size 8885797810  duration_of_algorithm 83.4007861470001 makespan_1 120879941.79059	 ms perceived 141617684.128739  duration_of_algorithm 61.6970355780003 makespan_2 141617684.128739
+algo_nr 1 chipseq_18000.dot input_size 5058052541  duration_of_algorithm 98.6711878149997 makespan_1 391637871.058856	 ms perceived 551378941.644283  duration_of_algorithm 38.5306379890004 makespan_2 551378941.644283
+algo_nr 1 atacseq_4000.dot input_size 11809629756  duration_of_algorithm 7.876738314 makespan_1 117339094.464787	 ms perceived 106060997.518405  duration_of_algorithm 6.16660810800001 makespan_2 106060997.518405
+algo_nr 1 atacseq_1000.dot input_size 14091675276  duration_of_algorithm 0.980503359000001 makespan_1 44878322.7333466	 ms perceived 32696614.5362449  duration_of_algorithm 0.277270344000001 makespan_2 32696614.5362449
+algo_nr 1 methylseq_4000.dot input_size 6273818718 
+ duration_of_algorithm 11.722843291 makespan_1 27645814.4227271	 ms perceived 27334113.820067  duration_of_algorithm 7.89144134600001 makespan_2 27334113.820067
+algo_nr 1 methylseq_18000.dot input_size 17027257018 
+ duration_of_algorithm 233.041055759 makespan_1 596134085.587922	 ms perceived 808020993.245556  duration_of_algorithm 222.375906641999 makespan_2 808020993.245556
+algo_nr 1 chipseq_1000.dot input_size 4605965334  duration_of_algorithm 1.055059647 makespan_1 17574917.3137975	 ms perceived 17978466.1664275  duration_of_algorithm 0.300352365000001 makespan_2 17978466.1664275
+algo_nr 1 methylseq_18000.dot input_size 11897958606 
+ duration_of_algorithm 260.570857542 makespan_1 311052715.210312	 ms perceived 379477362.708748  duration_of_algorithm 263.647630212002 makespan_2 379477362.708748
+algo_nr 1 atacseq_200.dot input_size 11809629756  duration_of_algorithm 0.105117986 makespan_1 15995595.8977956	 ms perceived 2805887.93495372  duration_of_algorithm 0.014258072 makespan_2 2805889.05835265
+algo_nr 1 eager_8000.dot input_size 19075314980  duration_of_algorithm 11.589767285 makespan_1 181491335.302299	 ms perceived 217606945.653938  duration_of_algorithm 66.3615202579998 makespan_2 217606945.653938
+algo_nr 1 methylseq_10000.dot input_size 110641579976  duration_of_algorithm 94.3599743450001 makespan_1 5208857167.04205	 ms perceived 7236704092.21346  duration_of_algorithm 66.2521458810002 makespan_2 7236704092.21346
+algo_nr 1 methylseq_2000.dot input_size 22500260922  duration_of_algorithm 2.854123712 makespan_1 71930835.2811899	 ms perceived 87826776.1343503  duration_of_algorithm 1.404611306 makespan_2 87826776.1343503
+algo_nr 1 chipseq_200.dot input_size 32978181418  duration_of_algorithm 0.093814113 makespan_1 22694154.9510595	 ms perceived 20612313.3359173  duration_of_algorithm 0.013293296 makespan_2 20612318.9469474
+algo_nr 1 chipseq_2000.dot input_size 4605965334  duration_of_algorithm 3.63539077 makespan_1 36753188.4145416	 ms perceived 31875760.8490408  duration_of_algorithm 1.50314434300001 makespan_2 31875760.8490408
+algo_nr 1 methylseq_30000.dot input_size 8885797810  duration_of_algorithm 666.128967209 makespan_1 387921084.737594	 ms perceived 481332815.444618  duration_of_algorithm 920.325955378015 makespan_2 481332815.444618
+algo_nr 1 eager_20000.dot input_size 19075314980  duration_of_algorithm 41.3062210659999 makespan_1 492913209.504017	 ms perceived 580947317.256106  duration_of_algorithm 192.303449319009 makespan_2 580947320.976154
+algo_nr 1 atacseq_8000.dot input_size 11809629756  duration_of_algorithm 30.0783281030001 makespan_1 253340056.063995	 ms perceived 272119451.145416  duration_of_algorithm 25.6004611999998 makespan_2 272119451.145416
+algo_nr 1 eager_30000.dot input_size 19100037384  duration_of_algorithm 89.5127275949999 makespan_1 717618236.824397	 ms perceived 888677388.456935  duration_of_algorithm 455.616175808003 makespan_2 888677388.456935
+algo_nr 1 chipseq_200.dot input_size 4807293396  duration_of_algorithm 0.095318711 makespan_1 7392698.26804219	 ms perceived 5883808.28614432  duration_of_algorithm 0.015228511 makespan_2 5883808.28614432
+algo_nr 1 chipseq_200.dot input_size 3793245764  duration_of_algorithm 0.09712281 makespan_1 8065772.17132989	 ms perceived 4132874.44948983  duration_of_algorithm 0.01482184 makespan_2 4132874.44948983
+algo_nr 1 eager_8000.dot input_size 19132169434  duration_of_algorithm 13.411853638 makespan_1 179860798.327646	 ms perceived 218944390.104404  duration_of_algorithm 60.7511109070004 makespan_2 218944391.482977
+algo_nr 1 atacseq_10000.dot input_size 11187378708  duration_of_algorithm 45.4632965840001 makespan_1 308130436.649184	 ms perceived 327859868.024774  duration_of_algorithm 30.886678553 makespan_2 327859868.024774
+algo_nr 1 chipseq_20000.dot input_size 4807293396  duration_of_algorithm 130.710384526 makespan_1 397800084.60863	 ms perceived 529597696.606062  duration_of_algorithm 62.7374298479999 makespan_2 529597696.606062
+algo_nr 1 chipseq_10000.dot input_size 5058052541  duration_of_algorithm 42.9179670339998 makespan_1 249179602.041283	 ms perceived 263077005.921716  duration_of_algorithm 19.7844139529999 makespan_2 263077005.921716
+algo_nr 1 atacseq.dot input_size 3908761308 algo_nr 1 atacseq_4000.dot input_size 11187378708  duration_of_algorithm 8.20243161599999 makespan_1 124475082.535763	 ms perceived 115595418.342925  duration_of_algorithm 5.72945549800001 makespan_2 115595418.342925
+algo_nr 1 chipseq_4000.dot input_size 32978181418  duration_of_algorithm 5.74498882299998 makespan_1 892860119.915285	 ms perceived 994520606.675608  duration_of_algorithm 1.999471348 makespan_2 994520606.675608
+algo_nr 1 eager_4000.dot input_size 19075314980  duration_of_algorithm 5.283851409 makespan_1 83448155.8608309	 ms perceived 110169975.92307  duration_of_algorithm 12.710235643 makespan_2 110169975.92307
+algo_nr 1 methylseq_4000.dot input_size 17027257018 
+ duration_of_algorithm 11.91355214 makespan_1 118437678.594366	 ms perceived 148311414.374588  duration_of_algorithm 7.35019163000002 makespan_2 148311414.374588
+algo_nr 1 chipseq_1000.dot input_size 41366257414  duration_of_algorithm 0.840261251 makespan_1 233769931.053038	 ms perceived 267615983.393865  duration_of_algorithm 0.105062781 makespan_2 267615983.393865
+algo_nr 1 atacseq_10000.dot input_size 3908761308  duration_of_algorithm 55.016721364 makespan_1 176203421.920836	 ms perceived 153623890.818341  duration_of_algorithm 44.0559719770001 makespan_2 153623890.818341
+algo_nr 1 atacseq_18000.dot input_size 14091675276  duration_of_algorithm 53.0751034009999 makespan_1 982837568.889234	 ms perceived 1111811949.87884  duration_of_algorithm 45.6052025230001 makespan_2 1111811949.87884
+algo_nr 1 eager_1000.dot input_size 19100037384  duration_of_algorithm 0.395457589 makespan_1 16471123.1957896	 ms perceived 21145556.2468613  duration_of_algorithm 0.647542768000002 makespan_2 21145556.2468613
+algo_nr 1 chipseq_25000.dot input_size 41366257414  duration_of_algorithm 67.5505308470002 makespan_1 6094765718.44178	 ms perceived 8026001815.1179  duration_of_algorithm 59.1096187500003 makespan_2 8026001815.1179
+algo_nr 1 atacseq.dot input_size 14091675276 algo_nr 1 methylseq_15000.dot input_size 11897958606  duration_of_algorithm 260.197116784001 makespan_1 256444161.763212	 ms perceived 313142785.249347  duration_of_algorithm 155.565987682 makespan_2 313142785.249347
+algo_nr 1 atacseq_30000.dot input_size 2223941232  duration_of_algorithm 328.991307378 makespan_1 315750338.364718	 ms perceived 289661730.830435  duration_of_algorithm 451.779821328998 makespan_2 289661730.830435
+algo_nr 1 methylseq_18000.dot input_size 8885797810 
+ duration_of_algorithm 264.464602764001 makespan_1 229096484.904154	 ms perceived 272716997.087774  duration_of_algorithm 225.466005364002 makespan_2 272716997.087774
+algo_nr 1 bacass.dot input_size 3637252230 algo_nr 1 methylseq_1000.dot input_size 11897958606  duration_of_algorithm 0.891161741000001 makespan_1 15669819.2633787	 ms perceived 15475408.0385808  duration_of_algorithm 0.299786187999999 makespan_2 15475408.0385808
+algo_nr 1 atacseq_2000.dot input_size 3908761308  duration_of_algorithm 3.05825684 makespan_1 25562466.8412359	 ms perceived 21503539.1311354  duration_of_algorithm 1.306718503 makespan_2 21503539.1311354
+algo_nr 1 methylseq input_size 11897958606  duration_of_algorithm 0.004446952 makespan_1 1840540.78750029	 ms perceived 1840539.7875  duration_of_algorithm 0.000445386 makespan_2 1840539.7875
+algo_nr 1 chipseq_25000.dot input_size 5058052541  duration_of_algorithm 179.285057376 makespan_1 569372398.288003	 ms perceived 758900086.663132  duration_of_algorithm 79.4507512810006 makespan_2 758900086.663132
+algo_nr 1 methylseq_15000.dot input_size 110641579976  duration_of_algorithm 188.242445098 makespan_1 7811810662.88432	 ms perceived 10870083246.5048  duration_of_algorithm 196.506214041001 makespan_2 10870083246.5048
+algo_nr 1 methylseq_15000.dot input_size 17027257018 
+ duration_of_algorithm 169.379577138001 makespan_1 484605941.652684	 ms perceived 665626262.222562  duration_of_algorithm 141.226427673 makespan_2 665626262.222562
+algo_nr 1 eager input_size 14754556884 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! duration_of_algorithm 0.009714864 makespan_1 2714598.75046978	 ms perceived 5825674.6375  duration_of_algorithm 0.009127642 makespan_2 5825674.6375
+algo_nr 1 chipseq_2000.dot input_size 32978181418  duration_of_algorithm 2.278031537 makespan_1 432555513.816589	 ms perceived 463089768.986024  duration_of_algorithm 0.556765306000002 makespan_2 463089768.986024
+algo_nr 1 eager_2000.dot input_size 19100037384  duration_of_algorithm 1.597480438 makespan_1 41517379.4083325	 ms perceived 41979881.5781492  duration_of_algorithm 3.262908966 makespan_2 41979881.5781492
+algo_nr 1 atacseq_20000.dot input_size 14091675276  duration_of_algorithm 57.5736568140001 makespan_1 1091851110.2044	 ms perceived 1227989762.43129  duration_of_algorithm 53.4939549940002 makespan_2 1227989762.43129
+algo_nr 1 atacseq_20000.dot input_size 2223941232  duration_of_algorithm 184.185132811 makespan_1 206521599.003871	 ms perceived 189721690.411056  duration_of_algorithm 195.447628905998 makespan_2 189721690.411056
+algo_nr 1 chipseq_2000.dot input_size 5058052541  duration_of_algorithm 3.49669827000001 makespan_1 41730844.1329346	 ms perceived 32738032.8113879  duration_of_algorithm 1.619892087 makespan_2 32738032.8113879
+algo_nr 1 methylseq_20000.dot input_size 11897958606 
+ duration_of_algorithm 358.456914099999 makespan_1 344785169.71376	 ms perceived 424843276.365373  duration_of_algorithm 297.000399422 makespan_2 424843276.365373
+algo_nr 1 atacseq_25000.dot input_size 14091675276  duration_of_algorithm 81.794050332 makespan_1 1356777259.69541	 ms perceived 1560250562.18412  duration_of_algorithm 78.8729525109992 makespan_2 1560250562.18412
+algo_nr 1 atacseq_4000.dot input_size 14091675276  duration_of_algorithm 8.43330884900002 makespan_1 189799220.642646	 ms perceived 207093283.932967  duration_of_algorithm 2.038063881 makespan_2 207093283.932967
+algo_nr 1 eager_200.dot input_size 25705994498  duration_of_algorithm 0.042108371 makespan_1 12046903.9934395	 ms perceived 7650493.11458333  duration_of_algorithm 0.034560853 makespan_2 7650493.11458333
+algo_nr 1 chipseq_15000.dot input_size 4605965334  duration_of_algorithm 65.7041858860002 makespan_1 342215373.977592	 ms perceived 408420752.999091  duration_of_algorithm 48.892663663 makespan_2 408420752.999091
+algo_nr 1 atacseq_15000.dot input_size 14091675276  duration_of_algorithm 37.476447695 makespan_1 843709536.60169	 ms perceived 911937700.505761  duration_of_algorithm 29.6316741829999 makespan_2 911937700.505761
+algo_nr 1 methylseq_200.dot input_size 110641579976  duration_of_algorithm 0.10284189 makespan_1 106218939.982932	 ms perceived 91236520.7273903  duration_of_algorithm 0.015077746 makespan_2 91236520.7273903
+algo_nr 1 methylseq input_size 6273818718  duration_of_algorithm 0.00454354 makespan_1 991876.362500406	 ms perceived 991875.3625  duration_of_algorithm 0.000453518 makespan_2 991875.3625
+algo_nr 1 atacseq_15000.dot input_size 11187378708  duration_of_algorithm 103.985095281 makespan_1 451267681.051532	 ms perceived 561774085.85373  duration_of_algorithm 57.2629214270005 makespan_2 561774085.85373
+algo_nr 1 eager input_size 25705994498 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! duration_of_algorithm 0.009315472 makespan_1 4042751.40451824	 ms perceived 7650493.11458333  duration_of_algorithm 0.009067284 makespan_2 7650493.11458333
+algo_nr 1 methylseq_4000.dot input_size 8885797810  duration_of_algorithm 10.860280857 makespan_1 43262844.0595551	 ms perceived 45776187.8064648  duration_of_algorithm 8.02016107200003 makespan_2 45776187.8064648
+algo_nr 1 methylseq_20000.dot input_size 110641579976  duration_of_algorithm 321.674062952 makespan_1 10768362458.3118	 ms perceived 14455544760.6795  duration_of_algorithm 381.242877366003 makespan_2 14455544760.6795
+algo_nr 1 chipseq_2000.dot input_size 41366257414  duration_of_algorithm 1.773915211 makespan_1 491493579.940142	 ms perceived 580551100.592714  duration_of_algorithm 0.295298131000001 makespan_2 580551100.592714
+algo_nr 1 chipseq_15000.dot input_size 32978181418  duration_of_algorithm 42.7588590169997 makespan_1 3261743764.58739	 ms perceived 4024283451.00697  duration_of_algorithm 19.9624022859999 makespan_2 4024283452.50596
+algo_nr 1 chipseq_8000.dot input_size 5058052541  duration_of_algorithm 25.713824454 makespan_1 205314351.150906	 ms perceived 213252194.720309  duration_of_algorithm 15.514092977 makespan_2 213252194.720309
+algo_nr 1 methylseq_8000.dot input_size 8885797810 
+ duration_of_algorithm 49.442620069 makespan_1 93935258.4704107	 ms perceived 107295620.265521  duration_of_algorithm 37.5878243960004 makespan_2 107295620.265521
+algo_nr 1 chipseq_8000.dot input_size 41366257414  duration_of_algorithm 11.96993668 makespan_1 1930542087.92392	 ms perceived 2498742633.2658  duration_of_algorithm 5.911306617 makespan_2 2498742633.2658
+algo_nr 1 methylseq_8000.dot input_size 6273818718  duration_of_algorithm 52.0685080260001 makespan_1 56144313.7384519	 ms perceived 61439223.7102416  duration_of_algorithm 40.1411612199997 makespan_2 61439223.7102416
+algo_nr 1 eager_15000.dot input_size 19100037384  duration_of_algorithm 26.076003726 makespan_1 365204519.166962	 ms perceived 448851501.719207  duration_of_algorithm 95.8439103579996 makespan_2 448851501.719207
+algo_nr 1 chipseq_30000.dot input_size 4807293396  duration_of_algorithm 285.483324758 makespan_1 598815709.443606	 ms perceived 829410902.050124  duration_of_algorithm 123.772971427 makespan_2 829410902.050124
+algo_nr 1 methylseq_30000.dot input_size 6761426956 
+ duration_of_algorithm 786.419890596998 makespan_1 258845127.999722	 ms perceived 317468520.505637  duration_of_algorithm 789.847650408009 makespan_2 317468520.505637
+algo_nr 1 chipseq_1000.dot input_size 32978181418  duration_of_algorithm 0.972798443 makespan_1 188451262.290142	 ms perceived 216735913.7281  duration_of_algorithm 0.128535118 makespan_2 216735914.000374
+algo_nr 1 chipseq_30000.dot input_size 4605965334  duration_of_algorithm 221.969997555999 makespan_1 633304627.131801	 ms perceived 817497051.353973  duration_of_algorithm 155.561359520999 makespan_2 817497051.353973
+algo_nr 1 methylseq_10000.dot input_size 6273818718  duration_of_algorithm 118.626378289 makespan_1 70657691.0134565	 ms perceived 81541515.3097692  duration_of_algorithm 65.6140934580005 makespan_2 81541515.3097692
+algo_nr 1 methylseq_25000.dot input_size 6761426956 
+ duration_of_algorithm 582.258343328 makespan_1 211749271.204339	 ms perceived 259993601.402456  duration_of_algorithm 500.010356059001 makespan_2 259993601.402456
+algo_nr 1 chipseq_10000.dot input_size 4605965334  duration_of_algorithm 41.9092728360001 makespan_1 244301636.105372	 ms perceived 253628822.542823  duration_of_algorithm 24.1900979930001 makespan_2 253628822.542823
+algo_nr 1 methylseq input_size 22500260922  duration_of_algorithm 0.004304948 makespan_1 2895227.8854169	 ms perceived 2895226.88541667  duration_of_algorithm 0.000440123 makespan_2 2895226.88541667
+algo_nr 1 methylseq input_size 110641579976  duration_of_algorithm 0.004282195 makespan_1 15084216.225	 ms perceived 15084215.225  duration_of_algorithm 0.000436957 makespan_2 15084215.225
+algo_nr 1 eager_25000.dot input_size 8330435694  duration_of_algorithm 105.305642131 makespan_1 202086912.621034	 ms perceived 304145897.215786  duration_of_algorithm 605.170393649006 makespan_2 304145941.007534
+algo_nr 1 chipseq_20000.dot input_size 41366257414  duration_of_algorithm 46.3602332090001 makespan_1 4859027471.62939	 ms perceived 6495137468.83778  duration_of_algorithm 44.7888886020002 makespan_2 6495137468.83778
+algo_nr 1 chipseq_20000.dot input_size 5058052541  duration_of_algorithm 123.131444058 makespan_1 428390026.221146	 ms perceived 599456887.002762  duration_of_algorithm 47.2395405010002 makespan_2 599456887.002762
+algo_nr 1 atacseq_25000.dot input_size 11187378708  duration_of_algorithm 243.500882153999 makespan_1 752721385.309461	 ms perceived 957539575.592638  duration_of_algorithm 137.063565476 makespan_2 957539575.592638
+algo_nr 1 atacseq_25000.dot input_size 3908761308  duration_of_algorithm 188.070859697 makespan_1 485088158.101457	 ms perceived 415637934.507861  duration_of_algorithm 176.071381511 makespan_2 415637934.507861
+algo_nr 1 chipseq_4000.dot input_size 5058052541  duration_of_algorithm 9.841093722 makespan_1 99599404.0957414	 ms perceived 101392866.318815  duration_of_algorithm 5.789832853 makespan_2 101392866.318815
+algo_nr 1 eager input_size 8330435694 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! duration_of_algorithm 0.009604027 makespan_1 1284705.02198131	 ms perceived 3178859.14583333  duration_of_algorithm 0.009133219 makespan_2 3178859.14583333
+algo_nr 1 eager_15000.dot input_size 14754556884  duration_of_algorithm 23.624161155 makespan_1 243575932.519111	 ms perceived 377620884.765156  duration_of_algorithm 153.824157875004 makespan_2 377620884.765156
+algo_nr 1 chipseq_15000.dot input_size 4807293396  duration_of_algorithm 77.2716693080002 makespan_1 309972831.191415	 ms perceived 378779042.384929  duration_of_algorithm 43.3870864960002 makespan_2 378779042.384929
+algo_nr 1 eager_4000.dot input_size 25705994498  duration_of_algorithm 3.487530281 makespan_1 124527106.546318	 ms perceived 134518381.332171  duration_of_algorithm 10.589220302 makespan_2 134518381.332171
+algo_nr 1 eager_8000.dot input_size 19100037384  duration_of_algorithm 12.930822621 makespan_1 182497407.684207	 ms perceived 218439431.456437  duration_of_algorithm 64.3943316060002 makespan_2 218439431.456437
+algo_nr 1 methylseq_4000.dot input_size 110641579976  duration_of_algorithm 14.394967019 makespan_1 2149203543.79234	 ms perceived 2805726229.22022  duration_of_algorithm 8.67757716499999 makespan_2 2805726229.22022
+algo_nr 1 chipseq.dot input_size 3793245764 algo_nr 1 eager_18000.dot input_size 19100037384  duration_of_algorithm 34.6912036819999 makespan_1 419952150.24391	 ms perceived 530939657.00261  duration_of_algorithm 169.195584958 makespan_2 530939657.881083
+algo_nr 1 atacseq_200.dot input_size 14091675276  duration_of_algorithm 0.106482073 makespan_1 21387345.8028378	 ms perceived 6048725.10273017  duration_of_algorithm 0.014272994 makespan_2 6048725.10273017
+algo_nr 1 chipseq_25000.dot input_size 32978181418  duration_of_algorithm 102.528884038 makespan_1 5454198441.45262	 ms perceived 6765758115.75051  duration_of_algorithm 56.8453436670003 makespan_2 6765758115.75051
+algo_nr 1 eager_10000.dot input_size 19100037384  duration_of_algorithm 17.067963063 makespan_1 220731318.991014	 ms perceived 297503556.778015  duration_of_algorithm 61.8136746340005 makespan_2 297503580.250235
+algo_nr 1 methylseq_30000.dot input_size 11897958606  duration_of_algorithm 954.241728229002 makespan_1 522281499.771854	 ms perceived 660618951.136724  duration_of_algorithm 931.250618189004 makespan_2 660618951.136724
+algo_nr 1 atacseq_25000.dot input_size 11809629756  duration_of_algorithm 248.917571463 makespan_1 782347707.998989	 ms perceived 980471993.340483  duration_of_algorithm 138.982848531999 makespan_2 980471993.340483
+algo_nr 1 eager_30000.dot input_size 19075314980  duration_of_algorithm 87.183416563 makespan_1 708007509.468215	 ms perceived 888667466.387073  duration_of_algorithm 491.094151094 makespan_2 888667468.122151
+algo_nr 1 methylseq_25000.dot input_size 11897958606  duration_of_algorithm 544.839696898998 makespan_1 438660511.60568	 ms perceived 540822464.470415  duration_of_algorithm 477.015785003005 makespan_2 540822464.470415
+algo_nr 1 eager_15000.dot input_size 19132169434  duration_of_algorithm 27.562703517 makespan_1 368585717.036625	 ms perceived 450847626.482843  duration_of_algorithm 128.167662895 makespan_2 450847630.000855
+algo_nr 1 methylseq_30000.dot input_size 22500260922 
+ duration_of_algorithm 810.557349333999 makespan_1 1286447984.21293	 ms perceived 1874304607.92993  duration_of_algorithm 803.955860128013 makespan_2 1874304607.92993
+algo_nr 1 atacseq_2000.dot input_size 11187378708  duration_of_algorithm 2.508637042 makespan_1 55890939.5940765	 ms perceived 37040865.2449308  duration_of_algorithm 1.090931557 makespan_2 37040865.2449308
+algo_nr 1 methylseq_10000.dot input_size 11897958606  duration_of_algorithm 88.1779005439998 makespan_1 169481999.71577	 ms perceived 199416374.213783  duration_of_algorithm 68.4893258510004 makespan_2 199416374.213783
+algo_nr 1 chipseq_25000.dot input_size 4605965334  duration_of_algorithm 146.208393572 makespan_1 514065814.41369	 ms perceived 674658393.733071  duration_of_algorithm 108.795042964 makespan_2 674658393.733071
+algo_nr 1 methylseq_30000.dot input_size 6273818718 
+ duration_of_algorithm 748.346349128997 makespan_1 235728662.026299	 ms perceived 291818022.416407  duration_of_algorithm 776.150002562012 makespan_2 291818022.416407
+algo_nr 1 bacass.dot input_size 4352562006 algo_nr 1 eager_30000.dot input_size 8330435694  duration_of_algorithm 105.418243574 makespan_1 238367298.706817	 ms perceived 358541506.678836  duration_of_algorithm 729.280615244999 makespan_2 358541545.864457
+algo_nr 1 chipseq_200.dot input_size 4605965334  duration_of_algorithm 0.097420519 makespan_1 8120863.98511544	 ms perceived 6017329.14820766  duration_of_algorithm 0.013580427 makespan_2 6017329.14820766
+algo_nr 1 methylseq_15000.dot input_size 6273818718 
+ duration_of_algorithm 261.347270899001 makespan_1 111234417.534398	 ms perceived 131943240.270952  duration_of_algorithm 162.295863098 makespan_2 131943240.270952
+algo_nr 1 methylseq_2000.dot input_size 11897958606  duration_of_algorithm 2.698080021 makespan_1 30480395.3108971	 ms perceived 29642694.424544  duration_of_algorithm 1.371318733 makespan_2 29642694.424544
+algo_nr 1 atacseq_200.dot input_size 3908761308  duration_of_algorithm 0.105382968 makespan_1 5541738.62063637	 ms perceived 2142117.13467234  duration_of_algorithm 0.014506108 makespan_2 2142117.13467234
+algo_nr 1 eager_8000.dot input_size 8330435694  duration_of_algorithm 26.418472308 makespan_1 65549702.9380412	 ms perceived 103372058.489421  duration_of_algorithm 47.0785475090003 makespan_2 103372058.489421
+algo_nr 1 atacseq_200.dot input_size 2223941232  duration_of_algorithm 0.105678481 makespan_1 3059076.49632468	 ms perceived 1348259.68923439  duration_of_algorithm 0.01468518 makespan_2 1348267.13058437
+algo_nr 1 chipseq_2000.dot input_size 4807293396  duration_of_algorithm 3.399488225 makespan_1 36637859.9022087	 ms perceived 28835311.6686714  duration_of_algorithm 1.529238939 makespan_2 28835311.6686714
+algo_nr 1 eager_20000.dot input_size 19100037384  duration_of_algorithm 39.6523730730001 makespan_1 468260865.423151	 ms perceived 586285698.37491  duration_of_algorithm 213.813323807003 makespan_2 586285705.603325
+algo_nr 1 eager_10000.dot input_size 19075314980  duration_of_algorithm 17.19610616 makespan_1 229263706.442607	 ms perceived 299371876.490457  duration_of_algorithm 52.3887382520002 makespan_2 299371884.596079
+algo_nr 1 methylseq_25000.dot input_size 6273818718 
+ duration_of_algorithm 508.489531523002 makespan_1 195612338.052079	 ms perceived 237549176.382037  duration_of_algorithm 506.936764588998 makespan_2 237549176.382037
+algo_nr 1 chipseq_18000.dot input_size 4605965334  duration_of_algorithm 84.1949818620002 makespan_1 398957847.170692	 ms perceived 496611970.37703  duration_of_algorithm 64.1841508069999 makespan_2 496611970.37703
+algo_nr 1 methylseq_200.dot input_size 8885797810 
+ duration_of_algorithm 0.098279099 makespan_1 2796244.89121171	 ms perceived 2795543.05  duration_of_algorithm 0.013872503 makespan_2 2795543.05
+algo_nr 1 atacseq_18000.dot input_size 3908761308  duration_of_algorithm 128.771116607 makespan_1 304669303.382368	 ms perceived 278376292.104796  duration_of_algorithm 141.872632916 makespan_2 278376292.104796
+algo_nr 1 chipseq input_size 32978181418  duration_of_algorithm 0.009604338 makespan_1 11836770.9613681	 ms perceived 11627408.4002066  duration_of_algorithm 0.00109546 makespan_2 11627408.4002066
+algo_nr 1 methylseq_2000.dot input_size 6761426956  duration_of_algorithm 2.786289958 makespan_1 14554567.1971877	 ms perceived 14611231.8574406  duration_of_algorithm 1.681309157 makespan_2 14611231.8574406
+algo_nr 1 atacseq_20000.dot input_size 3908761308  duration_of_algorithm 147.650018934 makespan_1 339813016.625195	 ms perceived 326298170.32831  duration_of_algorithm 162.480854382 makespan_2 326298170.32831
+algo_nr 1 atacseq_1000.dot input_size 11187378708  duration_of_algorithm 0.925511271 makespan_1 26668583.6710226	 ms perceived 20443175.6363267  duration_of_algorithm 0.224482488 makespan_2 20443175.6363267
+algo_nr 1 eager input_size 19100037384 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! duration_of_algorithm 0.009377685 makespan_1 3204640.81532641	 ms perceived 5859670.3875  duration_of_algorithm 0.009052582 makespan_2 5859670.3875
+algo_nr 1 chipseq_10000.dot input_size 32978181418  duration_of_algorithm 23.5336337179999 makespan_1 2209246232.16706	 ms perceived 2651828547.032  duration_of_algorithm 10.122085777 makespan_2 2651828547.032
+algo_nr 1 chipseq_18000.dot input_size 4807293396  duration_of_algorithm 106.890529015 makespan_1 371450729.511532	 ms perceived 475445220.915433  duration_of_algorithm 57.5780569960002 makespan_2 475445220.915433
+algo_nr 1 methylseq_18000.dot input_size 6273818718  duration_of_algorithm 228.968872569001 makespan_1 137116330.780012	 ms perceived 162628663.290155  duration_of_algorithm 229.054132198001 makespan_2 162628663.290155
+algo_nr 1 methylseq_2000.dot input_size 110641579976  duration_of_algorithm 3.386249565 makespan_1 1076496599.0127	 ms perceived 1322864109.46888  duration_of_algorithm 1.695722979 makespan_2 1322864109.46888
+algo_nr 1 chipseq_8000.dot input_size 3793245764  duration_of_algorithm 39.998237441 makespan_1 177812407.860888	 ms perceived 179805069.71493  duration_of_algorithm 18.0597737759999 makespan_2 179805069.71493
+algo_nr 1 eager_25000.dot input_size 19132169434  duration_of_algorithm 64.9819036070001 makespan_1 605823057.655287	 ms perceived 705580500.070191  duration_of_algorithm 382.182195910013 makespan_2 705580500.070191
+algo_nr 1 eager_4000.dot input_size 19132169434  duration_of_algorithm 5.313287608 makespan_1 81956792.1184552	 ms perceived 90939586.4011283  duration_of_algorithm 13.0344100540001 makespan_2 90939586.4011283
+algo_nr 1 chipseq_1000.dot input_size 4807293396  duration_of_algorithm 0.986558433999999 makespan_1 17845756.4376866	 ms perceived 16202073.2509244  duration_of_algorithm 0.324401377000001 makespan_2 16202075.8604438
+algo_nr 1 eager_15000.dot input_size 19075314980 Cycle detected at event: convertBam_00006477-adapter_removal_00006460-w-f
+algo_nr 1 methylseq_200.dot input_size 6761426956 
+ duration_of_algorithm 0.098474082 makespan_1 2149875.21780274	 ms perceived 2148974.675  duration_of_algorithm 0.013940698 makespan_2 2148974.675
+algo_nr 1 methylseq_18000.dot input_size 6761426956 
+ duration_of_algorithm 262.454046052 makespan_1 150290896.252542	 ms perceived 179301316.819514  duration_of_algorithm 221.044495785002 makespan_2 179301316.819514
+algo_nr 1 methylseq input_size 17027257018  duration_of_algorithm 0.004364131 makespan_1 2175362.36458364	 ms perceived 2175361.36458333  duration_of_algorithm 0.000440634 makespan_2 2175361.36458333
+algo_nr 1 eager_1000.dot input_size 8330435694  duration_of_algorithm 0.439728754 makespan_1 6283037.87809169	 ms perceived 9021808.77598964  duration_of_algorithm 0.544365811000001 makespan_2 9021808.77598964
+algo_nr 1 chipseq_4000.dot input_size 3793245764  duration_of_algorithm 13.811398099 makespan_1 81825141.1310119	 ms perceived 81994133.5229625  duration_of_algorithm 5.41997580300001 makespan_2 81994133.5229625
+algo_nr 1 methylseq_200.dot input_size 11897958606 
+ duration_of_algorithm 0.0973779039999999 makespan_1 3670647.19284644	 ms perceived 3669578.9375  duration_of_algorithm 0.013905763 makespan_2 3669578.9375
+algo_nr 1 atacseq_1000.dot input_size 3908761308  duration_of_algorithm 0.98099937 makespan_1 12858196.9678031	 ms perceived 10145511.7068156  duration_of_algorithm 0.279743325 makespan_2 10145511.7068156
+algo_nr 1 chipseq_1000.dot input_size 3793245764  duration_of_algorithm 1.057922255 makespan_1 17743138.3415003	 ms perceived 16710353.3013372  duration_of_algorithm 0.308286195 makespan_2 16710353.3013372
+algo_nr 1 atacseq_2000.dot input_size 11809629756  duration_of_algorithm 2.593655792 makespan_1 56706680.7504603	 ms perceived 38056784.7517186  duration_of_algorithm 1.085404115 makespan_2 38056784.7517186
+algo_nr 1 eager_4000.dot input_size 8330435694  duration_of_algorithm 6.57052272499999 makespan_1 36731109.995129	 ms perceived 33774988.2344531  duration_of_algorithm 15.944047301 makespan_2 33774988.2344531
+algo_nr 1 methylseq_200.dot input_size 22500260922 
+ duration_of_algorithm 0.0967002070000001 makespan_1 5972842.45722848	 ms perceived 5775022.01810326  duration_of_algorithm 0.013794624 makespan_2 5775022.01810326
+algo_nr 1 eager_4000.dot input_size 14754556884  duration_of_algorithm 6.203331207 makespan_1 67171701.3969705	 ms perceived 102150068.195839  duration_of_algorithm 12.478922132 makespan_2 102150068.195839
+algo_nr 1 methylseq input_size 6761426956  duration_of_algorithm 0.004472272 makespan_1 1080080.26250047	 ms perceived 1080079.2625  duration_of_algorithm 0.000448035 makespan_2 1080079.2625
+algo_nr 1 eager_200.dot input_size 19100037384  duration_of_algorithm 0.038049924 makespan_1 10289257.0304092	 ms perceived 5859670.3875  duration_of_algorithm 0.035060235 makespan_2 5859670.3875
+algo_nr 1 methylseq_20000.dot input_size 8885797810 
+ duration_of_algorithm 289.463446242 makespan_1 253907653.123546	 ms perceived 306970238.64325  duration_of_algorithm 316.600035922004 makespan_2 306970238.64325
+algo_nr 1 atacseq_25000.dot input_size 2223941232  duration_of_algorithm 252.825852839999 makespan_1 272769132.476504	 ms perceived 239666207.329192  duration_of_algorithm 322.422544383003 makespan_2 239666207.329192
+algo_nr 1 eager_20000.dot input_size 25705994498  duration_of_algorithm 42.2474946929998 makespan_1 635426462.981868	 ms perceived 847674876.29843  duration_of_algorithm 156.770825312004 makespan_2 847674879.629872
+algo_nr 1 atacseq_18000.dot input_size 11187378708  duration_of_algorithm 147.906728257999 makespan_1 559365245.30046	 ms perceived 680442292.546278  duration_of_algorithm 82.4410214969999 makespan_2 680442292.546278
+algo_nr 1 eager_25000.dot input_size 19075314980  duration_of_algorithm 59.7371260110001 makespan_1 599185792.538333	 ms perceived 709581067.514728  duration_of_algorithm 286.264756648004 makespan_2 709581069.108434
+algo_nr 1 chipseq_15000.dot input_size 5058052541  duration_of_algorithm 75.97800121 makespan_1 339941140.352552	 ms perceived 447191256.722461  duration_of_algorithm 40.9809742490004 makespan_2 447191256.722461
+algo_nr 1 chipseq_1000.dot input_size 5058052541  duration_of_algorithm 1.026504036 makespan_1 22136474.5988729	 ms perceived 18768241.5458594  duration_of_algorithm 0.323755343 makespan_2 18768241.5458594
+algo_nr 1 atacseq_15000.dot input_size 11809629756  duration_of_algorithm 97.4394914740003 makespan_1 488665009.591438	 ms perceived 568461762.858501  duration_of_algorithm 53.2130310439997 makespan_2 568461762.858501
+algo_nr 1 methylseq_2000.dot input_size 8885797810 
+ duration_of_algorithm 2.776525846 makespan_1 23094722.6442045	 ms perceived 21559463.9815407  duration_of_algorithm 1.369422582 makespan_2 21559463.9815407
+algo_nr 1 chipseq input_size 41366257414  duration_of_algorithm 0.008856548 makespan_1 15295377.083095	 ms perceived 15214902.7646195  duration_of_algorithm 0.001067232 makespan_2 15214902.7646195
+algo_nr 1 methylseq_15000.dot input_size 8885797810  duration_of_algorithm 177.000765515 makespan_1 189822737.296191	 ms perceived 225990486.80661  duration_of_algorithm 152.807085163 makespan_2 225990486.80661
+algo_nr 1 methylseq_30000.dot input_size 17027257018 
+ duration_of_algorithm 703.667887968003 makespan_1 1021429976.0091	 ms perceived 1398959146.74394  duration_of_algorithm 800.076452425002 makespan_2 1398959146.74394
+algo_nr 1 eager_2000.dot input_size 19075314980  duration_of_algorithm 1.595382167 makespan_1 36855152.8728166	 ms perceived 41842155.6019502  duration_of_algorithm 3.19301404599999 makespan_2 41842155.6019502
+algo_nr 1 eager_2000.dot input_size 19132169434  duration_of_algorithm 1.608925054 makespan_1 40723049.0979463	 ms perceived 41511229.0700368  duration_of_algorithm 3.46505454500001 makespan_2 41511229.0700368
+algo_nr 1 chipseq_20000.dot input_size 4605965334  duration_of_algorithm 107.211188504 makespan_1 420695693.566154	 ms perceived 534621216.884678  duration_of_algorithm 79.3530661509998 makespan_2 534621216.884678
+algo_nr 1 atacseq_200.dot input_size 11187378708  duration_of_algorithm 0.105189775 makespan_1 15683869.5894042	 ms perceived 3094286.69720294  duration_of_algorithm 0.014522676 makespan_2 3094286.69720294
+algo_nr 1 chipseq_15000.dot input_size 3793245764  duration_of_algorithm 72.6061601630004 makespan_1 301916222.113959	 ms perceived 351286649.374372  duration_of_algorithm 55.021742668 makespan_2 351286649.374372
+algo_nr 1 atacseq_8000.dot input_size 14091675276  duration_of_algorithm 16.95038409 makespan_1 442457694.757614	 ms perceived 452112478.073762  duration_of_algorithm 8.46750113399998 makespan_2 452112478.073762
+algo_nr 1 eager_10000.dot input_size 19132169434  duration_of_algorithm 17.070105516 makespan_1 222381974.073089	 ms perceived 300376750.886388  duration_of_algorithm 66.4556863710003 makespan_2 300376770.149126
+algo_nr 1 methylseq_8000.dot input_size 11897958606 
+ duration_of_algorithm 55.9735441669999 makespan_1 131840814.539014	 ms perceived 151862976.351863  duration_of_algorithm 37.966065597 makespan_2 151862976.351863
+algo_nr 1 eager_15000.dot input_size 25705994498  duration_of_algorithm 25.27618285 makespan_1 484376981.176112	 ms perceived 614129872.347529  duration_of_algorithm 103.306618264 makespan_2 614129872.347529
+algo_nr 1 eager_1000.dot input_size 19075314980  duration_of_algorithm 0.463138383 makespan_1 16281124.2919951	 ms perceived 21099293.7913078  duration_of_algorithm 0.666954116000001 makespan_2 21099293.7913078
+algo_nr 1 eager_30000.dot input_size 25705994498  duration_of_algorithm 74.0617692009998 makespan_1 964061184.493812	 ms perceived 1277406013.31752  duration_of_algorithm 430.170810823001 makespan_2 1277406016.5633
+algo_nr 1 eager_10000.dot input_size 25705994498  duration_of_algorithm 14.925952105 makespan_1 320551624.281841	 ms perceived 435440719.034545  duration_of_algorithm 36.3801939080003 makespan_2 435440730.809084
+algo_nr 1 eager_18000.dot input_size 19075314980  duration_of_algorithm 33.693041862 makespan_1 406738650.704499	 ms perceived 523049068.776112  duration_of_algorithm 137.950052965001 makespan_2 523049068.776112
+algo_nr 1 chipseq_20000.dot input_size 3793245764  duration_of_algorithm 111.882851275 makespan_1 381285244.21141	 ms perceived 478774029.058773  duration_of_algorithm 80.8107256749998 makespan_2 478774029.058773
+algo_nr 1 atacseq.dot input_size 11187378708 algo_nr 1 chipseq_18000.dot input_size 3793245764  duration_of_algorithm 96.9842775900006 makespan_1 359251375.683392	 ms perceived 437141592.270305  duration_of_algorithm 66.2541488810011 makespan_2 437141592.270305
+algo_nr 1 chipseq input_size 5058052541  duration_of_algorithm 0.010497451 makespan_1 2070314.32862904	 ms perceived 1992731.60517496  duration_of_algorithm 0.00128349 makespan_2 1992731.60517496
+algo_nr 1 chipseq_30000.dot input_size 41366257414  duration_of_algorithm 92.6180615019996 makespan_1 7329221870.01198	 ms perceived 9823002469.81121  duration_of_algorithm 88.0244203860002 makespan_2 9823002469.81121
+algo_nr 1 eager_8000.dot input_size 14754556884  duration_of_algorithm 9.68513078200004 makespan_1 130455763.683234	 ms perceived 167796298.053996  duration_of_algorithm 47.4390433119999 makespan_2 167796305.809192
+algo_nr 1 chipseq_30000.dot input_size 32978181418  duration_of_algorithm 141.509099539001 makespan_1 6592732632.92422	 ms perceived 8208785679.68978  duration_of_algorithm 99.8545553680002 makespan_2 8208785684.47752
+algo_nr 1 methylseq_25000.dot input_size 110641579976  duration_of_algorithm 565.195028559999 makespan_1 13016958699.5261	 ms perceived 17939324337.6148  duration_of_algorithm 638.091669744007 makespan_2 17939324337.6148
+algo_nr 1 eager_10000.dot input_size 14754556884  duration_of_algorithm 13.278604261 makespan_1 169068410.178698	 ms perceived 246104947.692894  duration_of_algorithm 57.0082083950002 makespan_2 246104947.692894
+algo_nr 1 eager_30000.dot input_size 14754556884  duration_of_algorithm 79.6983255499998 makespan_1 464744626.828831	 ms perceived 730227819.810052  duration_of_algorithm 388.319285302006 makespan_2 730227827.019402
+algo_nr 1 methylseq_8000.dot input_size 6761426956  duration_of_algorithm 45.5040091399999 makespan_1 60188917.079253	 ms perceived 68678267.2470355  duration_of_algorithm 39.2761997259999 makespan_2 68678267.2470355
+algo_nr 1 atacseq_10000.dot input_size 11809629756  duration_of_algorithm 45.442911064 makespan_1 328851363.441863	 ms perceived 340874490.775646  duration_of_algorithm 37.417709381 makespan_2 340874490.775646
+algo_nr 1 eager_20000.dot input_size 19132169434  duration_of_algorithm 42.20033043 makespan_1 460746387.15644	 ms perceived 581393736.665849  duration_of_algorithm 192.965494474003 makespan_2 581393741.625107
+algo_nr 1 eager_200.dot input_size 19075314980  duration_of_algorithm 0.038205493 makespan_1 10273802.8512167	 ms perceived 5845557  duration_of_algorithm 0.035045885 makespan_2 5845557
+algo_nr 1 eager_20000.dot input_size 14754556884  duration_of_algorithm 34.119790994 makespan_1 328576007.126723	 ms perceived 512814404.915253  duration_of_algorithm 176.003156159002 makespan_2 512814424.657384
+algo_nr 1 chipseq input_size 4807293396  duration_of_algorithm 0.010490258 makespan_1 1690117.2485623	 ms perceived 1630043.46875  duration_of_algorithm 0.001289152 makespan_2 1630043.46875
+algo_nr 1 eager_15000.dot input_size 8330435694  duration_of_algorithm 54.7676392629998 makespan_1 132742094.145424	 ms perceived 182347280.957135  duration_of_algorithm 176.260797523001 makespan_2 182347288.062275
+algo_nr 1 methylseq_10000.dot input_size 6761426956 
+ duration_of_algorithm 76.826572179 makespan_1 77177714.4330802	 ms perceived 89769516.1161462  duration_of_algorithm 60.6855470039999 makespan_2 89769516.1161462
+algo_nr 1 methylseq_1000.dot input_size 22500260922 
+ duration_of_algorithm 0.885734493999999 makespan_1 31948800.4101302	 ms perceived 34434181.2026366  duration_of_algorithm 0.325850392 makespan_2 34434181.2026366
+algo_nr 1 methylseq_8000.dot input_size 22500260922  duration_of_algorithm 50.703403435 makespan_1 336820826.690889	 ms perceived 456162759.46588  duration_of_algorithm 35.6928568179997 makespan_2 456162759.46588
+algo_nr 1 methylseq_25000.dot input_size 8885797810  duration_of_algorithm 491.193536474001 makespan_1 322851296.746069	 ms perceived 392858502.760933  duration_of_algorithm 499.955092506002 makespan_2 392858502.760933
+algo_nr 1 atacseq_1000.dot input_size 2223941232  duration_of_algorithm 0.924082628 makespan_1 9907544.18509945	 ms perceived 7462813.38587569  duration_of_algorithm 0.236128851000001 makespan_2 7462813.38587569
+algo_nr 1 atacseq_4000.dot input_size 3908761308  duration_of_algorithm 11.128526449 makespan_1 46964964.1803999	 ms perceived 39304239.823571  duration_of_algorithm 6.266109165 makespan_2 39304239.823571
+algo_nr 1 chipseq_10000.dot input_size 3793245764  duration_of_algorithm 49.2643827000001 makespan_1 230701111.895954	 ms perceived 214541538.083947  duration_of_algorithm 23.9838570809997 makespan_2 214541538.083947
+algo_nr 1 eager_1000.dot input_size 19132169434  duration_of_algorithm 0.463368774 makespan_1 16534182.860991	 ms perceived 21194263.8380712  duration_of_algorithm 0.633241861000003 makespan_2 21194263.8380712
+algo_nr 1 methylseq_20000.dot input_size 17027257018 
+ duration_of_algorithm 332.325458447 makespan_1 650170213.014167	 ms perceived 904142484.0352  duration_of_algorithm 291.903646422001 makespan_2 904142484.0352
+algo_nr 1 eager_8000.dot input_size 25705994498  duration_of_algorithm 10.938558114 makespan_1 283691306.346323	 ms perceived 336682836.865768  duration_of_algorithm 23.0768688940001 makespan_2 336682838.235913
+algo_nr 1 methylseq_2000.dot input_size 17027257018 
+ duration_of_algorithm 2.697364467 makespan_1 48169956.8189682	 ms perceived 57763211.0970613  duration_of_algorithm 1.572288703 makespan_2 57763211.0970613
+algo_nr 1 methylseq_4000.dot input_size 6761426956 
+ duration_of_algorithm 11.50466783 makespan_1 30483105.2590464	 ms perceived 31196602.5416167  duration_of_algorithm 8.49284997199999 makespan_2 31196602.5416167
+algo_nr 1 chipseq_8000.dot input_size 4807293396  duration_of_algorithm 26.6096092559999 makespan_1 181753987.687223	 ms perceived 196951111.477864  duration_of_algorithm 15.916477825 makespan_2 196951111.477864
+algo_nr 1 eager_18000.dot input_size 25705994498  duration_of_algorithm 36.832777574 makespan_1 574501507.853568	 ms perceived 756206586.838432  duration_of_algorithm 127.585158177998 makespan_2 756206589.45339
+algo_nr 1 methylseq_20000.dot input_size 6273818718 
+algo_nr 1 eager_4000.dot input_size 19100037384  duration_of_algorithm 5.081644176 makespan_1 79888217.4235248	 ms perceived 110315220.671403  duration_of_algorithm 12.997485711 makespan_2 110315220.671403
+algo_nr 1 methylseq_20000.dot input_size 22500260922 
+ duration_of_algorithm 320.851610087 makespan_1 858720187.425378	 ms perceived 1215168762.84072  duration_of_algorithm 285.982661786999 makespan_2 1215168762.84072
+algo_nr 1 eager_2000.dot input_size 14754556884  duration_of_algorithm 1.584796186 makespan_1 33240103.1084234	 ms perceived 31576432.4864351  duration_of_algorithm 3.330689095 makespan_2 31576432.4864351
+algo_nr 1 atacseq_20000.dot input_size 11187378708  duration_of_algorithm 177.847773119 makespan_1 602481665.54791	 ms perceived 766092331.395443  duration_of_algorithm 83.8132655880004 makespan_2 766092331.395443
+algo_nr 1 methylseq_4000.dot input_size 22500260922 
+ duration_of_algorithm 12.18471473 makespan_1 165096892.206804	 ms perceived 208738031.743674  duration_of_algorithm 7.97985663700001 makespan_2 208738031.743674
+algo_nr 1 atacseq_15000.dot input_size 2223941232  duration_of_algorithm 126.748411778 makespan_1 169251975.201514	 ms perceived 141085586.741672  duration_of_algorithm 101.06772071 makespan_2 141085586.741672
+algo_nr 1 eager_18000.dot input_size 8330435694  duration_of_algorithm 62.9206234800001 makespan_1 144169520.825652	 ms perceived 220820682.170776  duration_of_algorithm 250.65020433 makespan_2 220820694.079155
+algo_nr 1 atacseq_8000.dot input_size 2223941232  duration_of_algorithm 44.18813768 makespan_1 66989441.4659532	 ms perceived 49098637.0784653  duration_of_algorithm 29.3234102549999 makespan_2 49098637.0784653
+algo_nr 1 chipseq_200.dot input_size 41366257414  duration_of_algorithm 0.091746616 makespan_1 32710631.6107086	 ms perceived 33526439.671936  duration_of_algorithm 0.012595728 makespan_2 33526439.671936
+algo_nr 1 chipseq_18000.dot input_size 32978181418  duration_of_algorithm 57.3721500280001 makespan_1 3954352258.58984	 ms perceived 4794826420.74608  duration_of_algorithm 29.8541759669999 makespan_2 4794826420.74608
+algo_nr 1 eager_200.dot input_size 19132169434  duration_of_algorithm 0.038066907 makespan_1 10316313.8871162	 ms perceived 5835768.0375  duration_of_algorithm 0.034881299 makespan_2 5835768.0375
+algo_nr 1 chipseq_25000.dot input_size 4807293396  duration_of_algorithm 196.663886081 makespan_1 491522490.774574	 ms perceived 677242361.535623  duration_of_algorithm 86.6360652290005 makespan_2 677242361.535623
+algo_nr 1 atacseq_4000.dot input_size 2223941232  duration_of_algorithm 9.92496971999999 makespan_1 36456325.4809776	 ms perceived 25413469.8391166  duration_of_algorithm 5.42522970700001 makespan_2 25413469.8391166
+algo_nr 1 chipseq_10000.dot input_size 41366257414 not removed
+not removed
+algo_nr 1 chipseq_4000.dot input_size 4605965334  duration_of_algorithm 12.875077595 makespan_1 98323181.2823045	 ms perceived 96896421.8737784  duration_of_algorithm 5.47312162300001 makespan_2 96896421.8737784
+algo_nr 1 atacseq_10000.dot input_size 2223941232  duration_of_algorithm 61.3224906730001 makespan_1 84806970.1913129	 ms perceived 71366622.8594929  duration_of_algorithm 43.6857624289999 makespan_2 71366622.8594929
+algo_nr 1 chipseq_25000.dot input_size 3793245764  duration_of_algorithm 151.47235603 makespan_1 469676498.861079	 ms perceived 592082205.009747  duration_of_algorithm 137.005664985999 makespan_2 592082205.009747
+algo_nr 1 methylseq_25000.dot input_size 17027257018  duration_of_algorithm 490.410290301999 makespan_1 814833885.396025	 ms perceived 1150048213.91974  duration_of_algorithm 482.339532201001 makespan_2 1150048213.91974
+algo_nr 1 eager_30000.dot input_size 19132169434  duration_of_algorithm 91.0737931909999 makespan_1 719093978.48309	 ms perceived 894726523.518731  duration_of_algorithm 446.593079206998 makespan_2 894726523.518731
+algo_nr 1 eager_2000.dot input_size 8330435694  duration_of_algorithm 1.457082695 makespan_1 13233676.5569099	 ms perceived 19501393.1434758  duration_of_algorithm 3.164783727 makespan_2 19501393.1434758
+algo_nr 1 chipseq_30000.dot input_size 5058052541  duration_of_algorithm 258.362781731 makespan_1 677628824.741017	 ms perceived 914284403.384183  duration_of_algorithm 114.974253173999 makespan_2 914284403.384183
+algo_nr 1 chipseq_18000.dot input_size 41366257414  duration_of_algorithm 39.7604200890002 makespan_1 4405324028.71529	 ms perceived 5730646618.62785  duration_of_algorithm 36.2803098000001 makespan_2 5730646618.62785
+algo_nr 1 eager_18000.dot input_size 14754556884  duration_of_algorithm 33.019448268 makespan_1 310426395.712013	 ms perceived 468364698.367304  duration_of_algorithm 133.935688552 makespan_2 468364700.713231
+algo_nr 1 methylseq_4000.dot input_size 11897958606  duration_of_algorithm 17.406523086 makespan_1 57742576.9403068	 ms perceived 67352527.1463082  duration_of_algorithm 8.49355888599999 makespan_2 67352527.1463082
+algo_nr 1 chipseq_4000.dot input_size 4807293396  duration_of_algorithm 11.382575911 makespan_1 94456997.0345982	 ms perceived 90776362.5222994  duration_of_algorithm 5.48913902200001 makespan_2 90776362.5222994
+algo_nr 1 eager_200.dot input_size 14754556884  duration_of_algorithm 0.04332243 makespan_1 6410007.22437325	 ms perceived 5825674.6375  duration_of_algorithm 0.035342039 makespan_2 5825674.6375
+algo_nr 1 eager_18000.dot input_size 19132169434  duration_of_algorithm 33.7957919260001 makespan_1 411056601.011171	 ms perceived 524985923.728717  duration_of_algorithm 166.667994887002 makespan_2 524985927.318547
+algo_nr 1 chipseq.dot input_size 4605965334 algo_nr 1 methylseq_15000.dot input_size 22500260922 
+ duration_of_algorithm 179.470730803999 makespan_1 651794763.551784	 ms perceived 905717885.289873  duration_of_algorithm 152.969855388999 makespan_2 905717885.289873
+algo_nr 1 methylseq_2000.dot input_size 6273818718 
+ duration_of_algorithm 2.713424131 makespan_1 13332139.1812551	 ms perceived 12251098.2330543  duration_of_algorithm 1.563753901 makespan_2 12251098.2330543
+algo_nr 1 atacseq.dot input_size 2223941232 algo_nr 1 methylseq_18000.dot input_size 110641579976  duration_of_algorithm 306.667641297 makespan_1 9534495513.38698	 ms perceived 12877856222.1028  duration_of_algorithm 276.17336885 makespan_2 12877856222.1028
+algo_nr 1 methylseq_1000.dot input_size 17027257018 
+ duration_of_algorithm 0.854215169 makespan_1 24776869.7005203	 ms perceived 23205341.7224303  duration_of_algorithm 0.377392914 makespan_2 23205341.7224303
+algo_nr 1 eager_25000.dot input_size 19100037384  duration_of_algorithm 64.7167916290001 makespan_1 594101626.339074	 ms perceived 704162429.159695  duration_of_algorithm 352.744957967004 makespan_2 704162431.034068
+algo_nr 1 atacseq_2000.dot input_size 2223941232  duration_of_algorithm 3.158628057 makespan_1 19613915.4999784	 ms perceived 12234039.5136508  duration_of_algorithm 1.121141925 makespan_2 12234039.5136508
+algo_nr 1 methylseq_200.dot input_size 6273818718  duration_of_algorithm 0.099128081 makespan_1 1974294.85003342	 ms perceived 1973744.425  duration_of_algorithm 0.01392551 makespan_2 1973744.425
+algo_nr 1 atacseq_8000.dot input_size 11187378708  duration_of_algorithm 30.887441532 makespan_1 275911650.031884	 ms perceived 267425335.904897  duration_of_algorithm 20.901073854 makespan_2 267425335.904897
+algo_nr 1 methylseq input_size 8885797810  duration_of_algorithm 0.004440121 makespan_1 1402990.43750032	 ms perceived 1402989.4375  duration_of_algorithm 0.000451001 makespan_2 1402989.4375
+algo_nr 1 methylseq_10000.dot input_size 22500260922  duration_of_algorithm 75.5062145809998 makespan_1 427202829.23082	 ms perceived 590876059.824129  duration_of_algorithm 61.2010025720004 makespan_2 590876059.824129
+algo_nr 1 methylseq_1000.dot input_size 6761426956  duration_of_algorithm 0.810654198 makespan_1 7647268.4454249	 ms perceived 6578027.61553354  duration_of_algorithm 0.304828309000001 makespan_2 6578027.61553354
+algo_nr 1 chipseq_2000.dot input_size 3793245764  duration_of_algorithm 3.37454706299999 makespan_1 35679887.2188651	 ms perceived 30593214.6287616  duration_of_algorithm 1.331781791 makespan_2 30593214.6287616
+algo_nr 1 methylseq_25000.dot input_size 22500260922 
+ duration_of_algorithm 497.934102848999 makespan_1 1093466717.59374	 ms perceived 1542400230.29408  duration_of_algorithm 507.23839907401 makespan_2 1542400230.29408
+algo_nr 1 chipseq_30000.dot input_size 3793245764  duration_of_algorithm 159.682041142 makespan_1 573029913.265978	 ms perceived 728020397.956005  duration_of_algorithm 187.108985201 makespan_2 728020397.956005
+algo_nr 1 methylseq_1000.dot input_size 8885797810  duration_of_algorithm 0.842754256999999 makespan_1 11266410.2773154	 ms perceived 10764162.4823645  duration_of_algorithm 0.289259833 makespan_2 10764162.4823645
+algo_nr 1 eager input_size 19132169434 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! duration_of_algorithm 0.009292436 makespan_1 3219206.56537664	 ms perceived 5835768.0375  duration_of_algorithm 0.008999781 makespan_2 5835768.0375
+algo_nr 1 methylseq_10000.dot input_size 17027257018  duration_of_algorithm 76.532901497 makespan_1 313781828.259532	 ms perceived 427810257.612961  duration_of_algorithm 57.055935509 makespan_2 427810257.612961
+algo_nr 1 eager_200.dot input_size 8330435694  duration_of_algorithm 0.042651611 makespan_1 4698333.19673108	 ms perceived 3178859.14583333  duration_of_algorithm 0.0351822149999999 makespan_2 3178859.14583333
+algo_nr 1 atacseq.dot input_size 11809629756 algo_nr 1 methylseq_18000.dot input_size 22500260922 
+ duration_of_algorithm 268.14668428 makespan_1 773933612.62581	 ms perceived 1113854710.21543  duration_of_algorithm 230.746073850998 makespan_2 1113854710.21543
+algo_nr 1 chipseq_10000.dot input_size 4807293396  duration_of_algorithm 42.6186377550001 makespan_1 225752575.33489	 ms perceived 245512911.723419  duration_of_algorithm 22.244724987 makespan_2 245512911.723419
