@@ -36,7 +36,7 @@ void Liu_merge_last_two_segments_if_needed(Liu_schedule_t schedule, int *last_se
     schedule->segment_peak[(*last_segment) - 1] = max_memdag(schedule->segment_peak[(*last_segment) - 1], schedule->segment_peak[*last_segment]);
     *last_segment = (*last_segment) - 1;
     schedule->nb_of_segments--;
-    DEBUG_LIU_OPT_SEQ(fprintf(stderr,"Merged last segment with the previous one (new peak:%.1f, new valley:%.1f)\n", 
+    DEBUG_LIU_OPT_SEQ(fprintf(stderr,"Merged last segment with the previous one (new peak:%.1f, new valley:%.1f)\n",
 			      schedule->segment_peak[*last_segment],schedule->segment_valley[*last_segment]));
   }
 }
@@ -45,14 +45,14 @@ void print_Liu_schedule(FILE *out, Liu_schedule_t schedule, int produce_schedule
   int i;
   if (produce_schedule==1) {
     fprintf(out,"node list: ");
-    for(i=0; i<schedule->nb_of_nodes; i++) 
+    for(i=0; i<schedule->nb_of_nodes; i++)
       fprintf(out,"%d%s",schedule->node_list[i], ((i==schedule->nb_of_nodes-1)?"\t\t":","));
     fprintf(out,"segment start [peak,valley]: ");
-    for(i=0; i<schedule->nb_of_segments; i++) 
+    for(i=0; i<schedule->nb_of_segments; i++)
       fprintf(out,"%d[%.1f,%.1f]%s",schedule->segment_start[i],schedule->segment_peak[i],schedule->segment_valley[i], (i==schedule->nb_of_segments-1)?"\n":",");
   } else {
     fprintf(out,"segment [peak,valley]: ");
-    for(i=0; i<schedule->nb_of_segments; i++) 
+    for(i=0; i<schedule->nb_of_segments; i++)
       fprintf(out,"[%.1f,%.1f]%s",schedule->segment_peak[i],schedule->segment_valley[i], (i==schedule->nb_of_segments-1)?"\n":",");
   }
 }
@@ -62,11 +62,11 @@ Liu_schedule_t Liu_sequential_optimal_schedule(tree_t tree, int produce_schedule
   int k;
 
   // 1. Recursively compute the optimal schedules
-  Liu_schedule_t *sub_schedules = newn(Liu_schedule_t, tree->nb_of_children); 
+  Liu_schedule_t *sub_schedules = newn(Liu_schedule_t, tree->nb_of_children);
   int total_nb_of_segments = 0;
-  
+
   DEBUG_LIU_OPT_SEQ(fprintf(stderr,"\n******* Liu_sequential_optimal_schedule in node %d\n", tree->id));
-  
+
   for(k=0; k<tree->nb_of_children; k++) {
     sub_schedules[k] = Liu_sequential_optimal_schedule(tree->children[k], produce_schedule);
     if (produce_schedule) {
@@ -77,19 +77,19 @@ Liu_schedule_t Liu_sequential_optimal_schedule(tree_t tree, int produce_schedule
 
     total_nb_of_segments += sub_schedules[k]->nb_of_segments;
   }
-  
+
   // 2. Merge and recompute segments
   int *next_segment_of_child = newn(int, tree->nb_of_children);
-  
+
   // First allocate total_nb_of_segments+1 segments (the +1 is for the root) and then reallocate
   Liu_schedule_t schedule = newn(struct s_Liu_schedule_t, 1);
   if (produce_schedule) {
     schedule->node_list = newn(int, tree->subtree_size);
     schedule->nb_of_nodes = tree->subtree_size;
   }
-  int next_node_in_list = 0; 
+  int next_node_in_list = 0;
   int next_segment = 0;
-  
+
   //  int max_used_segments = 0;
   schedule->nb_of_segments = 0;
   if (produce_schedule) {
@@ -119,8 +119,8 @@ Liu_schedule_t Liu_sequential_optimal_schedule(tree_t tree, int produce_schedule
 
 
     DEBUG_LIU_OPT_SEQ(fprintf(stderr,"Combine at node %d: selected segment %d from child %d(#%d) (peak:%.1f valley:%.1f): [",
-			      tree->id, next_segment_of_child[chosen_child], tree->children[chosen_child]->id, chosen_child, 
-			      sub_schedules[chosen_child]->segment_peak[next_segment_of_child[chosen_child]], 
+			      tree->id, next_segment_of_child[chosen_child], tree->children[chosen_child]->id, chosen_child,
+			      sub_schedules[chosen_child]->segment_peak[next_segment_of_child[chosen_child]],
 			      sub_schedules[chosen_child]->segment_valley[next_segment_of_child[chosen_child]]));
 
 
@@ -154,10 +154,10 @@ Liu_schedule_t Liu_sequential_optimal_schedule(tree_t tree, int produce_schedule
     } else{
       DEBUG_LIU_OPT_SEQ(fprintf(stderr,"  case 2"));
       schedule->segment_peak[next_segment] = current_residual_memory
-	+ sub_schedules[chosen_child]->segment_peak[next_segment_of_child[chosen_child]] 
+	+ sub_schedules[chosen_child]->segment_peak[next_segment_of_child[chosen_child]]
 	- sub_schedules[chosen_child]->segment_valley[next_segment_of_child[chosen_child]-1];
-      schedule->segment_valley[next_segment] = current_residual_memory 
-	+ sub_schedules[chosen_child]->segment_valley[next_segment_of_child[chosen_child]] 
+      schedule->segment_valley[next_segment] = current_residual_memory
+	+ sub_schedules[chosen_child]->segment_valley[next_segment_of_child[chosen_child]]
 	- sub_schedules[chosen_child]->segment_valley[next_segment_of_child[chosen_child]-1];
     }
     current_residual_memory = schedule->segment_valley[next_segment];
@@ -180,7 +180,7 @@ Liu_schedule_t Liu_sequential_optimal_schedule(tree_t tree, int produce_schedule
   schedule->segment_peak[next_segment] = max_memdag(current_residual_memory,
 					     current_residual_memory - tree->total_input_size + tree->out_size); // using Liu's model: mem_peak=max(sum inputs, outputs)
   schedule->segment_valley[next_segment] = current_residual_memory + tree->out_size - tree->total_input_size;
-  DEBUG_LIU_OPT_SEQ(fprintf(stderr,"Added root node %d as a segment (peak:%.1f valley:%.1f)\n", 
+  DEBUG_LIU_OPT_SEQ(fprintf(stderr,"Added root node %d as a segment (peak:%.1f valley:%.1f)\n",
 			    tree->id, schedule->segment_peak[next_segment], schedule->segment_valley[next_segment]));
   //  max_used_segments = max(max_used_segments, next_segment + 1);
   Liu_merge_last_two_segments_if_needed(schedule, &next_segment);
@@ -201,16 +201,16 @@ Liu_schedule_t Liu_sequential_optimal_schedule(tree_t tree, int produce_schedule
   schedule->nb_of_segments = next_segment;
 
   //  fprintf(stderr,"%d -> %d max %d\n", total_nb_of_segments + 1, schedule->nb_of_segments, max_used_segments);
-    
+
 
   if (produce_schedule) {
-    schedule->segment_start = realloc(schedule->segment_start, next_segment * sizeof(int));
+    schedule->segment_start = (int*) realloc(schedule->segment_start, next_segment * sizeof(int));
   }
-  schedule->segment_peak = realloc(schedule->segment_peak, next_segment * sizeof(double));
-  schedule->segment_valley = realloc(schedule->segment_valley, next_segment * sizeof(double));
+  schedule->segment_peak = (double*) realloc(schedule->segment_peak, next_segment * sizeof(double));
+  schedule->segment_valley = (double*) realloc(schedule->segment_valley, next_segment * sizeof(double));
 
   for(k=0; k<tree->nb_of_children; k++) {
-    free_Liu_schedule(sub_schedules[k], produce_schedule); 
+    free_Liu_schedule(sub_schedules[k], produce_schedule);
   }
   free(sub_schedules);
   free(next_segment_of_child);
@@ -241,4 +241,4 @@ double Liu_optimal_sequential_memory(tree_t tree, int **schedule) {
   free(Liu_schedule);
   return optimal_sequential_memory;
 }
-  
+

@@ -39,8 +39,8 @@ void fifo_write(fifo_t *f, void* elt) {
     int old_size=f->size;
     f->size = f->size * 2;
     //    fprintf(stderr,"realloc to size %d (h:%d t:%d)\n",f->size, f->head, f->tail);
-	
-    f->elements = realloc(f->elements, f->size*sizeof(void*));
+
+    f->elements = (void**) realloc(f->elements, f->size*sizeof(void*));
     if(f->tail < f->head) {
       // copy elements[0...tail-1] to [old_size.. old_size+tail-1]
       // so that new fifo is located on [head..old_size+tail-1]
@@ -54,7 +54,7 @@ void fifo_write(fifo_t *f, void* elt) {
   f->elements[f->tail] = elt;
   f->tail = (f->tail + 1) % (f->size);
 }
-  
+
 
 void fifo_free(fifo_t *f) {
   free(f->elements);

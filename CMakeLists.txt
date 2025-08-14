@@ -2,6 +2,18 @@ cmake_minimum_required(VERSION 3.12)
 project(fonda_sched CXX)
 enable_language(C)
 
+option(PEDANTIC_FLAGS "Enable pedantic compiler flags" OFF)
+option(WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+
+if (PEDANTIC_FLAGS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wall -Wextra")
+endif ()
+if (WARNINGS_AS_ERRORS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+endif ()
+
 option(FONDA_BUILD_MEMDAG "Build external tool dagp" ON)
 
 
@@ -16,8 +28,8 @@ set(FONDA_INSTALL_PKGCONFIG_DIR "lib/pkgconfig"
 set(FONDA_CXX_STANDARD "17"
         CACHE STRING "CXX Version to compile with. Currently fixed to 17")
 
-set(FONDA_CXX_FLAGS "-O3 -fpermissive") #-pg -O0 -fsanitize=undefined -O3  -fsanitize=address -O0 -pg -g
-set(FONDA_LINK_FLAGS "") #-fsanitize=undefined
+#set(FONDA_CXX_FLAGS "-O3 -fpermissive") #-pg -O0 -fsanitize=undefined -O3  -fsanitize=address -O0 -pg -g
+#set(FONDA_LINK_FLAGS "") #-fsanitize=undefined
 
 if (DEFINED ENV{CONDA_PREFIX})
     set(FONDA_SEARCH_PREFIX "$ENV{CONDA_PREFIX}")
@@ -26,45 +38,44 @@ if (DEFINED ENV{CONDA_PREFIX})
 endif ()
 
 if (FONDA_BUILD_MEMDAG)
-    find_path(IGRAPH_INCLUDE_DIRS NAMES igraph/igraph.h
-            HINTS "/usr/local/include"
-            "/usr/local/include/igraph"
-            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/include")
-    find_library(IGRAPH_LIBRARIES igraph
-            HINTS
-            "/vol/home-vol1/maks/kulagins/slurm-experimente/igraph/lib"
-            "$ENV{LD_LIBRARY_PATH}"
-            "$ENV{DYLD_LIBRARY_PATH}")
+    find_package(PkgConfig)
+
+    pkg_check_modules(GraphViz REQUIRED IMPORTED_TARGET libgvc)
+
+    message(STATUS "GraphViz include dirs: ${GraphViz_INCLUDE_DIRS}")
 
     set(MEMDAG_SOURCE_DIR ${PROJECT_SOURCE_DIR}/extlibs/memdag/src/)
     add_library(memdag ${PROJECT_SOURCE_DIR}/extlibs/memdag/src/memdag.cpp)
-    target_sources(memdag PUBLIC ${MEMDAG_SOURCE_DIR}/seq-schedules-for-restrict.cpp
+    target_sources(memdag PUBLIC
+#            ${MEMDAG_SOURCE_DIR}/seq-schedules-for-restrict.cpp
             ${MEMDAG_SOURCE_DIR}/sp-ization.cpp
-            ${MEMDAG_SOURCE_DIR}/edge-selection-heuristics-for-restrict.cpp
+#            ${MEMDAG_SOURCE_DIR}/edge-selection-heuristics-for-restrict.cpp
             ${MEMDAG_SOURCE_DIR}/graph-algorithms.cpp
             ${MEMDAG_SOURCE_DIR}/tree.cpp
             ${MEMDAG_SOURCE_DIR}/fifo.cpp
             ${MEMDAG_SOURCE_DIR}/heap.cpp
             ${MEMDAG_SOURCE_DIR}/sp-recognition.cpp
             ${MEMDAG_SOURCE_DIR}/graph.cpp
-            ${MEMDAG_SOURCE_DIR}/maxmemory.cpp
+#            ${MEMDAG_SOURCE_DIR}/maxmemory.cpp
             ${MEMDAG_SOURCE_DIR}/sp-traversals.cpp
             ${MEMDAG_SOURCE_DIR}/tree-opt-sched.cpp
             ${MEMDAG_SOURCE_DIR}/tree-postorder-sched.cpp
             ${MEMDAG_SOURCE_DIR}/cluster.cpp
     )
 
-    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS} extlibs/csv/single_include)
-    target_link_libraries(memdag PRIVATE ${IGRAPH_LIBRARIES} -lcgraph -lcdt -lm -lgvc)
+    target_include_directories(memdag PUBLIC extlibs/memdag/src ${IGRAPH_INCLUDE_DIRS} ${GraphViz_INCLUDE_DIRS} extlibs/csv/single_include)
+    target_link_libraries(memdag PRIVATE ${IGRAPH_LIBRARIES} PkgConfig::GraphViz)
 
-    set_target_properties(memdag PROPERTIES
-            CXX_STANDARD ${FONDA_CXX_STANDARD}
-            COMPILE_FLAGS "${FONDA_CXX_FLAGS}"
-            LINK_FLAGS "${FONDA_LINK_FLAGS}")
+    set_target_properties(memdag PROPERTIES CXX_STANDARD ${FONDA_CXX_STANDARD})
 
 endif ()
 
-find_package(PkgConfig)
+# Add "include/" and "extlibs/"
+include_directories(
+    "${PROJECT_SOURCE_DIR}/include"
+    "${PROJECT_SOURCE_DIR}/extlibs"
+)
+
 #pkg_check_modules(Pistache REQUIRED IMPORTED_TARGET libpistache)
 
 add_executable(fonda_scheduler "${PROJECT_SOURCE_DIR}/fonda_scheduler/main.cpp"

@@ -76,7 +76,7 @@ void SP_tree_free(SP_tree_t *tree) {
 static vertex_t *SP_tree_add_nodes_to_graph(graph_t *graph, SP_tree_t *tree) {
   char nodename[255];
   //snprintf(nodename,255,"%d %s (%s -> %s)",tree->id, COMPOTYPE2STR(tree->type), tree->source_name, tree->target_name);
-  snprintf(nodename,255,"%s (%s -> %s)", COMPOTYPE2STR(tree->type), tree->source->name, tree->target->name);
+  snprintf(nodename,255,"%s (%s -> %s)", COMPOTYPE2STR(tree->type), tree->source->name.c_str(), tree->target->name.c_str());
   //  fprintf(stderr,"SP TREE seen node %p: \"%s\"\n", (void*)tree, nodename);
   vertex_t *root = new_vertex(graph, nodename, 0.0, (void*) tree);
   tree->id = root->id;
@@ -117,7 +117,7 @@ static void SP_tree_print_debug(SP_tree_t *tree, FILE *out, int level) {
   }
 }
 #endif
-  
+
 ///@private
 static void SP_minimize_tree(SP_tree_t *tree) {
   int new_nb_of_children = tree->nb_of_children;
@@ -153,7 +153,7 @@ static void SP_minimize_tree(SP_tree_t *tree) {
 }
 
 /**
- *  Recognize a SP graph and builds its decomposition tree 
+ *  Recognize a SP graph and builds its decomposition tree
  * @param original_graph
  *
  * If \p original_graph is a SP graph, then its decomposition tree is
@@ -174,19 +174,19 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
   /*
    * We work on a copy of the graph, since we need to modify the graph. We rely on the fact that ids are conserved by the copy.
    */
-  
+
   graph_t *graph = copy_graph(original_graph, 0);
-  
+
   /* out=fopen("graph_copied.dot","w"); */
   /* print_graph_to_dot_file(graph,out); */
   /* fclose(out); */
-  
+
   /*
    * Associate a partial tree to each edge of the graph, initialized with a leaf tree representing the edge
    */
   ACQUIRE(graph->generic_edge_pointer_lock);
   ACQUIRE(graph->generic_vertex_int_lock);
-  
+
 
   for(edge_t *e=graph->first_edge; e; e=e->next) {
     SP_tree_t *tree_node = SP_tree_new_node(SP_LEAF);
@@ -203,7 +203,7 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
    */
   fifo_t *unsatisfied_nodes = fifo_new();
   for(vertex_t *v=graph->first_vertex; v; v=v->next) {
-    if ((v->in_degree > 0) && (v->out_degree > 0)) {
+    if ((not v->in_edges.empty()) && (not v->out_edges.empty())) {
       v->generic_int = 1; // used as unsatisfied flag
       fifo_write(unsatisfied_nodes, (void*)v);
     }
@@ -219,7 +219,7 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
     vertex_t *v = (vertex_t*) fifo_read(unsatisfied_nodes);
     v->generic_int = 0;
     // there are no parallel edges -> try only series reduction
-    if ((v->in_degree == 1) && (v->out_degree == 1)) {
+    if ((v->in_edges.size() == 1) && (v->out_edges.size() == 1)) {
       // remove node, incoming and outgoing edges and add direct edge if it does not exist yet
       edge_t *in_edge = v->in_edges[0];
       vertex_t *in_vertex = in_edge->tail;
@@ -236,11 +236,11 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
       fprintf(stderr,"\nRemoving node %s...\nSeries_compo_tree:\n",v->name);
       SP_tree_print_debug(series_compo_tree, stderr,0);
 #endif
-      
+
       remove_edge(graph, in_edge);
       remove_edge(graph, out_edge);
       remove_vertex(graph, v);
-     
+
       // NB: we do not add an edge which is already present, to avoid the need for parallel reductions
       edge_t *existing_edge = find_edge(in_vertex, out_vertex);
       if (!existing_edge) {
@@ -270,22 +270,22 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
 	fifo_write(unsatisfied_nodes, (void*) in_vertex);
 	in_vertex->generic_int = 1;
       }
-      if ((out_vertex->generic_int==0) && (out_vertex != graph->target)) { 
+      if ((out_vertex->generic_int==0) && (out_vertex != graph->target)) {
 	fifo_write(unsatisfied_nodes, (void*) out_vertex);
 	out_vertex->generic_int = 1;
       }
     }
   }
   fifo_free(unsatisfied_nodes);
-  
+
   //fprintf(stderr,"We are done with the reduction.\n");
 
   // If it was a SP-graph, it should now be a single edge source->sink
   SP_tree_t *result = NULL;
-  if ((graph->number_of_vertices==2) && (graph->number_of_edges==1)) {
+  if ((graph->vertices_by_id.size()==2) && (graph->number_of_edges==1)) {
     edge_t *single_edge = graph->first_edge;
     SP_tree_t *tree = (SP_tree_t*) single_edge->generic_pointer;
-    SP_minimize_tree(tree);    
+    SP_minimize_tree(tree);
     result = tree;
   }
 
@@ -297,6 +297,6 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
   SP_tree_print_debug(result, stderr,0);
 #endif
 
- 
+
   return result;
 }
