@@ -203,7 +203,7 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
    */
   fifo_t *unsatisfied_nodes = fifo_new();
   for(vertex_t *v=graph->first_vertex; v; v=v->next) {
-    if ((v->in_degree > 0) && (v->out_degree > 0)) {
+    if ((not v->in_edges.empty()) && (not v->out_edges.empty())) {
       v->generic_int = 1; // used as unsatisfied flag
       fifo_write(unsatisfied_nodes, (void*)v);
     }
@@ -219,7 +219,7 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
     vertex_t *v = (vertex_t*) fifo_read(unsatisfied_nodes);
     v->generic_int = 0;
     // there are no parallel edges -> try only series reduction
-    if ((v->in_degree == 1) && (v->out_degree == 1)) {
+    if ((v->in_edges.size() == 1) && (v->out_edges.size() == 1)) {
       // remove node, incoming and outgoing edges and add direct edge if it does not exist yet
       edge_t *in_edge = v->in_edges[0];
       vertex_t *in_vertex = in_edge->tail;
@@ -282,7 +282,7 @@ SP_tree_t *build_SP_decomposition_tree(graph_t *original_graph) {
 
   // If it was a SP-graph, it should now be a single edge source->sink
   SP_tree_t *result = NULL;
-  if ((graph->number_of_vertices==2) && (graph->number_of_edges==1)) {
+  if ((graph->vertices_by_id.size()==2) && (graph->number_of_edges==1)) {
     edge_t *single_edge = graph->first_edge;
     SP_tree_t *tree = (SP_tree_t*) single_edge->generic_pointer;
     SP_minimize_tree(tree);

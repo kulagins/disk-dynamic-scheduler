@@ -1,12 +1,14 @@
 #ifndef FONDA_SCHEDULER_OPTIONS_HPP
 #define FONDA_SCHEDULER_OPTIONS_HPP
 
+#include "algorithms.hpp"
+
 #include <iostream>
 #include <string>
 
 #include <getopt.h>
 
-#include "common.hpp"
+#include "utils.hpp"
 
 namespace fonda {
 struct Options {
@@ -95,23 +97,6 @@ inline void printHelp(const char* program_name)
               << "  -h, --help                           Show this help message and exit\n";
 }
 
-inline int algoNameToNumber(std::string algoName)
-{
-    std::transform(algoName.begin(), algoName.end(), algoName.begin(), ::tolower);
-    algoName = trimQuotes(algoName);
-    if (algoName == "heft") {
-        return 0; // HEFT
-    } else if (algoName == "heft-bl") {
-        return 1; // HEFT-BL
-    } else if (algoName == "heft-blc") {
-        return 2; // HEFT-BLC
-    } else if (algoName == "heft-mm") {
-        return 3; // HEFT-MM
-    } else {
-        throw std::invalid_argument("Unknown algorithm name: " + algoName);
-    }
-}
-
 template <typename T, typename ParseFunction>
 void parseArg(const char* name, const char* arg, T& value, ParseFunction&& parse_function)
 {
@@ -145,21 +130,21 @@ inline Options parseOptions(int argc, char* argv[])
             break;
         case 'w':
             options.workflowName = optarg;
-            options.workflowName = trimQuotes(options.workflowName);
+            options.workflowName = fonda_scheduler::trimQuotes(options.workflowName);
             break;
         case 'i':
             parseArg("input-size", optarg, options.inputSize, [](const char* arg) { return std::stol(arg); });
             break;
         case 'a':
-            parseArg("algorithm", optarg, options.algoNumber, [](const char* arg) { return algoNameToNumber(arg); });
+            parseArg("algorithm", optarg, options.algoNumber, [](const char* arg) { return fonda_scheduler::algoNameToNumber(arg); });
             break;
         case 'p':
             options.pathPrefix = optarg;
-            options.pathPrefix = trimQuotes(options.pathPrefix);
+            options.pathPrefix = fonda_scheduler::trimQuotes(options.pathPrefix);
             break;
         case 'f':
             options.machinesFile = optarg;
-            options.machinesFile = trimQuotes(options.machinesFile);
+            options.machinesFile = fonda_scheduler::trimQuotes(options.machinesFile);
             break;
         case 'd':
             parseArg("deviation-model", optarg, options.deviationModel, [](const char* arg) { return std::stoi(arg); });
@@ -171,7 +156,7 @@ inline Options parseOptions(int argc, char* argv[])
             printHelp(argv[0]);
             exit(EXIT_SUCCESS);
         default:
-            std::cerr << "Unknown option: " << c << std::endl;
+            std::cerr << "Unknown option: " << c << '\n';
             printHelp(argv[0]);
             exit(EXIT_FAILURE);
         }

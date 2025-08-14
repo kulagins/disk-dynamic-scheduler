@@ -311,7 +311,7 @@ static liu_res_t compute_optimal_SP_traversal_rec(graph_t *sp_graph, SP_tree_t *
  */
 
 vertex_t **compute_optimal_SP_traversal(graph_t  *sp_graph, SP_tree_t *tree) { 
-  vertex_t **final_schedule = (vertex_t**) calloc(sp_graph->number_of_vertices, sizeof(vertex_t*));
+  vertex_t **final_schedule = (vertex_t**) calloc(sp_graph->vertices_by_id.size(), sizeof(vertex_t*));
   liu_res_t rec_result = compute_optimal_SP_traversal_rec(sp_graph, tree);
   final_schedule[0] = sp_graph->source;
   //fprintf(stderr,"copying node 0/%d: %s\n", sp_graph->number_of_vertices, sp_graph->source->name);
@@ -326,7 +326,7 @@ vertex_t **compute_optimal_SP_traversal(graph_t  *sp_graph, SP_tree_t *tree) {
   }
   final_schedule[next_index++] = sp_graph->target;
   //fprintf(stderr,"copying node %d/%d: %s\n",next_index-1, sp_graph->number_of_vertices, sp_graph->target->name);
-  assert(next_index==sp_graph->number_of_vertices);
+  assert(next_index==sp_graph->vertices_by_id.size());
 
   free_schedule(rec_result.schedule_before_min_cut);
   free_schedule(rec_result.schedule_after_min_cut);

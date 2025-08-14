@@ -2,11 +2,8 @@
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
-#include <set>
-#include <vector>
 
 #include <csignal>
-#include <cstring>
 
 #include "csv/single_include/csv2/csv2.hpp"
 #include "fonda_scheduler/DynamicSchedulerHeader.hpp"
@@ -40,12 +37,12 @@
 // 100000000 100 1 1 chipseq_2000 3793245764 1 yes ../ machines.csv
 // 1000000 100 1 0.001 eager_2000 25705994498 1 no ../ machines.csv
 // 100000000 100 1 0.001 eager 8330435694 1 no ../ machines.csv 3
-int main(int argc, char* argv[])
+int main(const int argc, char* argv[])
 {
     auto start = std::chrono::system_clock::now();
 
     fonda::Options options = fonda::parseOptions(argc, argv);
-    cout << "algo_nr " << options.algoNumber << " " << options.workflowName << " " << "input_size " << options.inputSize << " ";
+    std::cout << "algo_nr " << options.algoNumber << " " << options.workflowName << " " << "input_size " << options.inputSize << " ";
 
     const auto workflow_rows = fonda_scheduler::loadTracesFile(options.pathPrefix + options.tracesFile);
 
@@ -58,7 +55,7 @@ int main(int argc, char* argv[])
     const double biggestMem = imaginedCluster->getMemBiggestFreeProcessor()->getMemorySize();
 
     // QUESTION: Why not reading directly from the options.workflowName?
-    string filename;
+    std::string filename;
     if (options.workflowName.rfind("/home", 0) == 0 || options.workflowName.rfind("/work", 0) == 0) {
         filename = options.workflowName.substr(0, options.workflowName.find("//") + 1) + options.workflowName.substr(options.workflowName.find("//") + 2, options.workflowName.size());
     } else {
@@ -70,19 +67,18 @@ int main(int argc, char* argv[])
         //  }
         filename += options.workflowName;
 
-        size_t pos = filename.find(".dot");
-        if (pos == std::string::npos) {
+        if (const size_t pos = filename.find(".dot"); pos == std::string::npos) {
             filename += ".dot";
         }
     }
 
-    graph_t* graphMemTopology = read_dot_graph(filename.c_str(), NULL, NULL, NULL);
+    graph_t* graphMemTopology = read_dot_graph(filename.c_str(), nullptr, nullptr, nullptr);
     checkForZeroMemories(graphMemTopology);
 
-    unsigned long i1 = options.workflowName.find("//");
-    options.workflowName = i1 == string::npos ? options.workflowName : options.workflowName.substr(i1 + 2, options.workflowName.size());
+    const auto i1 = options.workflowName.find("//");
+    options.workflowName = i1 == std::string::npos ? options.workflowName : options.workflowName.substr(i1 + 2, options.workflowName.size());
     // remove the size from name: atacseq_2000 -> atacseq
-    unsigned long n4 = options.workflowName.find('_');
+    const auto n4 = options.workflowName.find('_');
     options.workflowName = options.workflowName.substr(0, n4);
 
     // 10, 100                                                               memShorteningDivision, ioShorteningCoef
@@ -97,18 +93,18 @@ int main(int argc, char* argv[])
     std::chrono::duration<double> elapsed_seconds = end - start;
     // std::cout << " duration_of_prep " << elapsed_seconds.count()<<" ";// << endl;
 
-    vector<Assignment*> assignments;
-    cout << std::setprecision(15);
+    std::cout << std::setprecision(15);
+    std::clog << std::setprecision(15);
 
     start = std::chrono::system_clock::now();
     double runtimeDynamic = 0;
-    double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.algoNumber == 0, options.deviationModel, true /* usePreemptiveWrites */, runtimeDynamic);
+    double d = dynMedih(graphMemTopology, actualCluster /* cluster */, options.algoNumber, options.deviationModel, true /* usePreemptiveWrites */, runtimeDynamic);
     end = std::chrono::system_clock::now();
     elapsed_seconds = end - start;
 
     events.deleteAll();
     std::cout << " duration_of_algorithm " << runtimeDynamic << " "; // << endl;
-    cout << "makespan_1 " << d << "\t";
+    std::cout << "makespan_1 " << d << "\t";
 
     delete actualCluster;
     actualCluster = Fonda::buildClusterFromCsv(options.pathPrefix + options.machinesFile, options.memoryMultiplicator, options.readWritePenalty, options.offloadPenalty, options.speedMultiplicator);
@@ -116,11 +112,11 @@ int main(int argc, char* argv[])
     clearGraph(graphMemTopology);
     start = std::chrono::system_clock::now();
     double runtimeStatic = 0;
-    d = medih(graphMemTopology, options.algoNumber, options.algoNumber == 0, runtimeStatic);
+    d = medih(graphMemTopology, options.algoNumber, runtimeStatic);
     end = std::chrono::system_clock::now();
     elapsed_seconds = end - start;
     std::cout << " duration_of_algorithm " << runtimeStatic << " "; // << endl;
-    cout << "makespan_2 " << d << endl;
+    std::cout << "makespan_2 " << d << '\n';
 
     delete graphMemTopology;
     delete imaginedCluster;

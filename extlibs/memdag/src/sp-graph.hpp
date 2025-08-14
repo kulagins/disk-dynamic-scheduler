@@ -48,7 +48,7 @@ graph_t *SP_tree_to_graph(SP_tree_t *tree);
 SP_tree_t *build_SP_decomposition_tree(graph_t *graph);
 vertex_t **compute_optimal_SP_traversal(graph_t  *sp_graph, SP_tree_t *tree);
 
-graph_t *graph_sp_ization(graph_t *graph);
+graph_t *graph_sp_ization(const graph_t *graph);
 
 ///\endcond
 #endif
